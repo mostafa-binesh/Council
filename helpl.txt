@@ -1,0 +1,1 @@
+user agent: 	dev.Get("/userAgent", func(c *fiber.Ctx) error { return c.JSON(fiber.Map{"msg": c.Get("User-Agent")}) })
