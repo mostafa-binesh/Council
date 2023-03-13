@@ -10,7 +10,7 @@ COPY go.sum ./
 # RUN go install -v ./...
 RUN go mod download
 # COPY . . // copy all files
-COPY *.go ./
+COPY . .
 RUN go build -o /docker
 EXPOSE 8070
 CMD [ "/docker" ]

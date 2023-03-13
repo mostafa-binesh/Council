@@ -7,10 +7,11 @@ import (
 	// "github.com/google/uuid"
 )
 
-// ! the model that been used for migration and retreive and add data to the database
+// ! the model that been used for migration and retrieve and add data to the database
 type User struct {
 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
-	ID       uint   `gorm:"primary_key"`
+	// gorm.Model
+	ID       uint   `gorm:"primaryKey"`
 	Name     string `gorm:"type:varchar(100);not null"`
 	Email    string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password string `gorm:"type:varchar(100);not null"`

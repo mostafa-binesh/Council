@@ -2,8 +2,10 @@ package controllers
 
 import (
 	D "docker/database"
-	// S "docker/database/seeders"
+	S "docker/database/seeders"
 	M "docker/models"
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -11,9 +13,10 @@ import (
 func AutoMigrate(c *fiber.Ctx) error {
 	err := D.DB().AutoMigrate(&M.User{}, &M.Law{}, &M.Comment{}, &M.UserMigration{}, &M.Keyword{})
 	if err != nil {
-		return c.SendString(err.Error())
+		return c.Status(400).SendString(err.Error())
 	}
+	fmt.Println("Tables migration done...")
 	// ! seeders
-	// S.UserSeeder()
+	S.InitSeeder()
 	return c.SendString("migrate completed")
 }

@@ -2,7 +2,7 @@ package routes
 
 import (
 	C "docker/controllers"
-	U "docker/utils"
+	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,7 +13,10 @@ func RouterInit() {
 		AppName:      "Authentication with Gorm Validation v0.1",
 	})
 	// routes
-	router.Get("/", func(c *fiber.Ctx) error { return c.JSON(fiber.Map{"msg": "hello world"}) })
+	router.Get("/", func(c *fiber.Ctx) error { return c.JSON(fiber.Map{"version": "0.11"}) })
+	// ! laws route
+	laws := router.Group("/laws")
+	laws.Get("/", C.AllLaws)
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)
@@ -24,6 +27,6 @@ func RouterInit() {
 	// ! dashboard routes
 	dashboard := router.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
-	APP_PORT, _ := U.Env("APP_PORT")
-	router.Listen(":" + APP_PORT)
+	// APP_PORT, _ := U.Env("APP_PORT")
+	router.Listen(":" + "8070")
 }
