@@ -1,17 +1,23 @@
 package utils
 
 import (
-	env "github.com/joho/godotenv"
+	"fmt"
 	"os"
+
+	env "github.com/joho/godotenv"
 )
 
-func Env(key string) (string, error) {
+func Env(key string) string {
 	// load .env file
 	err := env.Load(".env")
 	if err != nil {
-		return "", err
+		value, ok := os.LookupEnv(key)
+		if !ok {
+			panic(fmt.Sprintf("can't get env variable: %s", key))
+		}
+		return value
 	}
-	return os.Getenv(key), nil
+	return os.Getenv(key)
 }
 
 // func GetEnv(c *fiber.Ctx) error {

@@ -2,8 +2,10 @@ package routes
 
 import (
 	C "docker/controllers"
+	U "docker/utils"
 	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func RouterInit() {
@@ -12,8 +14,15 @@ func RouterInit() {
 		ServerHeader: "Kurox",
 		AppName:      "Authentication with Gorm Validation v0.1",
 	})
+	router.Use(cors.New())
 	// routes
-	router.Get("/", func(c *fiber.Ctx) error { return c.JSON(fiber.Map{"version": "0.11"}) })
+	router.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"version":     "0.121",
+			"lastChange":  "added cors",
+			"envVariable": U.Env("APP_PORT"),
+		})
+	})
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)

@@ -13,6 +13,12 @@ type Law struct {
 	Image              string     `json:"image" gorm:"type:varchar(255);not null"`
 	CreatedAt          *time.Time `json:"createdAt" gorm:"not null;default:now()"`
 }
+type LawMinimal struct {
+	ID        uint       `json:"id"`
+	Title     string     `json:"title"`
+	Image     string     `json:"image"`
+	CreatedAt *time.Time `json:"createdAt"`
+}
 type Comment struct {
 	ID              uint   `gorm:"primary_key"`
 	Body            string `gorm:"type:text;not null"`

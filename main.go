@@ -21,12 +21,9 @@ func main() {
 		Expiration:     time.Hour * 5,
 		KeyGenerator: func() string {
 			// secretKey, err := C.GetEnvVar("SESSION_SECRET_KEY")
-			secretKey, err := U.Env("SESSION_SECRET_KEY")
-			if err != nil {
-				panic(err)
-			}
+			secretKey := U.Env("SESSION_SECRET_KEY")
 			var sessionID string
-			sessionID, err = C.GenerateSessionID(secretKey)
+			sessionID, err := C.GenerateSessionID(secretKey)
 			if err != nil {
 				panic(err)
 			}
