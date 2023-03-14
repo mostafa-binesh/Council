@@ -3,3 +3,4 @@
 .env.liara
 .env.local
 
+docker.exe
