@@ -35,11 +35,11 @@ func ConnectToDB() {
 			Colorful:                  false,       // Disable color
 		},
 	)
-	DB_SERVER, _ := U.Env("DB_SERVER") // localhost name and port
-	DB_USERNAME, _ := U.Env("DB_USERNAME")
-	DB_PASSWORD, _ := U.Env("DB_PASSWORD")
-	DB_NAME, _ := U.Env("DB_NAME") // database name
-	DB_PORT, _ := U.Env("DB_PORT")
+	DB_SERVER := U.Env("DB_SERVER") // localhost name and port
+	DB_USERNAME := U.Env("DB_USERNAME")
+	DB_PASSWORD := U.Env("DB_PASSWORD")
+	DB_NAME := U.Env("DB_NAME") // database name
+	DB_PORT := U.Env("DB_PORT")
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", DB_USERNAME, DB_PASSWORD, DB_SERVER, DB_PORT, DB_NAME)
 	gormDatabase, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,

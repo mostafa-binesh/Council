@@ -51,3 +51,17 @@ func AllLaws(c *fiber.Ctx) error {
 		},
 	})
 }
+func Search(c *fiber.Ctx)error  {
+	laws := []M.Law{}
+	if c.FormValue("startDate")=="" || c.FormValue("endDate")==""{
+		return c.Status(400).JSON(fiber.Map{
+			"error": "هر دو تاریخ را پر کنید",
+		},)
+	}
+	D.DB().Where("notification_date BETWEEN ? AND ?" , c.FormValue("startDate"),c.FormValue("endDate")).Find(&laws)
+	return c.JSON(fiber.Map{
+		"data" : fiber.Map{
+			"law": laws,
+		},
+	})
+}
