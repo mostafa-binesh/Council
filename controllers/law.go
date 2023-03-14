@@ -88,6 +88,14 @@ func LawSearch(c *fiber.Ctx) error {
 		D.DB().Where("notification_date BETWEEN ? AND ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
 		// ! only title exists
 	} else if c.FormValue("startDate") == "" &&
+		c.FormValue("endDate") != "" &&
+		c.FormValue("title") != "" {
+		D.DB().Where("notification_date >= ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+	} else if c.FormValue("startDate") != "" &&
+		c.FormValue("endDate") == "" &&
+		c.FormValue("title") != "" {
+		D.DB().Where("notification_date <= ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+	} else if c.FormValue("startDate") == "" &&
 		c.FormValue("endDate") == "" &&
 		c.FormValue("title") != "" {
 		D.DB().Where("title LIKE ?", fmt.Sprintf("%%%s%%", c.FormValue("title"))).Find(&laws)
@@ -98,7 +106,7 @@ func LawSearch(c *fiber.Ctx) error {
 		D.DB().Where("title LIKE ? AND notification_date BETWEEN ? AND ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
 			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
 	} else {
-		return U.ResErr(c,"")
+		return U.ResErr(c, "")
 	}
 	return c.JSON(fiber.Map{
 		"data": laws,
