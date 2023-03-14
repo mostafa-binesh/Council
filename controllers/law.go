@@ -53,16 +53,61 @@ func AllLaws(c *fiber.Ctx) error {
 		},
 	})
 }
-func Search(c *fiber.Ctx)error  {
-	laws := []M.Law{}
-	if c.FormValue("startDate")=="" || c.FormValue("endDate")==""{
-		return c.Status(400).JSON(fiber.Map{
-			"error": "هر دو تاریخ را پر کنید",
-		},)
-	}
-	D.DB().Where("notification_date BETWEEN ? AND ?" , c.FormValue("startDate"),c.FormValue("endDate")).Find(&laws)
+func LawsEnactments(c *fiber.Ctx)error  {
+	enactments := M.Law{}
+	D.DB().Where("Type = ?", 3).Find(&enactments)
 	return c.JSON(fiber.Map{
 		"data" : fiber.Map{
+			"enactments":enactments,
+		},
+	})
+}
+func LawsStatutes(c *fiber.Ctx)error  {
+	statutes := M.Law{}
+	D.DB().Where("Type = ?", 2).Find(&statutes)
+	return c.JSON(fiber.Map{
+		"data" : fiber.Map{
+			"statutes":statutes,
+		},
+	})
+}
+func LawsRegulations(c *fiber.Ctx)error  {
+	regulations := M.Law{}
+	D.DB().Where("Type = ?", 1).Find(&regulations)
+	return c.JSON(fiber.Map{
+		"data" : fiber.Map{
+			"regulations":regulations,
+		},
+	})
+}
+func LawsSearch(c *fiber.Ctx) error {
+	laws := []M.Law{}
+	if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" || c.FormValue("title") == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "لطفا تاریخ ها یا عنوان را پر کنید ",
+		})
+	}
+	if c.FormValue("titel") == "" {
+		D.DB().Where("notification_date BETWEEN ? AND ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+		return c.JSON(fiber.Map{
+			"data": fiber.Map{
+				"law": laws,
+			},
+		})
+	}
+	if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" {
+		D.DB().Where("title = ?", c.FormValue("title")).Find(&laws)
+		return c.JSON(fiber.Map{
+			"data": fiber.Map{
+				"law": laws,
+			},
+		})
+	}
+
+	D.DB().Where("title = ? AND notification_date BETWEEN ? AND ?", c.FormValue("title"),
+		c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+	return c.JSON(fiber.Map{
+		"data": fiber.Map{
 			"law": laws,
 		},
 	})
