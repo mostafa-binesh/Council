@@ -32,33 +32,34 @@ type Comment struct {
 	ID              uint   `gorm:"primary_key"`
 	Body            string `gorm:"type:text;not null"`
 	UserID          uint
-	User            UserMigration `gorm:"foreignKey:UserID"`
-	ParentCommentID uint          // `gorm:"foreignKey:UserID"`
-	ParentComment   *Comment      `gorm:"foreignKey:ParentCommentID"`
-	CreatedAt       *time.Time    `gorm:"not null;default:now()"`
-	UpdatedAt       *time.Time    `json:"updatedAt" gorm:"not null;default:now()"`
+	User            User       `gorm:"foreignKey:UserID"`
+	ParentCommentID uint       // `gorm:"foreignKey:UserID"`
+	ParentComment   *Comment   `gorm:"foreignKey:ParentCommentID"`
+	CreatedAt       *time.Time `gorm:"not null;default:now()"`
+	UpdatedAt       *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
-type UserMigration struct {
-	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
-	ID          uint       `gorm:"primary_key"`
-	Name        string     `gorm:"type:varchar(255);not null"`
-	LastName    string     `gorm:"type:varchar(255);not null"`
-	Username    string     `gorm:"type:varchar(255);not null"`
-	PhoneNumber string     `gorm:"type:varchar(255);not null"`
-	Email       string     `gorm:"type:varchar(255);not null"`
-	Password    string     `gorm:"type:varchar(255);not null"`
-	CreatedAt   *time.Time `gorm:"not null;default:now()"`
-	UpdatedAt   *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
-}
+
+// type UserMigration struct {
+// 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+// 	ID          uint       `gorm:"primary_key"`
+// 	Name        string     `gorm:"type:varchar(255);not null"`
+// 	LastName    string     `gorm:"type:varchar(255);not null"`
+// 	Username    string     `gorm:"type:varchar(255);not null"`
+// 	PhoneNumber string     `gorm:"type:varchar(255);not null"`
+// 	Email       string     `gorm:"type:varchar(255);not null"`
+// 	Password    string     `gorm:"type:varchar(255);not null"`
+// 	CreatedAt   *time.Time `gorm:"not null;default:now()"`
+// 	UpdatedAt   *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
+// }
 
 type Keyword struct {
 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ID        uint   `gorm:"primary_key"`
 	Body      string `gorm:"type:varchar(255);not null"`
 	UserID    uint
-	User      UserMigration `gorm:"foreignKey:UserID;not null"`
-	CreatedAt *time.Time    `gorm:"not null;default:now()"`
-	UpdatedAt *time.Time    `json:"updatedAt" gorm:"not null;default:now()"`
+	User      User       `gorm:"foreignKey:UserID;not null"`
+	CreatedAt *time.Time `gorm:"not null;default:now()"`
+	UpdatedAt *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type Attachment struct {
 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`

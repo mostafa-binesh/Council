@@ -111,6 +111,7 @@ func LawsSearch(c *fiber.Ctx) error {
 			"law": laws,
 		},
 	})
+
 }
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}

@@ -16,6 +16,8 @@ type User struct {
 	Email    string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password string `gorm:"type:varchar(100);not null"`
 	Role     uint   `gorm:"default:1;not null"`
+	City     string `gorm:"type:varchar(100);not null"`
+
 	// Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`
 	// Photo     *string    `gorm:"not null;default:'default.png'"`
 	// Verified  *bool      `gorm:"not null;default:false"`
