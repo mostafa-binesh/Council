@@ -22,7 +22,7 @@ func AllLaws(c *fiber.Ctx) error {
 				ID:               laws[i].ID,
 				Title:            laws[i].Title,
 				Image:            laws[i].Image,
-				NotificationDate: laws[i].CreatedAt,
+				NotificationDate: laws[i].NotificationDate,
 			})
 		}
 	}
@@ -33,7 +33,7 @@ func AllLaws(c *fiber.Ctx) error {
 				Title:            laws[i].Title,
 				Image:            laws[i].Image,
 				SessionNumber:    laws[i].SessionNumber,
-				NotificationDate: laws[i].CreatedAt,
+				NotificationDate: laws[i].NotificationDate,
 			})
 		}
 	}
@@ -43,7 +43,7 @@ func AllLaws(c *fiber.Ctx) error {
 				ID:               laws[i].ID,
 				Title:            laws[i].Title,
 				Image:            laws[i].Image,
-				NotificationDate: laws[i].CreatedAt,
+				NotificationDate: laws[i].NotificationDate,
 			})
 		}
 	}
@@ -108,8 +108,16 @@ func LawSearch(c *fiber.Ctx) error {
 	} else {
 		return U.ResErr(c, "")
 	}
+	pass_data :=[] M.LawMinimal_min{}
+	for i := 0; i < len(laws); i++ {
+		pass_data = append(pass_data, M.LawMinimal_min{
+			ID:               laws[i].ID,
+			Title:            laws[i].Title,
+			Image:            laws[i].Image,
+		})
+	}
 	return c.JSON(fiber.Map{
-		"data": laws,
+		"data": pass_data,
 	})
 	// else if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" {
 	// 	D.DB().Where("title LIKE %?%", c.FormValue("title")).Find(&laws)

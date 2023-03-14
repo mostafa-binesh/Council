@@ -36,6 +36,11 @@ type LawMinimal struct {
 	Image            string    `json:"image"`
 	NotificationDate time.Time `json:"date"`
 }
+type LawMinimal_min struct{
+	ID               uint      `json:"id"`
+	Title            string    `json:"title"`
+	Image            string    `json:"image"`
+}
 type LawStatutesMinimal struct {
 	ID               uint      `json:"id"`
 	Title            string    `json:"title"`
