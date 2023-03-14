@@ -89,31 +89,46 @@ func LawSearch(c *fiber.Ctx) error {
 		// ! only title exists
 	} else if c.FormValue("startDate") == "" &&
 		c.FormValue("endDate") != "" &&
-		c.FormValue("title") != "" {
-		D.DB().Where("notification_date >= ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+		c.FormValue("title") == "" {
+		D.DB().Where("notification_date <= ?", c.FormValue("endDate")).Find(&laws)
+		// ! only end date
 	} else if c.FormValue("startDate") != "" &&
 		c.FormValue("endDate") == "" &&
-		c.FormValue("title") != "" {
-		D.DB().Where("notification_date <= ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+		c.FormValue("title") == "" {
+		D.DB().Where("notification_date >= ?", c.FormValue("startDate")).Find(&laws)
+		// ! only start date
 	} else if c.FormValue("startDate") == "" &&
 		c.FormValue("endDate") == "" &&
 		c.FormValue("title") != "" {
 		D.DB().Where("title LIKE ?", fmt.Sprintf("%%%s%%", c.FormValue("title"))).Find(&laws)
-		// ! everything exists
+		// ! only title exists
+	} else if c.FormValue("startDate") == "" &&
+		c.FormValue("endDate") != "" &&
+		c.FormValue("title") != "" {
+		D.DB().Where("title LIKE ? AND notification_date <= ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
+			c.FormValue("endDate")).Find(&laws)
+		// ! both enddate and title
+	} else if c.FormValue("startDate") != "" &&
+		c.FormValue("endDate") == "" &&
+		c.FormValue("title") != "" {
+		D.DB().Where("title LIKE ? AND notification_date >= ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
+			c.FormValue("startDate")).Find(&laws)
+		// ! both startDate and title
 	} else if c.FormValue("startDate") != "" &&
 		c.FormValue("endDate") != "" &&
 		c.FormValue("title") != "" {
 		D.DB().Where("title LIKE ? AND notification_date BETWEEN ? AND ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
-			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+		c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+		// ! evry thing exist
 	} else {
 		return U.ResErr(c, "")
 	}
-	pass_data :=[] M.LawMinimal_min{}
+	pass_data := []M.LawMinimal_min{}
 	for i := 0; i < len(laws); i++ {
 		pass_data = append(pass_data, M.LawMinimal_min{
-			ID:               laws[i].ID,
-			Title:            laws[i].Title,
-			Image:            laws[i].Image,
+			ID:    laws[i].ID,
+			Title: laws[i].Title,
+			Image: laws[i].Image,
 		})
 	}
 	return c.JSON(fiber.Map{
