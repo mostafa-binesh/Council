@@ -3,6 +3,7 @@ package routes
 import (
 	C "docker/controllers"
 	U "docker/utils"
+
 	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -27,8 +28,10 @@ func RouterInit() {
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)
 	laws.Post("/search", C.LawSearch)
-	
-	laws.Get("/:id", C.LawByID)
+	laws.Get("/regulations", C.LawRegulations)
+	laws.Get("/statutes", C.LawStatutes)
+	laws.Get("/enactments", C.LawEnactments)
+	laws.Get("/:id", C.LawByID) // get certain law by id
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)

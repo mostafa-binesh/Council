@@ -53,63 +53,44 @@ func AllLaws(c *fiber.Ctx) error {
 		},
 	})
 }
-func LawsEnactments(c *fiber.Ctx)error  {
-	enactments := M.Law{}
-	D.DB().Where("Type = ?", 3).Find(&enactments)
+func LawEnactments(c *fiber.Ctx) error {
+	enactments := []M.Law{}
+	D.DB().Where("type = ?", 3).Find(&enactments)
 	return c.JSON(fiber.Map{
-		"data" : fiber.Map{
-			"enactments":enactments,
-		},
+		"data": enactments,
 	})
 }
-func LawsStatutes(c *fiber.Ctx)error  {
-	statutes := M.Law{}
-	D.DB().Where("Type = ?", 2).Find(&statutes)
+func LawStatutes(c *fiber.Ctx) error {
+	statutes := []M.Law{}
+	D.DB().Where("type = ?", 2).Find(&statutes)
 	return c.JSON(fiber.Map{
-		"data" : fiber.Map{
-			"statutes":statutes,
-		},
+		"data": statutes,
 	})
 }
-func LawsRegulations(c *fiber.Ctx)error  {
-	regulations := M.Law{}
-	D.DB().Where("Type = ?", 1).Find(&regulations)
+func LawRegulations(c *fiber.Ctx) error {
+	regulations := []M.Law{}
+	D.DB().Where("type = ?", 1).Find(&regulations)
 	return c.JSON(fiber.Map{
-		"data" : fiber.Map{
-			"regulations":regulations,
-		},
+		"data": regulations,
 	})
 }
-func LawsSearch(c *fiber.Ctx) error {
+func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" || c.FormValue("title") == "" {
-		return c.Status(400).JSON(fiber.Map{
-			"error": "لطفا تاریخ ها یا عنوان را پر کنید ",
-		})
+		U.ResErr(c, "لطفا تاریخ ها یا عنوان را پر کنید")
 	}
-	if c.FormValue("titel") == "" {
+	// ! if title doesn't exist
+	if c.FormValue("title") == "" {
 		D.DB().Where("notification_date BETWEEN ? AND ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
-		return c.JSON(fiber.Map{
-			"data": fiber.Map{
-				"law": laws,
-			},
-		})
+	} else {
+		D.DB().Where("title = ? AND notification_date BETWEEN ? AND ?", c.FormValue("title"),
+			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
 	}
-	if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" {
-		D.DB().Where("title = ?", c.FormValue("title")).Find(&laws)
-		return c.JSON(fiber.Map{
-			"data": fiber.Map{
-				"law": laws,
-			},
-		})
-	}
-
-	D.DB().Where("title = ? AND notification_date BETWEEN ? AND ?", c.FormValue("title"),
-		c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+	// if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" {
+	// 	D.DB().Where("title = ?", c.FormValue("title")).Find(&laws)
+	// }
 	return c.JSON(fiber.Map{
-		"data": fiber.Map{
-			"law": laws,
-		},
+		"data": laws,
 	})
 
 }
