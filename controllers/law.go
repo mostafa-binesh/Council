@@ -3,7 +3,7 @@ package controllers
 import (
 	D "docker/database"
 	M "docker/models"
-
+	U "docker/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -56,9 +56,7 @@ func AllLaws(c *fiber.Ctx) error {
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}
 	if err := D.DB().First(law, c.Params("id")).Error; err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": "یافت نشد",
-		})
+		return U.DBError(c, err)
 	}
 	return c.JSON(fiber.Map{
 		"data": law,
