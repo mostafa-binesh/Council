@@ -26,6 +26,7 @@ func RouterInit() {
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)
+	laws.Get("/:id", C.LawByID)
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)

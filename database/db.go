@@ -7,8 +7,6 @@ import (
 	"time"
 
 	U "docker/utils"
-	// "gorm.io/driver/mysql"
-	// U "docker/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -32,7 +30,7 @@ func ConnectToDB() {
 			SlowThreshold:             time.Second, // Slow SQL threshold
 			LogLevel:                  logger.Info, // Log level
 			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,       // Disable color
+			Colorful:                  true,        // Disable color
 		},
 	)
 	DB_SERVER := U.Env("DB_SERVER") // localhost name and port
@@ -41,13 +39,14 @@ func ConnectToDB() {
 	DB_NAME := U.Env("DB_NAME") // database name
 	DB_PORT := U.Env("DB_PORT")
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", DB_USERNAME, DB_PASSWORD, DB_SERVER, DB_PORT, DB_NAME)
+	fmt.Printf("connection string: %s", dsn)
 	gormDatabase, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {
 		panic("Failed to connect to the database")
 	}
-	fmt.Printf("database connection stablished.")
+	fmt.Printf("database connection stablished.\n")
 }
 func RowsCount(query string, searchValue string) int {
 	rows, err := gormDatabase.Raw(query, searchValue).Rows()
