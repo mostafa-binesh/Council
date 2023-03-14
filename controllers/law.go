@@ -5,6 +5,8 @@ import (
 	M "docker/models"
 	U "docker/utils"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -118,7 +120,7 @@ func LawSearch(c *fiber.Ctx) error {
 		c.FormValue("endDate") != "" &&
 		c.FormValue("title") != "" {
 		D.DB().Where("title LIKE ? AND notification_date BETWEEN ? AND ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
-		c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
 		// ! evry thing exist
 	} else {
 		return U.ResErr(c, "")
@@ -161,5 +163,49 @@ func LawByID(c *fiber.Ctx) error {
 	// law.Comments = M.GetMinimalComment(GetMinimalComment)
 	return c.JSON(fiber.Map{
 		"data": lawWithComment,
+	})
+}
+
+// Type               int       `json:"type" gorm:"type:int;not null"`
+//
+//	Title              string    `json:"title" gorm:"type:varchar(100);not null"`
+//	SessionNumber      int       `json:"sessionNumber" gorm:"type:int;not null"`
+//	SessionDate        time.Time `json:"sessionDate" gorm:"not null;default:now()"`      // ! change default now later
+//	NotificationDate   time.Time `json:"notificationDate" gorm:"not null;default:now()"` // ! change default now later
+//	NotificationNumber string    `json:"notificationNumber" gorm:"not null"`
+//	Body               string    `json:"body" gorm:"type:text;not null"`
+//	Image
+func CreateLaw(c *fiber.Ctx) error {
+	if c.FormValue("type") == "" || c.FormValue("sessionNumber") == "" || c.FormValue("sessionDate") == "" ||
+		c.FormValue("notificationDate") == "" || c.FormValue("title") == "" ||
+		c.FormValue("notificationNumber") == "" || c.FormValue("body") == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "لطفا تمام فیلد ها را پر کنید",
+		})
+	}
+	tp, err := strconv.Atoi(c.FormValue("type"))
+	sNumber, err := strconv.Atoi(c.FormValue("sessionNumber"))
+	sDate, err := time.Parse("2006-01-02", c.FormValue("sessionDate"))
+	nDate, err := time.Parse("2006-01-02", c.FormValue("notificationDate"))
+	if err != nil {
+	}
+	result := D.DB().Create(&M.Law{
+		Type:               tp,
+		Title:              c.FormValue("title"),
+		SessionNumber:      sNumber,
+		SessionDate:        sDate,
+		NotificationDate:   nDate,
+		NotificationNumber: c.FormValue("notificationNumber"),
+		Body:               c.FormValue("body"),
+		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+	})
+
+	if result.Error != nil {
+		return c.JSON(fiber.Map{
+			"message": "خطایی در اضافه کردن مصوبه پیش آمده است.",
+		})
+	}
+	return c.JSON(fiber.Map{
+		"message": "مصوبه با موفقیت اضافه شد",
 	})
 }
