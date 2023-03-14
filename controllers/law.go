@@ -4,6 +4,8 @@ import (
 	D "docker/database"
 	M "docker/models"
 	U "docker/utils"
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -76,22 +78,28 @@ func LawRegulations(c *fiber.Ctx) error {
 }
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
-	if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" || c.FormValue("title") == "" {
+	// ! nothing exist
+	if c.FormValue("startDate") == "" && c.FormValue("endDate") == "" && c.FormValue("title") == "" {
 		U.ResErr(c, "لطفا تاریخ ها یا عنوان را پر کنید")
-	}
-	// ! if title doesn't exist
-	if c.FormValue("title") == "" {
+		// ! only dates exist
+	} else if c.FormValue("startDate") != "" &&
+		c.FormValue("endDate") != "" &&
+		c.FormValue("title") == "" {
 		D.DB().Where("notification_date BETWEEN ? AND ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+		// ! only title exist
+	} else if c.FormValue("startDate") == "" && c.FormValue("endDate") == "" && c.FormValue("title") != "" {
+		D.DB().Where("title LIKE ?", fmt.Sprintf("%%%s%%", c.FormValue("title"))).Find(&laws)
 	} else {
-		D.DB().Where("title = ? AND notification_date BETWEEN ? AND ?", c.FormValue("title"),
+		D.DB().Where("title LIKE ? AND notification_date BETWEEN ? AND ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
 			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+
 	}
-	// if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" {
-	// 	D.DB().Where("title = ?", c.FormValue("title")).Find(&laws)
-	// }
 	return c.JSON(fiber.Map{
 		"data": laws,
 	})
+	// else if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" {
+	// 	D.DB().Where("title LIKE %?%", c.FormValue("title")).Find(&laws)
+	// }
 
 }
 func LawByID(c *fiber.Ctx) error {

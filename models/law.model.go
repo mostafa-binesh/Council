@@ -60,7 +60,7 @@ type CommentMinimal struct {
 	ID              uint   `json:"id"`
 	Body            string `json:"body"`
 	FullName        string `json:"fullName"`
-	ParentCommentID uint
+	ParentCommentID uint   `json:"parentCommentID"`
 }
 
 // type UserMigration struct {
