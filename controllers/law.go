@@ -78,21 +78,27 @@ func LawRegulations(c *fiber.Ctx) error {
 }
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
-	// ! nothing exist
+	// ! nothing exists
 	if c.FormValue("startDate") == "" && c.FormValue("endDate") == "" && c.FormValue("title") == "" {
 		U.ResErr(c, "لطفا تاریخ ها یا عنوان را پر کنید")
-		// ! only dates exist
+		// ! only dates exists
 	} else if c.FormValue("startDate") != "" &&
 		c.FormValue("endDate") != "" &&
 		c.FormValue("title") == "" {
 		D.DB().Where("notification_date BETWEEN ? AND ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
-		// ! only title exist
-	} else if c.FormValue("startDate") == "" && c.FormValue("endDate") == "" && c.FormValue("title") != "" {
+		// ! only title exists
+	} else if c.FormValue("startDate") == "" &&
+		c.FormValue("endDate") == "" &&
+		c.FormValue("title") != "" {
 		D.DB().Where("title LIKE ?", fmt.Sprintf("%%%s%%", c.FormValue("title"))).Find(&laws)
-	} else {
+		// ! everything exists
+	} else if c.FormValue("startDate") != "" &&
+		c.FormValue("endDate") != "" &&
+		c.FormValue("title") != "" {
 		D.DB().Where("title LIKE ? AND notification_date BETWEEN ? AND ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
 			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
-
+	} else {
+		return U.ResErr(c,"")
 	}
 	return c.JSON(fiber.Map{
 		"data": laws,
