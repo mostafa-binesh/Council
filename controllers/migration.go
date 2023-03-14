@@ -11,7 +11,7 @@ import (
 
 // ! add any migration that you wanna add to the database
 func AutoMigrate(c *fiber.Ctx) error {
-	err := D.DB().AutoMigrate(&M.User{}, &M.Law{}, &M.Comment{}, &M.UserMigration{}, &M.Keyword{})
+	err := D.DB().AutoMigrate(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{})
 	if err != nil {
 		return c.Status(400).SendString(err.Error())
 	}
