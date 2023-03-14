@@ -96,10 +96,25 @@ func LawSearch(c *fiber.Ctx) error {
 }
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}
-	if err := D.DB().First(law, c.Params("id")).Error; err != nil {
-		return U.DBError(c, err)
+	if err := D.DB().Preload("Comments.User").First(law, c.Params("id")).Error; err != nil {
+		return c.SendString(err.Error())
+		// return U.DBError(c, err)
 	}
+	lawWithComment := M.LawWithMinimalComment{}
+	lawWithComment.ID = law.ID
+	lawWithComment.Type = law.Type
+	lawWithComment.Title = law.Title
+	lawWithComment.SessionNumber = law.SessionNumber
+	lawWithComment.SessionDate = law.SessionDate
+	lawWithComment.NotificationDate = law.NotificationDate
+	lawWithComment.NotificationNumber = law.NotificationNumber
+	lawWithComment.Body = law.Body
+	lawWithComment.Image = law.Image
+	lawWithComment.Comments = M.GetMinimalComment(law.Comments)
+	lawWithComment.CreatedAt = law.CreatedAt
+	lawWithComment.UpdatedAt = law.UpdatedAt
+	// law.Comments = M.GetMinimalComment(GetMinimalComment)
 	return c.JSON(fiber.Map{
-		"data": law,
+		"data": lawWithComment,
 	})
 }
