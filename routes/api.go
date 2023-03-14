@@ -27,7 +27,7 @@ func RouterInit() {
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)
-	laws.Post("/search", C.LawsSearch)
+	laws.Post("/search", C.LawSearch)
 	laws.Get("/regulations", C.LawRegulations)
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
