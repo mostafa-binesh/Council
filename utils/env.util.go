@@ -19,11 +19,3 @@ func Env(key string) string {
 	}
 	return os.Getenv(key)
 }
-
-// func GetEnv(c *fiber.Ctx) error {
-// 	secretKey, err := GetEnvVar("SESSION_SECRET_KEY")
-// 	if err != nil {
-// 		c.SendString("get env. variable error")
-// 	}
-// 	return c.SendString(secretKey)
-// }
