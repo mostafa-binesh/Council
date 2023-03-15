@@ -6,6 +6,7 @@ import (
 	U "docker/utils"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -166,15 +167,6 @@ func LawByID(c *fiber.Ctx) error {
 	})
 }
 
-// Type               int       `json:"type" gorm:"type:int;not null"`
-//
-//	Title              string    `json:"title" gorm:"type:varchar(100);not null"`
-//	SessionNumber      int       `json:"sessionNumber" gorm:"type:int;not null"`
-//	SessionDate        time.Time `json:"sessionDate" gorm:"not null;default:now()"`      // ! change default now later
-//	NotificationDate   time.Time `json:"notificationDate" gorm:"not null;default:now()"` // ! change default now later
-//	NotificationNumber string    `json:"notificationNumber" gorm:"not null"`
-//	Body               string    `json:"body" gorm:"type:text;not null"`
-//	Image
 func CreateLaw(c *fiber.Ctx) error {
 	if c.FormValue("type") == "" || c.FormValue("sessionNumber") == "" || c.FormValue("sessionDate") == "" ||
 		c.FormValue("notificationDate") == "" || c.FormValue("title") == "" ||
@@ -189,7 +181,7 @@ func CreateLaw(c *fiber.Ctx) error {
 	nDate, err := time.Parse("2006-01-02", c.FormValue("notificationDate"))
 	if err != nil {
 	}
-	result := D.DB().Create(&M.Law{
+	law := M.Law{
 		Type:               tp,
 		Title:              c.FormValue("title"),
 		SessionNumber:      sNumber,
@@ -198,14 +190,29 @@ func CreateLaw(c *fiber.Ctx) error {
 		NotificationNumber: c.FormValue("notificationNumber"),
 		Body:               c.FormValue("body"),
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
-	})
+	}
+	result := D.DB().Create(&law)
 
 	if result.Error != nil {
-		return c.JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"message": "خطایی در اضافه کردن مصوبه پیش آمده است.",
 		})
 	}
-	return c.JSON(fiber.Map{
+	var tags = c.FormValue("tags")
+	var tag = strings.Split(tags, ",")
+	for i := 0; i < len(tag); i++ {
+		result2 := D.DB().Create(&M.Keyword{
+			Word:  tag[i],
+			LawID: law.ID,
+		})
+		if result2.Error != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"message": "خطایی در اضافه کردن تگ ها پیش آمده است.",
+			})
+		}
+	}
+
+	return c.Status(200).JSON(fiber.Map{
 		"message": "مصوبه با موفقیت اضافه شد",
 	})
 }
