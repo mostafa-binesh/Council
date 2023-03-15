@@ -2,6 +2,7 @@ package controllers
 
 import (
 	D "docker/database"
+	F "docker/database/filters"
 	M "docker/models"
 	U "docker/utils"
 	"fmt"
@@ -80,7 +81,7 @@ func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	// ! nothing exists
 	if c.FormValue("startDate") == "" && c.FormValue("endDate") == "" && c.FormValue("title") == "" {
-		U.ResErr(c, "لطفا تاریخ ها یا عنوان را پر کنید")
+		return U.ResErr(c, "لطفا تاریخ ها یا عنوان را پر کنید")
 		// ! only dates exists
 	} else if c.FormValue("startDate") != "" &&
 		c.FormValue("endDate") != "" &&
@@ -118,7 +119,7 @@ func LawSearch(c *fiber.Ctx) error {
 		c.FormValue("endDate") != "" &&
 		c.FormValue("title") != "" {
 		D.DB().Where("title LIKE ? AND notification_date BETWEEN ? AND ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
-		c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
+			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
 		// ! evry thing exist
 	} else {
 		return U.ResErr(c, "")

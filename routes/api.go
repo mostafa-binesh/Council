@@ -2,7 +2,6 @@ package routes
 
 import (
 	C "docker/controllers"
-	U "docker/utils"
 
 	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
@@ -13,21 +12,21 @@ func RouterInit() {
 	router := fiber.New(fiber.Config{
 		// Prefork:       true,
 		ServerHeader: "Kurox",
-		AppName:      "Authentication with Gorm Validation v0.1",
+		AppName:      "Higher Education Council",
 	})
+	// ! add middleware
 	router.Use(cors.New())
 	// routes
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"version":     "0.121",
-			"lastChange":  "added cors",
-			"envVariable": U.Env("APP_PORT"),
+			"msg": "WELCOME",
 		})
 	})
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)
 	laws.Post("/search", C.LawSearch)
+	laws.Get("/advancedLawSearch", C.AdvancedLawSearch)
 	laws.Get("/regulations", C.LawRegulations)
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
