@@ -21,3 +21,10 @@ func ToCamelCase(s string) string {
 	}
 	return result
 }
+func ToSnakeCase(s string) string {
+    s = strings.TrimSpace(s)
+    s = strings.ToLower(s)
+    s = strings.ReplaceAll(s, " ", "_")
+    s = strings.ReplaceAll(s, "-", "_")
+    return s
+}
