@@ -77,6 +77,16 @@ func LawRegulations(c *fiber.Ctx) error {
 		"data": regulations,
 	})
 }
+func AdvancedLawSearch(c *fiber.Ctx) error {
+	laws := []M.Law{}
+	D.DB().Scopes(
+		F.FilterByType(c,
+			F.FilterType{QueryName: "title", Operator: "LIKE"},
+			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="})).
+		Find(&laws)
+	return c.JSON(fiber.Map{"data": laws})
+}
+
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	// ! nothing exists
