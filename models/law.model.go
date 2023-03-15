@@ -84,9 +84,9 @@ type CommentMinimal struct {
 type Keyword struct {
 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ID        uint   `gorm:"primary_key"`
-	Body      string `gorm:"type:varchar(255);not null"`
-	UserID    uint
-	User      User      `gorm:"foreignKey:UserID;not null"`
+	Word      string `gorm:"type:varchar(70);not null"`
+	LawID     uint
+	Law       *Law      `gorm:"foreignKey:LawID"`
 	CreatedAt time.Time `gorm:"not null;default:now()"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }

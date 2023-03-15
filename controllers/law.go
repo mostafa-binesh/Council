@@ -6,6 +6,9 @@ import (
 	M "docker/models"
 	U "docker/utils"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -172,5 +175,55 @@ func LawByID(c *fiber.Ctx) error {
 	// law.Comments = M.GetMinimalComment(GetMinimalComment)
 	return c.JSON(fiber.Map{
 		"data": lawWithComment,
+	})
+}
+
+func CreateLaw(c *fiber.Ctx) error {
+	if c.FormValue("type") == "" || c.FormValue("sessionNumber") == "" || c.FormValue("sessionDate") == "" ||
+		c.FormValue("notificationDate") == "" || c.FormValue("title") == "" ||
+		c.FormValue("notificationNumber") == "" || c.FormValue("body") == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "لطفا تمام فیلد ها را پر کنید",
+		})
+	}
+	tp, err := strconv.Atoi(c.FormValue("type"))
+	sNumber, err := strconv.Atoi(c.FormValue("sessionNumber"))
+	sDate, err := time.Parse("2006-01-02", c.FormValue("sessionDate"))
+	nDate, err := time.Parse("2006-01-02", c.FormValue("notificationDate"))
+	if err != nil {
+	}
+	law := M.Law{
+		Type:               tp,
+		Title:              c.FormValue("title"),
+		SessionNumber:      sNumber,
+		SessionDate:        sDate,
+		NotificationDate:   nDate,
+		NotificationNumber: c.FormValue("notificationNumber"),
+		Body:               c.FormValue("body"),
+		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+	}
+	result := D.DB().Create(&law)
+
+	if result.Error != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "خطایی در اضافه کردن مصوبه پیش آمده است.",
+		})
+	}
+	var tags = c.FormValue("tags")
+	var tag = strings.Split(tags, ",")
+	for i := 0; i < len(tag); i++ {
+		result2 := D.DB().Create(&M.Keyword{
+			Word:  tag[i],
+			LawID: law.ID,
+		})
+		if result2.Error != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"message": "خطایی در اضافه کردن تگ ها پیش آمده است.",
+			})
+		}
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "مصوبه با موفقیت اضافه شد",
 	})
 }

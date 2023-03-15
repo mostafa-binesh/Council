@@ -31,6 +31,7 @@ func RouterInit() {
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
 	laws.Get("/:id", C.LawByID) // get certain law by id
+	laws.Post("/create",C.CreateLaw)
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)
