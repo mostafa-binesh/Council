@@ -6,6 +6,9 @@ import (
 	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	// "github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func RouterInit() {
@@ -16,7 +19,12 @@ func RouterInit() {
 	})
 	// ! add middleware
 	router.Use(cors.New())
-	// routes
+	// router.Use(logger.New())
+	router.Use(recover.New())
+	// #######################
+	// ########## ROUTES #############
+	// #######################
+	// ! routes
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"msg": "WELCOME",
@@ -25,16 +33,19 @@ func RouterInit() {
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)
-	laws.Post("/search", C.LawSearch)
+	laws.Get("/search", C.LawSearch)
 	laws.Get("/advancedLawSearch", C.AdvancedLawSearch)
 	laws.Get("/regulations", C.LawRegulations)
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
-	laws.Get("/:id", C.LawByID) // get certain law by id
-	laws.Post("/create",C.CreateLaw)
+	laws.Get("/:id<int>", C.LawByID) // get certain law by id
+	laws.Post("/create", C.CreateLaw)
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)
+	dev.Get("/translation", C.TranslationTest)
+	dev.Get("/monitor", monitor.New())
+	dev.Get("/panic", func(c *fiber.Ctx) error { panic("PANIC!") })
 	// ! authentication routes
 	router.Post("/signup", C.SignUpUser)
 	router.Post("/login", C.Login)

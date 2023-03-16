@@ -5,7 +5,6 @@ import (
 	F "docker/database/filters"
 	M "docker/models"
 	U "docker/utils"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -92,51 +91,12 @@ func AdvancedLawSearch(c *fiber.Ctx) error {
 
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
-	// ! nothing exists
-	if c.FormValue("startDate") == "" && c.FormValue("endDate") == "" && c.FormValue("title") == "" {
-		return U.ResErr(c, "لطفا تاریخ ها یا عنوان را پر کنید")
-		// ! only dates exists
-	} else if c.FormValue("startDate") != "" &&
-		c.FormValue("endDate") != "" &&
-		c.FormValue("title") == "" {
-		D.DB().Where("notification_date BETWEEN ? AND ?", c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
-		// ! only title exists
-	} else if c.FormValue("startDate") == "" &&
-		c.FormValue("endDate") != "" &&
-		c.FormValue("title") == "" {
-		D.DB().Where("notification_date <= ?", c.FormValue("endDate")).Find(&laws)
-		// ! only end date
-	} else if c.FormValue("startDate") != "" &&
-		c.FormValue("endDate") == "" &&
-		c.FormValue("title") == "" {
-		D.DB().Where("notification_date >= ?", c.FormValue("startDate")).Find(&laws)
-		// ! only start date
-	} else if c.FormValue("startDate") == "" &&
-		c.FormValue("endDate") == "" &&
-		c.FormValue("title") != "" {
-		D.DB().Where("title LIKE ?", fmt.Sprintf("%%%s%%", c.FormValue("title"))).Find(&laws)
-		// ! only title exists
-	} else if c.FormValue("startDate") == "" &&
-		c.FormValue("endDate") != "" &&
-		c.FormValue("title") != "" {
-		D.DB().Where("title LIKE ? AND notification_date <= ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
-			c.FormValue("endDate")).Find(&laws)
-		// ! both enddate and title
-	} else if c.FormValue("startDate") != "" &&
-		c.FormValue("endDate") == "" &&
-		c.FormValue("title") != "" {
-		D.DB().Where("title LIKE ? AND notification_date >= ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
-			c.FormValue("startDate")).Find(&laws)
-		// ! both startDate and title
-	} else if c.FormValue("startDate") != "" &&
-		c.FormValue("endDate") != "" &&
-		c.FormValue("title") != "" {
-		D.DB().Where("title LIKE ? AND notification_date BETWEEN ? AND ?", fmt.Sprintf("%%%s%%", c.FormValue("title")),
-			c.FormValue("startDate"), c.FormValue("endDate")).Find(&laws)
-		// ! evry thing exist
-	} else {
-		return U.ResErr(c, "")
-	}
+	D.DB().Scopes(
+		F.FilterByType(c,
+			F.FilterType{QueryName: "title", Operator: "LIKE"},
+			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="},
+			F.FilterType{QueryName: "endDate", ColumnName: "notification_date", Operator: "<="})).
+		Find(&laws)
 	pass_data := []M.LawMinimal_min{}
 	for i := 0; i < len(laws); i++ {
 		pass_data = append(pass_data, M.LawMinimal_min{
@@ -148,16 +108,11 @@ func LawSearch(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"data": pass_data,
 	})
-	// else if c.FormValue("startDate") == "" || c.FormValue("endDate") == "" {
-	// 	D.DB().Where("title LIKE %?%", c.FormValue("title")).Find(&laws)
-	// }
-
 }
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}
 	if err := D.DB().Preload("Comments.User").First(law, c.Params("id")).Error; err != nil {
-		return c.SendString(err.Error())
-		// return U.DBError(c, err)
+		return U.DBError(c, err)
 	}
 	lawWithComment := M.LawWithMinimalComment{}
 	lawWithComment.ID = law.ID
@@ -172,7 +127,6 @@ func LawByID(c *fiber.Ctx) error {
 	lawWithComment.Comments = M.GetMinimalComment(law.Comments)
 	lawWithComment.CreatedAt = law.CreatedAt
 	lawWithComment.UpdatedAt = law.UpdatedAt
-	// law.Comments = M.GetMinimalComment(GetMinimalComment)
 	return c.JSON(fiber.Map{
 		"data": lawWithComment,
 	})
@@ -203,7 +157,6 @@ func CreateLaw(c *fiber.Ctx) error {
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
 	}
 	result := D.DB().Create(&law)
-
 	if result.Error != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": "خطایی در اضافه کردن مصوبه پیش آمده است.",
@@ -222,7 +175,6 @@ func CreateLaw(c *fiber.Ctx) error {
 			})
 		}
 	}
-
 	return c.Status(200).JSON(fiber.Map{
 		"message": "مصوبه با موفقیت اضافه شد",
 	})
