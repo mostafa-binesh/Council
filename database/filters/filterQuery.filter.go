@@ -59,7 +59,7 @@ func FilterByInterface(c *fiber.Ctx, u interface{}) func(db *gorm.DB) *gorm.DB {
 		for i := 0; i < v.NumField(); i++ {
 			field := v.Type().Field(i)
 			if jsonTag = field.Tag.Get("column"); jsonTag == "" {
-				jsonTag = utils.ToSnakeCase(field.Name)
+				jsonTag = utils.ToSnake(field.Name)
 			}
 			value := v.Field(i).Interface()
 			queryValue = c.Query(jsonTag)
@@ -77,10 +77,11 @@ func FilterByInterface(c *fiber.Ctx, u interface{}) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
+// ! eg. filterType{ QueryName: "name"} >> there should be a name parameter in the query
 // ! eg. filterType{ QueryName: "body", Operator: "LIKE"} >> there should be a body parameter in the query
-// ! eg. filterType{ QueryName: "name", Operator: "="} >> there should be a name parameter in the query
-// ! eg. filterType{ QueryName: "startDate",ColumnName: "release_date", Operator: ">="} >> there should be a name parameter in the query
+// ! eg. filterType{ QueryName: "startDate",ColumnName: "release_date", Operator: ">="}
 // ! columnName is optional, if not exist, queryName will be considered as columnName
+// ! Operator is optional as well, default is =
 func FilterByType(c *fiber.Ctx, filterTypes ...FilterType) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		var value string

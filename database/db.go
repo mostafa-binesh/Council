@@ -39,14 +39,13 @@ func ConnectToDB() {
 	DB_NAME := U.Env("DB_NAME") // database name
 	DB_PORT := U.Env("DB_PORT")
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", DB_USERNAME, DB_PASSWORD, DB_SERVER, DB_PORT, DB_NAME)
-	fmt.Printf("connection string: %s", dsn)
 	gormDatabase, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})
 	if err != nil {
-		panic("Failed to connect to the database")
+		panic(fmt.Sprintf("Failed to connect to the database.\nConnection string: %s", dsn))
 	}
-	fmt.Printf("database connection stablished.\n")
+	fmt.Println("database connection stablished")
 }
 func RowsCount(query string, searchValue string) int {
 	rows, err := gormDatabase.Raw(query, searchValue).Rows()
