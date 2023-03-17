@@ -10,3 +10,5 @@ func ConvertToUserMinimal(users []*User) []*UserMinimal {
     }
     return result
 }
+TOOD:
+- change operator to condition in FilterByType 
