@@ -48,6 +48,16 @@ type LawStatutesMinimal struct {
 	SessionNumber    int       `json:"sessionNumber"`
 	NotificationDate time.Time `json:"date"`
 }
+type CreateLawInput struct {
+	Type               int       `json:"type" validate:"required"`
+	Title              string    `json:"title"  validate:"required"`
+	SessionNumber      int       `json:"sessionNumber" validate:"required"`
+	SessionDate        time.Time `json:"sessionDate" validate:"required"`               // ! change default now later
+	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
+	NotificationNumber string    `json:"notificationNumber" validate:"required"`
+	Body               string    `json:"body" validate:"required"`
+	Tags               string    `json:"tags" validate:"required"`
+}
 type Comment struct {
 	ID              uint   `json:"id" gorm:"primary_key"`
 	Body            string `json:"body" gorm:"type:text;not null"`
@@ -84,7 +94,7 @@ type CommentMinimal struct {
 type Keyword struct {
 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ID        uint   `gorm:"primary_key"`
-	Word      string `gorm:"type:varchar(70);not null"`
+	Keyword   string `gorm:"type:varchar(70);not null"`
 	LawID     uint
 	Law       *Law      `gorm:"foreignKey:LawID"`
 	CreatedAt time.Time `gorm:"not null;default:now()"`

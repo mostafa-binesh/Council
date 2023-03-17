@@ -35,13 +35,13 @@ func RouterInit() {
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)
+	laws.Post("/", C.CreateLaw)
 	laws.Get("/search", C.LawSearch)
 	laws.Get("/advancedLawSearch", C.AdvancedLawSearch) // ! only for test proposes
 	laws.Get("/regulations", C.LawRegulations)
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
 	laws.Get("/:id<int>", C.LawByID) // get certain law by id
-	laws.Post("/", C.CreateLaw)
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)

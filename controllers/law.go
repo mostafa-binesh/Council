@@ -5,9 +5,7 @@ import (
 	F "docker/database/filters"
 	M "docker/models"
 	U "docker/utils"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -133,50 +131,37 @@ func LawByID(c *fiber.Ctx) error {
 }
 
 func CreateLaw(c *fiber.Ctx) error {
-	if c.FormValue("type") == "" || c.FormValue("sessionNumber") == "" || c.FormValue("sessionDate") == "" ||
-		c.FormValue("notificationDate") == "" || c.FormValue("title") == "" ||
-		c.FormValue("notificationNumber") == "" || c.FormValue("body") == "" {
-		return c.Status(400).JSON(fiber.Map{
-			"error": "لطفا تمام فیلد ها را پر کنید",
-		})
-	}
-	tp, err := strconv.Atoi(c.FormValue("type"))
-	sNumber, err := strconv.Atoi(c.FormValue("sessionNumber"))
-	sDate, err := time.Parse("2006-01-02", c.FormValue("sessionDate"))
-	nDate, err := time.Parse("2006-01-02", c.FormValue("notificationDate"))
-	if err != nil {
+	payload := new(M.CreateLawInput)
+	// parsing the payload
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
 	}
 	law := M.Law{
-		Type:               tp,
-		Title:              c.FormValue("title"),
-		SessionNumber:      sNumber,
-		SessionDate:        sDate,
-		NotificationDate:   nDate,
-		NotificationNumber: c.FormValue("notificationNumber"),
-		Body:               c.FormValue("body"),
+		Type:               payload.Type,
+		Title:              payload.Title,
+		SessionNumber:      payload.SessionNumber,
+		SessionDate:        payload.SessionDate,
+		NotificationDate:   payload.NotificationDate,
+		NotificationNumber: payload.NotificationNumber,
+		Body:               payload.Body,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
 	}
 	result := D.DB().Create(&law)
 	if result.Error != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"message": "خطایی در اضافه کردن مصوبه پیش آمده است.",
-		})
+		return U.ResErr(c, result.Error.Error())
 	}
-	var tags = c.FormValue("tags")
-	var tag = strings.Split(tags, ",")
-	for i := 0; i < len(tag); i++ {
+	var tags = strings.Split(payload.Tags, ",")
+	for i := 0; i < len(tags); i++ {
 		result2 := D.DB().Create(&M.Keyword{
-			Word:  tag[i],
-			LawID: law.ID,
+			Keyword: tags[i],
+			LawID:   law.ID,
 		})
 		if result2.Error != nil {
-			return c.Status(400).JSON(fiber.Map{
-				"message": "خطایی در اضافه کردن تگ ها پیش آمده است.",
-			})
+			// return U.ResErr(c, result.Error.Error())
+			return U.ResErr(c, "خطایی در اضافه کردن تگ ها پیش آمده است.")
 		}
 	}
 	return c.Status(200).JSON(fiber.Map{
 		"message": "مصوبه با موفقیت اضافه شد",
 	})
 }
-

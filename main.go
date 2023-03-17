@@ -2,7 +2,6 @@ package main
 
 import (
 	C "docker/controllers"
-	// M "docker/models"
 	D "docker/database"
 	R "docker/routes"
 	U "docker/utils"
