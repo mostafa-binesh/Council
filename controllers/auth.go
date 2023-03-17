@@ -5,17 +5,12 @@ import (
 	// "github.com/go-playground/validator/v10"
 	D "docker/database"
 	M "docker/models"
+	U "docker/utils"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
+
 	"golang.org/x/crypto/bcrypt"
 	"strings"
-)
-
-var (
-	Store    *session.Store
-	AUTH_KEY string = "authenticated"
-	USER_ID  string = "user_id"
 )
 
 type Person struct {
@@ -86,8 +81,8 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid email or Password"})
 	}
-	sess := GetSess(c)
-	sess.Set(USER_ID, user.ID)
+	sess := U.Session(c)
+	sess.Set(U.USER_ID, user.ID)
 	if err := sess.Save(); err != nil {
 		return ReturnError(c, "server error", 500)
 	}
@@ -95,7 +90,7 @@ func Login(c *fiber.Ctx) error {
 }
 func Logout(c *fiber.Ctx) error {
 	// ! just remove the session
-	sess, err := Store.Get(c)
+	sess, err := U.Store.Get(c)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": "not authenticated",
@@ -113,12 +108,12 @@ func Dashboard(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"dashboard": "heres the dashboard", "user": user})
 }
 func AuthMiddleware(c *fiber.Ctx) error {
-	sess := GetSess(c)
-	userID := sess.Get(USER_ID)
+	sess := U.Session(c)
+	userID := sess.Get(U.USER_ID)
 	if userID == nil {
 		return ReturnError(c, "not authenticated", fiber.StatusUnauthorized) // ! notAuthorized is notAuthenticated
 	} else {
-		c.SendString(fmt.Sprintf("user id is: %s", sess.Get(USER_ID)))
+		c.SendString(fmt.Sprintf("user id is: %s", sess.Get(U.USER_ID)))
 	}
 	var user M.User
 	result := D.DB().Find(&user, userID)

@@ -17,11 +17,13 @@ func AutoMigrate(c *fiber.Ctx) error {
 		fmt.Println("dropping all tables")
 		D.DB().Migrator().DropTable(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{}, &M.Comment{})
 	}
+	fmt.Println("Tables migration done...")
 	// ! migrate tables
 	err := D.DB().AutoMigrate(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{})
 	if err != nil {
 		return c.Status(400).SendString(err.Error())
 	}
+	// ! set seederRepeatCount, default 1
 	var seederRepeatCount int64
 	seederRepeatCount = 1
 	seedCountQuery := c.Query("seederRepeatCount")
@@ -32,7 +34,6 @@ func AutoMigrate(c *fiber.Ctx) error {
 			panic("seedCount query param. cannot be parsed")
 		}
 	}
-	fmt.Println("Tables migration done...")
 	// ! seeders
 	fmt.Printf("seeder gonna run for %d loop", seederRepeatCount)
 	for i := 0; i < int(seederRepeatCount); i++ {

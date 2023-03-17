@@ -15,14 +15,14 @@ func main() {
 	C.Initilize()   // initialize controllers value
 	R.RouterInit()
 	// ! session
-	C.Store = session.New(session.Config{
+	U.Store = session.New(session.Config{
 		CookieHTTPOnly: true,
 		Expiration:     time.Hour * 5,
 		KeyGenerator: func() string {
 			// secretKey, err := C.GetEnvVar("SESSION_SECRET_KEY")
 			secretKey := U.Env("SESSION_SECRET_KEY")
 			var sessionID string
-			sessionID, err := C.GenerateSessionID(secretKey)
+			sessionID, err := U.GenerateSessionID(secretKey)
 			if err != nil {
 				panic(err)
 			}
