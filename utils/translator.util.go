@@ -18,9 +18,18 @@ var (
 	validate *validator.Validate
 )
 var faTranslation = map[string]string{
-	"Username": "نام کاربری",
-	"Password": "رمز عبور",
-	"Age":      "سن",
+	"Username":           "نام کاربری",
+	"Password":           "رمز عبور",
+	"Age":                "سن",
+	"Type":               "نوع",
+	"Title":              "عنوان",
+	"SessionNumber":      "شماره جلسه",
+	"SessionDate":        "تاریخ جلسه",
+	"NotificationNumber": "شماره ابلاغ",
+	"NotificationDate":   "تاریخ ابلاغ",
+	"Body":               "بدنه",
+	"Tags":               "تگ ها",
+	"Image":              "عکس",
 }
 
 func Validate(fields interface{}) map[string]string {
@@ -46,7 +55,7 @@ func Validate(fields interface{}) map[string]string {
 		return t
 	})
 
-	// ! possible issues: if fields have another struct in it, getJSONTag 
+	// ! possible issues: if fields have another struct in it, getJSONTag
 	// ! > won't work properly
 	err := validate.Struct(fields)
 	if err != nil {
@@ -56,7 +65,7 @@ func Validate(fields interface{}) map[string]string {
 		for _, e := range errs {
 			jsonTag = GetJSONTag(fields, e.StructField())
 			if jsonTag == "" {
-				jsonTag = ToSnake(e.StructField())
+				jsonTag = ToLowerCamel(e.StructField())
 			}
 			responseError[jsonTag] = e.Translate(trans) // works fine
 		}

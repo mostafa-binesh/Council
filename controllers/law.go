@@ -160,7 +160,7 @@ func CreateLaw(c *fiber.Ctx) error {
 			LawID:   law.ID,
 		})
 		if result2.Error != nil {
-			D.DB().Delete(&M.User{}, law.ID)
+			D.DB().Delete(&M.Law{}, law.ID)
 			return U.ResErr(c, result.Error.Error())
 			// return U.ResErr(c, "خطایی در اضافه کردن تگ ها پیش آمده است.")
 		}
