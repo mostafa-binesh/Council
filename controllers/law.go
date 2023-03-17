@@ -136,6 +136,9 @@ func CreateLaw(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		U.ResErr(c, err.Error())
 	}
+	if errs := U.Validate(payload); errs != nil {
+		return c.JSON(fiber.Map{"errors": errs})
+	}
 	law := M.Law{
 		Type:               payload.Type,
 		Title:              payload.Title,

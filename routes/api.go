@@ -29,7 +29,7 @@ func RouterInit() {
 	// ! routes
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"lastJobDone": "Fixing create law tags",
+			"lastJobDone": "New file structure",
 		})
 	})
 	// ! laws route
