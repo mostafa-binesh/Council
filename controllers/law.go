@@ -137,7 +137,7 @@ func CreateLaw(c *fiber.Ctx) error {
 		U.ResErr(c, err.Error())
 	}
 	if errs := U.Validate(payload); errs != nil {
-		return c.JSON(fiber.Map{"errors": errs})
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
 	law := M.Law{
 		Type:               payload.Type,
