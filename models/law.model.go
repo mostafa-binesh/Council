@@ -52,10 +52,11 @@ type CreateLawInput struct {
 	Type               int       `json:"type" validate:"required"`
 	Title              string    `json:"title"  validate:"required"`
 	SessionNumber      int       `json:"sessionNumber" validate:"required"`
-	SessionDate        time.Time `json:"sessionDate" validate:"required"`               // ! change default now later
+	SessionDate        time.Time `json:"sessionDate" validate:"required"`      // ! change default now later
 	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
 	NotificationNumber string    `json:"notificationNumber" validate:"required"`
 	Body               string    `json:"body" validate:"required"`
+	Image              string    `json:"image" validate:"required"`
 	Tags               string    `json:"tags" validate:"required"`
 }
 type Comment struct {
