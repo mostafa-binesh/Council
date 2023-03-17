@@ -157,8 +157,8 @@ func CreateLaw(c *fiber.Ctx) error {
 			LawID:   law.ID,
 		})
 		if result2.Error != nil {
-			// return U.ResErr(c, result.Error.Error())
-			return U.ResErr(c, "خطایی در اضافه کردن تگ ها پیش آمده است.")
+			return U.ResErr(c, result.Error.Error())
+			// return U.ResErr(c, "خطایی در اضافه کردن تگ ها پیش آمده است.")
 		}
 	}
 	return c.Status(200).JSON(fiber.Map{
