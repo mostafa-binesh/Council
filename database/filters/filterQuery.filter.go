@@ -59,7 +59,7 @@ func FilterByInterface(c *fiber.Ctx, u interface{}) func(db *gorm.DB) *gorm.DB {
 		for i := 0; i < v.NumField(); i++ {
 			field := v.Type().Field(i)
 			if jsonTag = field.Tag.Get("column"); jsonTag == "" {
-				jsonTag = utils.ToSnake(field.Name)
+				jsonTag = utils.ToLowerCamel(field.Name)
 			}
 			value := v.Field(i).Interface()
 			queryValue = c.Query(jsonTag)

@@ -5,46 +5,59 @@ import (
 	// "unicode"
 )
 
-// ToSnake convert the given string to snake case following the Golang format:
-// acronyms are converted to lower-case and preceded by an underscore.
-// func ToSnake(in string) string {
-// 	runes := []rune(in)
-// 	length := len(runes)
+var uppercaseAcronym = map[string]string{
+	"ID": "id",
+}
 
-// 	var out []rune
-// 	for i := 0; i < length; i++ {
-// 		if i > 0 && unicode.IsUpper(runes[i]) && ((i+1 < length && unicode.IsLower(runes[i+1])) || unicode.IsLower(runes[i-1])) {
-// 			out = append(out, '_')
-// 		}
-// 		out = append(out, unicode.ToLower(runes[i]))
-// 	}
+// ConfigureAcronym allows you to add additional words which will be considered acronyms
+func ConfigureAcronym(key, val string) {
+	uppercaseAcronym[key] = val
+}
+func toCamelInitCase(s string, initCase bool) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return s
+	}
+	if a, ok := uppercaseAcronym[s]; ok {
+		s = a
+	}
 
-// 	return string(out)
-// }
-
-func ToCamelCase(s string) string {
-	var result string
-	capitalize := false
-	for _, c := range s {
-		if c >= 'A' && c <= 'Z' {
-			result += string(c)
-		} else if c >= 'a' && c <= 'z' {
-			if capitalize {
-				result += strings.ToUpper(string(c))
-				capitalize = false
-			} else {
-				result += string(c)
+	n := strings.Builder{}
+	n.Grow(len(s))
+	capNext := initCase
+	for i, v := range []byte(s) {
+		vIsCap := v >= 'A' && v <= 'Z'
+		vIsLow := v >= 'a' && v <= 'z'
+		if capNext {
+			if vIsLow {
+				v += 'A'
+				v -= 'a'
 			}
+		} else if i == 0 {
+			if vIsCap {
+				v += 'a'
+				v -= 'A'
+			}
+		}
+		if vIsCap || vIsLow {
+			n.WriteByte(v)
+			capNext = false
+		} else if vIsNum := v >= '0' && v <= '9'; vIsNum {
+			n.WriteByte(v)
+			capNext = true
 		} else {
-			capitalize = true
+			capNext = v == '_' || v == ' ' || v == '-' || v == '.'
 		}
 	}
-	return result
+	return n.String()
 }
-func ToSnake(s string) string {
-	s = strings.TrimSpace(s)
-	s = strings.ToLower(s)
-	s = strings.ReplaceAll(s, " ", "_")
-	s = strings.ReplaceAll(s, "-", "_")
-	return s
+
+// ToCamel converts a string to CamelCase
+func ToCamel(s string) string {
+	return toCamelInitCase(s, true)
+}
+
+// ToLowerCamel converts a string to lowerCamelCase
+func ToLowerCamel(s string) string {
+	return toCamelInitCase(s, false)
 }
