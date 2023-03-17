@@ -136,9 +136,6 @@ func CreateLaw(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		U.ResErr(c, err.Error())
 	}
-	if errs := U.Validate(payload); errs != nil {
-		return c.JSON(fiber.Map{"errors": errs})
-	}
 	law := M.Law{
 		Type:               payload.Type,
 		Title:              payload.Title,
@@ -160,7 +157,6 @@ func CreateLaw(c *fiber.Ctx) error {
 			LawID:   law.ID,
 		})
 		if result2.Error != nil {
-			D.DB().Delete(&M.User{}, law.ID)
 			return U.ResErr(c, result.Error.Error())
 			// return U.ResErr(c, "خطایی در اضافه کردن تگ ها پیش آمده است.")
 		}
