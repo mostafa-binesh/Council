@@ -1,26 +1,49 @@
 package filters
 
-import "gorm.io/gorm"
+import (
+	D "docker/database"
+	"math"
+
+	"gorm.io/gorm"
+)
 
 type Pagination struct {
-	Page     int `json:"page"`
-	PageSize int `json:"size"`
+	Limit      int    `json:"limit" query:"limit"` // per page
+	Page       int    `json:"page" query:"page"`   // current page
+	Sort       string `json:"sort" query:"sort"`   // !
+	TotalRows  int64  `json:"totalRows"`           // total records
+	TotalPages int    `json:"totalPages"`          // total pages
+	// Rows       interface{} `json:"rows"`
 }
 
-func Paginate(p *Pagination) func(db *gorm.DB) *gorm.DB {
+func (p *Pagination) GetOffset() int {
+	return (p.GetPage() - 1) * p.GetLimit()
+}
+func (p *Pagination) GetLimit() int {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	return p.Limit
+}
+func (p *Pagination) GetPage() int {
+	if p.Page == 0 {
+		p.Page = 1
+	}
+	return p.Page
+}
+func (p *Pagination) GetSort() string {
+	if p.Sort == "" {
+		p.Sort = "Id desc"
+	}
+	return p.Sort
+}
+func Paginate(value interface{}, pagination *Pagination) func(db *gorm.DB) *gorm.DB {
+	var totalRows int64
+	D.DB().Model(value).Count(&totalRows)
+	pagination.TotalRows = totalRows
+	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.Limit)))
+	pagination.TotalPages = totalPages
 	return func(db *gorm.DB) *gorm.DB {
-		// if page was not set, set it to default (1)
-		if p.Page <= 0 {
-			p.Page = 1
-		}
-		// if pageSize was not set, set it to default (8)
-		switch {
-		case p.PageSize > 100:
-			p.PageSize = 100
-		case p.PageSize <= 0:
-			p.PageSize = 8
-		}
-		offset := (p.Page - 1) * p.PageSize
-		return db.Offset(offset).Limit(p.PageSize)
+		return db.Offset(pagination.GetOffset()).Limit(pagination.GetLimit()).Order(pagination.GetSort())
 	}
 }
