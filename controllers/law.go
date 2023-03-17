@@ -179,3 +179,4 @@ func CreateLaw(c *fiber.Ctx) error {
 		"message": "مصوبه با موفقیت اضافه شد",
 	})
 }
+
