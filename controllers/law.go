@@ -144,7 +144,7 @@ func CreateLaw(c *fiber.Ctx) error {
 		NotificationDate:   payload.NotificationDate,
 		NotificationNumber: payload.NotificationNumber,
 		Body:               payload.Body,
-		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		Image:              payload.Image,
 	}
 	result := D.DB().Create(&law)
 	if result.Error != nil {
@@ -157,6 +157,7 @@ func CreateLaw(c *fiber.Ctx) error {
 			LawID:   law.ID,
 		})
 		if result2.Error != nil {
+			D.DB().Delete(&M.User{}, law.ID)
 			return U.ResErr(c, result.Error.Error())
 			// return U.ResErr(c, "خطایی در اضافه کردن تگ ها پیش آمده است.")
 		}
