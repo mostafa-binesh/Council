@@ -9,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-
 func TranslationTest(c *fiber.Ctx) error {
 	type User struct {
 		Username string `validate:"required" json:"username"`
@@ -32,5 +31,18 @@ func PaginationTest(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"meta": pagination,
 		"data": enactments,
+	})
+}
+
+func DevAllUsers(c *fiber.Ctx) error {
+	users := []M.User{}
+	pagination := new(F.Pagination)
+	if err := c.QueryParser(pagination); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	D.DB().Scopes(F.Paginate(users, pagination)).Find(&users)
+	return c.JSON(fiber.Map{
+		"meta": pagination,
+		"data": users,
 	})
 }

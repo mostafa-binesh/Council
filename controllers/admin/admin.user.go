@@ -15,9 +15,15 @@ import (
 	M "docker/models"
 )
 
-////////////////////////////////////////////////////////////////////////////////////////////
-//######user Admin#####//
-///////////////////////////////////////////////////////////////////////////////////////////
+// TODO
+// ! niazi be get ba'd delete nist, delete kon, erroresh ro ba U.DBError handle kon
+// ! joda kardan verify va unverify
+// ! eshtebah haye hejaii mesle code_persenel > personal_code
+// ! update kardan moshkel dare, documentation update e gorm ro bekhun
+// ! c.Query("id") shayad vojud nadashte bashe, bayad ba c.param handle she
+// ############################
+// ##########    USER   #############
+// ############################
 
 // ! Index User with admin/users route
 func IndexUser(c *fiber.Ctx) error {
@@ -32,7 +38,7 @@ func IndexUser(c *fiber.Ctx) error {
 
 func UserByID(c *fiber.Ctx) error {
 	user := M.User{}
-	D.DB().Where("id=?", c.Query("id")).Find(&user)
+	D.DB().Where("id = ?", c.Query("id")).Find(&user)
 	if user.Name == "" {
 		return U.ResErr(c, "کاربر وجود ندارد")
 	}
@@ -42,7 +48,7 @@ func UserByID(c *fiber.Ctx) error {
 }
 func DeleteUser(c *fiber.Ctx) error {
 	user := M.User{}
-	D.DB().Where("id=?", c.Query("id")).Find(&user)
+	D.DB().Where("id = ?", c.Query("id")).Find(&user)
 	if user.Name == "" {
 		return U.ResErr(c, "کاربر وجود ندارد")
 	}
@@ -78,8 +84,8 @@ func UserSearch(c *fiber.Ctx) error {
 	D.DB().Scopes(
 		F.FilterByType(c,
 			F.FilterType{QueryName: "name", Operator: "LIKE"},
-			F.FilterType{QueryName: "national_code", ColumnName: "national_code", Operator: "="},
-			F.FilterType{QueryName: "code_persenal", ColumnName: "code_persenal", Operator: "="})).
+			F.FilterType{QueryName: "national_code", ColumnName: "national_code"},
+			F.FilterType{QueryName: "code_persenal", ColumnName: "code_persenal"})).
 		Find(&user)
 	return c.JSON(fiber.Map{
 		"data": user,
@@ -94,7 +100,6 @@ func AddUser(c *fiber.Ctx) error {
 		return res
 	}
 	// ! validate request
-	// ! todo: create a shorter function for the validation, like payload.validate(), validate function can get a T template
 	// err = C.validate.Struct(payload)
 	if err != nil {
 		return C.ValidationHandle(c, err)
@@ -102,11 +107,11 @@ func AddUser(c *fiber.Ctx) error {
 	// hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		U.ResErr(c, err.Error())
 	}
 	newUser := M.User{
 		Name:         payload.Name,
-		Email:        strings.ToLower(payload.Email), // ! can use fiber toLower function that has better performance
+		Email:        strings.ToLower(payload.Email),
 		Password:     string(hashedPassword),
 		CodePersonal: payload.CodePersonal,
 		NationalCode: payload.NationalCode,
@@ -122,9 +127,9 @@ func AddUser(c *fiber.Ctx) error {
 
 }
 
-// //////////////////////////////////////////////////////////////////////////////////////////
-// ######Law Admin#####//
-// /////////////////////////////////////////////////////////////////////////////////////////
+// ############################
+// ##########    LAW   #############
+// ############################
 func UpdateLaw(c *fiber.Ctx) error {
 	law := M.Law{}
 	payload := new(M.CreateLawInput)
@@ -135,39 +140,39 @@ func UpdateLaw(c *fiber.Ctx) error {
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
-	D.DB().Where("id=?", c.Query("id")).Find(&law)
+	D.DB().Where("id = ?", c.Query("id")).Find(&law)
 	if law.Title == "" {
 		return U.ResErr(c, "قانون مد نظر یافت نشد")
 	}
 	result := D.DB().Model(&law).Where("role = ?", "admin").Updates(M.Law{
-		Body: payload.Body,
-		Image: payload.Image,
-		NotificationDate: payload.NotificationDate,
+		Body:               payload.Body,
+		Image:              payload.Image,
+		NotificationDate:   payload.NotificationDate,
 		NotificationNumber: payload.NotificationNumber,
-		SessionNumber: payload.SessionNumber,
-		SessionDate: payload.SessionDate,
-		Title: payload.Title,
-		Type: payload.Type,
+		SessionNumber:      payload.SessionNumber,
+		SessionDate:        payload.SessionDate,
+		Title:              payload.Title,
+		Type:               payload.Type,
 	})
-	if result.Error !=nil {
-		return U.ResErr(c,"مشکلی در به روز رسانی به وجود آمده")
+	if result.Error != nil {
+		return U.ResErr(c, "مشکلی در به روز رسانی به وجود آمده")
 	}
 	return c.JSON(fiber.Map{
-		"message":"به روز رسانی با موفقیت انجام شد",
+		"message": "به روز رسانی با موفقیت انجام شد",
 	})
 }
 
-func DeleteLaw(c *fiber.Ctx)error{
+func DeleteLaw(c *fiber.Ctx) error {
 	law := M.Law{}
 	D.DB().Where("id=?", c.Query("id")).Find(&law)
 	if law.Title == "" {
 		return U.ResErr(c, "قانون مد نظر یافت نشد")
 	}
-	result := D.DB().Delete(&M.Law{} , c.Query("id"))
-	if result.Error !=nil {
-		return U.ResErr(c,"مشکلی در به حذف کردن  به وجود آمده")
+	result := D.DB().Delete(&M.Law{}, c.Query("id"))
+	if result.Error != nil {
+		return U.ResErr(c, "مشکلی در به حذف کردن  به وجود آمده")
 	}
 	return c.JSON(fiber.Map{
-		"message":"حذف کردن با موفقیت انجام شد",
-	})	
+		"message": "حذف کردن با موفقیت انجام شد",
+	})
 }
