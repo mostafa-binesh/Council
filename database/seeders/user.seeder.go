@@ -104,11 +104,13 @@ func UserSeeder() {
 		cityRandomNumber := rand.Intn(len(cities))
 		nameRandomNumber := rand.Intn(len(names))
 		D.DB().Create(&M.User{
-			Name:     names[nameRandomNumber],
-			Email:    "mostafa@gmail.com" + string(i),
-			Password: "This is my password",
-			Role:     1,
-			City:     cities[cityRandomNumber],
+			Name:         names[nameRandomNumber],
+			Email:        "mostafa@gmail.com" + string(i),
+			Password:     "This is my password",
+			Role:         1,
+			City:         cities[cityRandomNumber],
+			NationalCode: "111111111" + string(i),
+			CodePersonal: "1111111" + string(i),
 		})
 	}
 }

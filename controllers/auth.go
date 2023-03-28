@@ -9,8 +9,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"golang.org/x/crypto/bcrypt"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Person struct {
@@ -37,9 +38,11 @@ func SignUpUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
 	}
 	newUser := M.User{
-		Name:     payload.Name,
-		Email:    strings.ToLower(payload.Email), // ! can use fiber toLower function that has better performance
-		Password: string(hashedPassword),
+		Name:         payload.Name,
+		Email:        strings.ToLower(payload.Email), // ! can use fiber toLower function that has better performance
+		Password:     string(hashedPassword),
+		CodePersonal: payload.CodePersonal,
+		NationalCode:  payload.NationalCode,
 		// Photo:    &payload.Photo, // ? don't know why add & in the payload for photo
 	}
 	// ! add user to the database
@@ -67,7 +70,7 @@ func Login(c *fiber.Ctx) error {
 		return ValidationHandle(c, err)
 	}
 	var user M.User
-	result := D.DB().First(&user, "email = ?", strings.ToLower(payload.Email))
+	result := D.DB().First(&user, "email = ?", strings.ToLower(payload.CodePersonal))
 	// ! result.error will not be null if no row returned, so i commented it
 	// ! i guess the way that i handled it is not the best and i should create a method and check if the error is
 	// ! no row found, ignore the error

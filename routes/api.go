@@ -2,10 +2,12 @@ package routes
 
 import (
 	C "docker/controllers"
+	A "docker/controllers/admin"
 
 	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	// "github.com/gofiber/fiber/v2/middleware/logger"
 	// "github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
@@ -32,6 +34,16 @@ func RouterInit() {
 			"lastJobDone": "New file structure",
 		})
 	})
+	// ! Admin Route
+	admin := router.Group("/admin")
+	admin.Get("/users", A.IndexUser)
+	admin.Get("userbyid", A.UserByID)
+	admin.Get("/userSearch", A.UserSearch)
+	admin.Post("/user", A.AddUser)
+	admin.Post("/user/verify", A.UserVerification)
+	admin.Delete("DeleteUser", A.DeleteUser)
+	admin.Put("/laws", A.UpdateLaw)
+	admin.Delete("/laws", A.DeleteLaw)
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)

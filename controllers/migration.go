@@ -13,7 +13,10 @@ import (
 // ! add any migration that you wanna add to the database
 func AutoMigrate(c *fiber.Ctx) error {
 	// ! drop all tables if 'dropAllTables' field is 1 in the query
-	if c.Query("dropAllTables") == "1" {
+	// return c.JSON(fiber.Map{
+	// 	"message":c.Query("dropAllTables"),
+	// })
+	if c.Query("dropAllTables") == "" {
 		fmt.Println("dropping all tables")
 		D.DB().Migrator().DropTable(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{}, &M.Comment{})
 	}

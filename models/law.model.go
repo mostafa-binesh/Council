@@ -63,8 +63,8 @@ type Comment struct {
 	ID              uint   `json:"id" gorm:"primary_key"`
 	Body            string `json:"body" gorm:"type:text;not null"`
 	UserID          uint   `json:"userID"`
-	User            User   `json:"user" gorm:"foreignKey:UserID"`
-	ParentCommentID uint   `json:"parentCommentID" gorm:"foreignKey:UserID"`
+	User            User   `json:"user" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
+	ParentCommentID uint   `json:"parentCommentID" gorm:"foreignKey:UserID;"`
 	// ParentComment   *Comment   `gorm:"foreignKey:ParentCommentID"`
 
 	LawID     uint      `json:"lawID"`
@@ -95,7 +95,7 @@ type CommentMinimal struct {
 type Keyword struct {
 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ID        uint   `gorm:"primary_key"`
-	Keyword   string `gorm:"type:varchar(70);not null"`
+	Keyword   string `gorm:"type:varchar(70)"`
 	LawID     uint
 	Law       *Law      `gorm:"foreignKey:LawID"`
 	CreatedAt time.Time `gorm:"not null;default:now()"`

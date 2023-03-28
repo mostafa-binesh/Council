@@ -11,13 +11,14 @@ import (
 type User struct {
 	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	// gorm.Model
-	ID       uint   `gorm:"primaryKey"`
-	Name     string `gorm:"type:varchar(100);not null"`
-	Email    string `gorm:"type:varchar(100);uniqueIndex;not null"`
-	Password string `gorm:"type:varchar(100);not null"`
-	Role     uint   `gorm:"default:1;not null"`
-	City     string `gorm:"type:varchar(100);not null"`
-
+	ID           uint   `gorm:"primaryKey"`
+	Name         string `gorm:"type:varchar(100);not null"`
+	Email        string `gorm:"type:varchar(100);uniqueIndex;not null"`
+	Password     string `gorm:"type:varchar(100);not null"`
+	Role         uint   `gorm:"default:1;not null"`
+	City         string `gorm:"type:varchar(100);not null"`
+	CodePersonal string `gorm:"type:varchar(10);uniqueIndex"`
+	NationalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	// Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`
 	// Photo     *string    `gorm:"not null;default:'default.png'"`
 	Verified  *bool      `gorm:"not null;default:false"`
@@ -31,13 +32,15 @@ type SignUpInput struct {
 	Email           string `json:"email" validate:"required,email,gunique=users.email"`
 	Password        string `json:"password" validate:"required,min=8"`
 	PasswordConfirm string `json:"passwordConfirm" validate:"required,min=8,eqfield=Password"`
-	Photo           string `json:"photo"`
+	CodePersonal    string `json:"CodePersonal" validate:"required,max=8,gunique=users.code_personal"`
+	NationalCode    string `json:"NationalCode" validate:"required,max=10,min=10,gunique=users.national_code"`
+	// Photo string `json:"photo"`
 }
 
 // ! this model has been used in login handler
 type SignInInput struct {
-	Email    string `json:"email"  validate:"required,email"`
-	Password string `json:"password"  validate:"required"`
+	CodePersonal string `json:"email"  validate:"required"`
+	Password     string `json:"password"  validate:"required"`
 }
 
 // ! not been used

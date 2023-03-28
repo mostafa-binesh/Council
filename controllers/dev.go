@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+
 func TranslationTest(c *fiber.Ctx) error {
 	type User struct {
 		Username string `validate:"required" json:"username"`
