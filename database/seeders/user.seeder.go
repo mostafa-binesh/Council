@@ -4,6 +4,8 @@ import (
 	D "docker/database"
 	M "docker/models"
 	"math/rand"
+	"strconv"
+	"time"
 )
 
 func UserSeeder() {
@@ -100,6 +102,7 @@ func UserSeeder() {
 		"شهیندخت دلاوری",
 		"مهدی مستوفی",
 	}
+	rand.Seed(time.Now().UnixNano()) // Seed the random number generator with current time
 	for i := 0; i < 40; i++ {
 		cityRandomNumber := rand.Intn(len(cities))
 		nameRandomNumber := rand.Intn(len(names))
@@ -109,8 +112,8 @@ func UserSeeder() {
 			Password:     "This is my password",
 			Role:         1,
 			City:         cities[cityRandomNumber],
-			NationalCode: "111111111" + string(i),
-			CodePersonal: "1111111" + string(i),
+			NationalCode: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
+			CodePersonal: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
 		})
 	}
 }
