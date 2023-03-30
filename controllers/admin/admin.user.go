@@ -4,9 +4,10 @@ import (
 	D "docker/database"
 	F "docker/database/filters"
 	U "docker/utils"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"strings"
 
 	C "docker/controllers"
 	// "strconv"
@@ -24,6 +25,7 @@ import (
 // ############################
 // ##########    USER   #############
 // ############################
+// api/admin/users/1
 
 // ! Index User with admin/users route
 func IndexUser(c *fiber.Ctx) error {
@@ -36,9 +38,10 @@ func IndexUser(c *fiber.Ctx) error {
 	})
 }
 
+// ! user by id with admin/users/{id}
 func UserByID(c *fiber.Ctx) error {
 	user := M.User{}
-	D.DB().Where("id = ?", c.Query("id")).Find(&user)
+	D.DB().Where("id = ?", c.Params("id")).Find(&user)
 	if user.Name == "" {
 		return U.ResErr(c, "کاربر وجود ندارد")
 	}
@@ -46,15 +49,14 @@ func UserByID(c *fiber.Ctx) error {
 		"data": user,
 	})
 }
+
+// ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
-	user := M.User{}
-	D.DB().Where("id = ?", c.Query("id")).Find(&user)
-	if user.Name == "" {
-		return U.ResErr(c, "کاربر وجود ندارد")
-	}
-	result := D.DB().Delete(&M.User{}, c.Query("id"))
+
+	result := D.DB().Delete(&M.User{}, c.Params("id"))
+
 	if result.Error != nil {
-		return U.ResErr(c, "در حذف کاربر مشکلی پیش آمده است")
+		return U.DBError(c, result.Error)
 	}
 	return c.JSON(fiber.Map{
 		"message": " کابر با موفقیت حذف شد",
@@ -66,11 +68,17 @@ func DeleteUser(c *fiber.Ctx) error {
 // ! for verifying, you need to get the user first, if it was verified already, return error
 func UserVerification(c *fiber.Ctx) error {
 
-	var bool = true
-	if c.FormValue("verify") == "0" {
-		bool = false
+	result := D.DB().Model(&M.User{}).Where("id = ?", c.Params("id")).Update("Verified", true)
+	if result.Error != nil {
+		U.DBError(c, result.Error)
 	}
-	result := D.DB().Model(&M.User{}).Where("id = ?", c.FormValue("id")).Update("Verified", bool)
+	return c.Status(400).JSON(fiber.Map{
+		"message": " بروز رسانی با موفقیت انجام شد",
+	})
+}
+func UserUnVerification(c *fiber.Ctx) error {
+
+	result := D.DB().Model(&M.User{}).Where("id = ?", c.Params("id")).Update("Verified", false)
 	if result.Error != nil {
 		U.DBError(c, result.Error)
 	}
@@ -140,20 +148,19 @@ func UpdateLaw(c *fiber.Ctx) error {
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
-	D.DB().Where("id = ?", c.Query("id")).Find(&law)
-	if law.Title == "" {
-		return U.ResErr(c, "قانون مد نظر یافت نشد")
+	result1 := D.DB().Where("id = ?", c.Params("id")).Find(&law)
+	if result1.Error != nil {
+		return U.DBError(c, result1.Error)
 	}
-	result := D.DB().Model(&law).Where("role = ?", "admin").Updates(M.Law{
-		Body:               payload.Body,
-		Image:              payload.Image,
-		NotificationDate:   payload.NotificationDate,
-		NotificationNumber: payload.NotificationNumber,
-		SessionNumber:      payload.SessionNumber,
-		SessionDate:        payload.SessionDate,
-		Title:              payload.Title,
-		Type:               payload.Type,
-	})
+	law.Body = payload.Body
+	law.Image = payload.Image
+	law.NotificationDate = payload.NotificationDate
+	law.NotificationNumber = payload.NotificationNumber
+	law.SessionDate = payload.SessionDate
+	law.SessionNumber = payload.SessionNumber
+	law.Title = payload.Title
+	law.Type = payload.Type
+	result := D.DB().Save(&law)
 	if result.Error != nil {
 		return U.ResErr(c, "مشکلی در به روز رسانی به وجود آمده")
 	}
@@ -163,14 +170,9 @@ func UpdateLaw(c *fiber.Ctx) error {
 }
 
 func DeleteLaw(c *fiber.Ctx) error {
-	law := M.Law{}
-	D.DB().Where("id=?", c.Query("id")).Find(&law)
-	if law.Title == "" {
-		return U.ResErr(c, "قانون مد نظر یافت نشد")
-	}
-	result := D.DB().Delete(&M.Law{}, c.Query("id"))
+	result := D.DB().Delete(&M.Law{}, c.Params("id"))
 	if result.Error != nil {
-		return U.ResErr(c, "مشکلی در به حذف کردن  به وجود آمده")
+		return U.DBError(c, result.Error)
 	}
 	return c.JSON(fiber.Map{
 		"message": "حذف کردن با موفقیت انجام شد",
