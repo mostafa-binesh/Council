@@ -93,7 +93,7 @@ func UserSearch(c *fiber.Ctx) error {
 		F.FilterByType(c,
 			F.FilterType{QueryName: "name", Operator: "LIKE"},
 			F.FilterType{QueryName: "national_code", ColumnName: "national_code"},
-			F.FilterType{QueryName: "code_persenal", ColumnName: "code_persenal"})).
+			F.FilterType{QueryName: "personal_code", ColumnName: "personal_code"})).
 		Find(&user)
 	return c.JSON(fiber.Map{
 		"data": user,
@@ -121,7 +121,7 @@ func AddUser(c *fiber.Ctx) error {
 		Name:         payload.Name,
 		Email:        strings.ToLower(payload.Email),
 		Password:     string(hashedPassword),
-		CodePersonal: payload.CodePersonal,
+		PersonalCode: payload.PersonalCode,
 		NationalCode: payload.NationalCode,
 		// Photo:    &payload.Photo, // ? don't know why add & in the payload for photo
 	}

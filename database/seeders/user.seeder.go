@@ -113,7 +113,7 @@ func UserSeeder() {
 			Role:         1,
 			City:         cities[cityRandomNumber],
 			NationalCode: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
-			CodePersonal: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
+			PersonalCode: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
 		})
 	}
 }
