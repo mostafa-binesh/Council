@@ -64,11 +64,13 @@ func EditUser(c *fiber.Ctx) error {
 	}
 	user.Name = payload.Name
 	user.NationalCode = payload.NationalCode
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return U.ResErr(c, "خطا در پردازش رمز عبور")
+	if payload.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return U.ResErr(c, "خطا در پردازش رمز عبور")
+		}
+		user.Password = string(hashedPassword)
 	}
-	user.Password = string(hashedPassword)
 	user.PhoneNumber = payload.PhoneNumber
 	user.PersonalCode = payload.PersonalCode
 	result := D.DB().Save(&user)
