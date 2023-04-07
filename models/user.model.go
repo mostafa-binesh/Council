@@ -39,7 +39,7 @@ type SignUpInput struct {
 	Password        string `json:"password" validate:"required,min=8"`
 	PasswordConfirm string `json:"passwordConfirm" validate:"required,min=8,eqfield=Password"`
 	PersonalCode    string `json:"PersonalCode" validate:"required,max=8"`
-	NationalCode    string `json:"NationalCode" validate:"required,max=10,min=10"`
+	NationalCode    string `json:"NationalCode" validate:"required,len=10"`
 	// Photo string `json:"photo"`
 }
 
@@ -47,8 +47,9 @@ type SignUpInput struct {
 type EditInput struct {
 	Name         string `json:"name" validate:"required"`
 	PhoneNumber  string `json:"phoneNumber" validate:"required"`
-	PersonalCode string `json:"personalCode" validate:"required,max=8"`
-	NationalCode string `json:"nationalCode" validate:"required,max=10,min=10"`
+	PersonalCode string `json:"personalCode" validate:"required,max=8,numeric"`
+	NationalCode string `json:"nationalCode" validate:"required,len=10,numeric"`
+	Password     string `json:"password"`
 	// Photo string `json:"photo"`
 }
 
