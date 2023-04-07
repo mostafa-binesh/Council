@@ -47,7 +47,7 @@ type SignUpInput struct {
 type EditInput struct {
 	Name         string `json:"name" validate:"required"`
 	PhoneNumber  string `json:"phoneNumber" validate:"required"`
-	PersonalCode string `json:"personalCode" validate:"required,max=8,numeric"`
+	PersonalCode string `json:"personalCode" validate:"required,max=10,numeric"`
 	NationalCode string `json:"nationalCode" validate:"required,len=10,numeric"`
 	Password     string `json:"password"`
 	// Photo string `json:"photo"`
