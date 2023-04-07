@@ -18,6 +18,7 @@ var (
 	validate *validator.Validate
 )
 var faTranslation = map[string]string{
+	"Name":               "نام",
 	"Username":           "نام کاربری",
 	"Password":           "رمز عبور",
 	"Age":                "سن",
@@ -30,6 +31,9 @@ var faTranslation = map[string]string{
 	"Body":               "بدنه",
 	"Tags":               "تگ ها",
 	"Image":              "عکس",
+	"PersonalCode":       "کد پرسنلی",
+	"NationalCode":       "کد ملی",
+	"PhoneNumber":        "شماره همراه",
 }
 
 func Validate(fields interface{}) map[string]string {
