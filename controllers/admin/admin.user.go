@@ -55,33 +55,24 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 func EditUser(c *fiber.Ctx) error {
-	
+
 	user := M.User{}
-	payload := M.SignUpInput{}
-	// if err := c.BodyParser(payload); err != nil {
-	// 	U.ResErr(c, err.Error())
-	// }
-	// if errs := U.Validate(payload); errs != nil {
-	// 	return c.Status(400).JSON(fiber.Map{"errors": errs})
-	// }
+	payload := new(M.EditInput)
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
 	result1 := D.DB().Where("id = ?", c.Params("id")).Find(&user)
 	if result1.Error != nil {
 		return U.DBError(c, result1.Error)
 	}
-	
+
 	D.DB().Where("id = ?", c.Params("id")).Find(&user)
-	passErr := CheckPasswordHash(payload.Password, user.Password)
-	
-	if passErr != false {
-		return U.ResErr(c, "پسورد وارد شده اشتباه است")
-	}
+
 	user.Name = payload.Name
 	user.NationalCode = payload.NationalCode
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
-	if err!=nil {
-		return err
-	}
-	user.Password = string(hashedPassword)
 	user.PhoneNumber = payload.PhoneNumber
 	user.PersonalCode = payload.PersonalCode
 	result := D.DB().Save(&user)
@@ -92,6 +83,7 @@ func EditUser(c *fiber.Ctx) error {
 		"message": "اطلاعات با موفقیت ادیت شد",
 	})
 }
+
 // ! user by id with admin/users/{id}
 func UserByID(c *fiber.Ctx) error {
 	user := M.User{}
@@ -111,6 +103,7 @@ func UserByID(c *fiber.Ctx) error {
 		"data": minUser,
 	})
 }
+
 // ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
 
@@ -123,6 +116,7 @@ func DeleteUser(c *fiber.Ctx) error {
 		"message": " کابر با موفقیت حذف شد",
 	})
 }
+
 // ! create two routes for verification, one for verify, second for unverify
 // ! there's no need to convert formValue to int
 // ! for verifying, you need to get the user first, if it was verified already, return error
@@ -191,6 +185,7 @@ func AddUser(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "user has been created successfully"})
 }
+
 // ############################
 // ##########    LAW   #############
 // ############################

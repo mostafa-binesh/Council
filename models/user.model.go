@@ -35,11 +35,20 @@ type MinUser struct {
 // ! this model has been used in signup handler
 type SignUpInput struct {
 	Name            string `json:"name" validate:"required"`
-	PhoneNumber     string `json:"PhoneNumber" validate:"required,phone_number,gunique=users.phone_number"`
+	PhoneNumber     string `json:"PhoneNumber" validate:"required"`
 	Password        string `json:"password" validate:"required,min=8"`
 	PasswordConfirm string `json:"passwordConfirm" validate:"required,min=8,eqfield=Password"`
-	PersonalCode    string `json:"PersonalCode" validate:"required,max=8,gunique=users.personal_code"`
-	NationalCode    string `json:"NationalCode" validate:"required,max=10,min=10,gunique=users.national_code"`
+	PersonalCode    string `json:"PersonalCode" validate:"required,max=8"`
+	NationalCode    string `json:"NationalCode" validate:"required,max=10,min=10"`
+	// Photo string `json:"photo"`
+}
+
+// ! this model has been used in Edit user handler
+type EditInput struct {
+	Name         string `json:"name" validate:"required"`
+	PhoneNumber  string `json:"phoneNumber" validate:"required"`
+	PersonalCode string `json:"personalCode" validate:"required,max=8"`
+	NationalCode string `json:"nationalCode" validate:"required,max=10,min=10"`
 	// Photo string `json:"photo"`
 }
 

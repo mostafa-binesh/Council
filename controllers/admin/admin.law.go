@@ -113,7 +113,7 @@ func CreateLaw(c *fiber.Ctx) error {
 }
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
-	// pagination := new(F.Pagination)
+	pagination := new(F.Pagination)
 	D.DB().Scopes(
 		F.FilterByType(c,
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
@@ -126,7 +126,7 @@ func LawSearch(c *fiber.Ctx) error {
 			F.FilterType{QueryName: "notification_endDate", ColumnName: "notification_date", Operator: "<="},
 			F.FilterType{QueryName: "session_startDate", ColumnName: "session_date", Operator: ">="},
 			F.FilterType{QueryName: "session_endDate", ColumnName: "session_date", Operator: "<="}),
-			).
+			F.Paginate(laws, pagination)).
 		Find(&laws)
 	pass_data := []M.LawMinimal_min{}
 	for i := 0; i < len(laws); i++ {
@@ -137,6 +137,7 @@ func LawSearch(c *fiber.Ctx) error {
 		})
 	}
 	return c.JSON(fiber.Map{
+		"meta": pagination,
 		"data": pass_data,
 	})
 }
