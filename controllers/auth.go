@@ -39,7 +39,7 @@ func SignUpUser(c *fiber.Ctx) error {
 	}
 	newUser := M.User{
 		Name:         payload.Name,
-		Email:        strings.ToLower(payload.Email), // ! can use fiber toLower function that has better performance
+		PhoneNumber:        strings.ToLower(payload.PhoneNumber), // ! can use fiber toLower function that has better performance
 		Password:     string(hashedPassword),
 		PersonalCode: payload.PersonalCode,
 		NationalCode:  payload.NationalCode,
@@ -70,7 +70,7 @@ func Login(c *fiber.Ctx) error {
 		return ValidationHandle(c, err)
 	}
 	var user M.User
-	result := D.DB().First(&user, "email = ?", strings.ToLower(payload.PersonalCode))
+	result := D.DB().First(&user, "personal_code = ?", strings.ToLower(payload.PersonalCode))
 	// ! result.error will not be null if no row returned, so i commented it
 	// ! i guess the way that i handled it is not the best and i should create a method and check if the error is
 	// ! no row found, ignore the error

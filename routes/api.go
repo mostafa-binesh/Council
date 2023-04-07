@@ -37,13 +37,23 @@ func RouterInit() {
 	admin := router.Group("/admin")
 	admin.Get("/users", AC.IndexUser)
 	admin.Get("/users/:id<int>", AC.UserByID)
+	admin.Put("/user/:id<int>",AC.EditUser)
 	admin.Get("/users/search", AC.UserSearch)
 	admin.Post("/users", AC.AddUser)
-	admin.Put("/user/:id<int>/verify", AC.UserVerification)
-	admin.Put("/user/:id<int>/unverify", AC.UserUnVerification)
+	// admin.Put("/user/:id<int>/verify", AC.UserVerification)
+	// admin.Put("/user/:id<int>/unverify", AC.UserUnVerification)
 	admin.Delete("/users/:id<int>", AC.DeleteUser)
+	admin.Get("/laws",AC.IndexLaw)
+	admin.Get("/laws/search",AC.LawSearch)
+	admin.Get("laws/:id<int>", C.LawByID) // get certain law by id
+	admin.Post("/laws",AC.CreateLaw)
 	admin.Put("/laws/:id<int>", AC.UpdateLaw)
 	admin.Delete("/laws/:id<int>", AC.DeleteLaw)
+	// admin.Put("/user/:id<int>",func(c *fiber.Ctx) error {
+	// 	return c.JSON(fiber.Map{
+	// 		"messag": "sssss",
+	// 	})
+	// })
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)

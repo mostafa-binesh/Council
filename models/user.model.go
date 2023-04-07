@@ -13,10 +13,9 @@ type User struct {
 	// gorm.Model
 	ID           uint   `gorm:"primaryKey"`
 	Name         string `gorm:"type:varchar(100);not null"`
-	Email        string `gorm:"type:varchar(100);uniqueIndex;not null"`
+	PhoneNumber  string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password     string `gorm:"type:varchar(100);not null"`
 	Role         uint   `gorm:"default:1;not null"`
-	City         string `gorm:"type:varchar(100);not null"`
 	PersonalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	NationalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	// Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`
@@ -25,34 +24,41 @@ type User struct {
 	CreatedAt *time.Time `gorm:"not null;default:now()"`
 	UpdatedAt *time.Time `gorm:"not null;default:now()"`
 }
+type MinUser struct {
+	ID           uint   `json:"Id,omitempty"`
+	Name         string `json:"Name"`
+	PhoneNumber  string `json:"PhoneNumber"`
+	PersonalCode string `json:"PersonalCode"`
+	NationalCode string `json:"NationalCode"`
+}
 
 // ! this model has been used in signup handler
 type SignUpInput struct {
 	Name            string `json:"name" validate:"required"`
-	Email           string `json:"email" validate:"required,email,gunique=users.email"`
+	PhoneNumber     string `json:"PhoneNumber" validate:"required,phone_number,gunique=users.phone_number"`
 	Password        string `json:"password" validate:"required,min=8"`
 	PasswordConfirm string `json:"passwordConfirm" validate:"required,min=8,eqfield=Password"`
-	PersonalCode    string `json:"PersonalCode" validate:"required,max=8,gunique=users.code_personal"`
+	PersonalCode    string `json:"PersonalCode" validate:"required,max=8,gunique=users.personal_code"`
 	NationalCode    string `json:"NationalCode" validate:"required,max=10,min=10,gunique=users.national_code"`
 	// Photo string `json:"photo"`
 }
 
 // ! this model has been used in login handler
 type SignInInput struct {
-	PersonalCode string `json:"email"  validate:"required"`
+	PersonalCode string `json:"personal_code"  validate:"required"`
 	Password     string `json:"password"  validate:"required"`
 }
 
 // ! not been used
 type UserResponse struct {
-	ID        uint      `json:"id,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	Email     string    `json:"email,omitempty"`
-	Role      string    `json:"role,omitempty"`
-	Photo     string    `json:"photo,omitempty"`
-	Provider  string    `json:"provider"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID          uint      `json:"id,omitempty"`
+	Name        string    `json:"name,omitempty"`
+	PhoneNumber string    `json:"phone_number,omitempty"`
+	Role        string    `json:"role,omitempty"`
+	Photo       string    `json:"photo,omitempty"`
+	Provider    string    `json:"provider"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 var validate = validator.New()

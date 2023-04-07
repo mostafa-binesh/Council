@@ -13,6 +13,9 @@ type Law struct {
 	Body               string    `json:"body" gorm:"type:text;not null"`
 	Image              string    `json:"image" gorm:"type:varchar(255);not null"`
 	Comments           []Comment
+	NumberItems        int       `json:"NumberItems" gorm:"type:int;not null"`
+	NumberNotes        int       `json:"NumberNotes" gorm:"type:int;not null"`
+	Recommender        string    `json:"Recommender" gorm:"not null"`
 	CreatedAt          time.Time `json:"createdAt" gorm:"not null;default:now()"`
 	UpdatedAt          time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
@@ -27,6 +30,9 @@ type LawWithMinimalComment struct {
 	Body               string           `json:"body" gorm:"type:text;not null"`
 	Image              string           `json:"image" gorm:"type:varchar(255);not null"`
 	Comments           []CommentMinimal `json:"comments"`
+	NumberItems        int              `json:"NumberItems" gorm:"type:int;not null"`
+	NumberNotes        int              `json:"NumberNotes" gorm:"type:int;not null"`
+	Recommender        string           `json:"Recommender" gorm:"not null"`
 	CreatedAt          time.Time        `json:"createdAt" gorm:"not null;default:now()"`
 	UpdatedAt          time.Time        `json:"updatedAt" gorm:"not null;default:now()"`
 }
@@ -57,6 +63,9 @@ type CreateLawInput struct {
 	NotificationNumber string    `json:"notificationNumber" validate:"required"`
 	Body               string    `json:"body" validate:"required"`
 	Image              string    `json:"image" validate:"required"`
+	NumberItems        int       `json:"NumberItems" validate:"required"`
+	NumberNotes        int       `json:"NumberNotes" validate:"required"`
+	Recommender        string    `json:"Recommender" validate:"required"`
 	Tags               string    `json:"tags" validate:"required"`
 }
 type Comment struct {
@@ -106,6 +115,7 @@ type Attachment struct {
 	ID        uint   `gorm:"primary_key"`
 	FileName  string `gorm:"type:varchar(255);not null"`
 	LawID     uint
+	Type      int       `gorm:"type:int;not null"`
 	Law       *Law      `gorm:"foreignKey:LawID"`
 	CreatedAt time.Time `gorm:"not null;default:now()"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"not null;default:now()"`

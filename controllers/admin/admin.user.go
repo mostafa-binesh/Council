@@ -30,14 +30,68 @@ import (
 // ! Index User with admin/users route
 func IndexUser(c *fiber.Ctx) error {
 	user := []M.User{}
-
-	D.DB().Find(&user)
-
-	return c.Status(200).JSON(fiber.Map{
-		"data": user,
+	pagination := new(F.Pagination)
+	if err := c.QueryParser(pagination); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	D.DB().Where("id > ?", 0).Scopes(F.Paginate(user, pagination)).Find(&user)
+	pass_data := []M.MinUser{}
+	for i := 0; i < len(user); i++ {
+		pass_data = append(pass_data, M.MinUser{
+			ID:           user[i].ID,
+			Name:         user[i].Name,
+			PhoneNumber:  user[i].PhoneNumber,
+			PersonalCode: user[i].PersonalCode,
+			NationalCode: user[i].NationalCode,
+		})
+	}
+	return c.JSON(fiber.Map{
+		"meta": pagination,
+		"data": pass_data,
 	})
 }
-
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+func EditUser(c *fiber.Ctx) error {
+	
+	user := M.User{}
+	payload := M.SignUpInput{}
+	// if err := c.BodyParser(payload); err != nil {
+	// 	U.ResErr(c, err.Error())
+	// }
+	// if errs := U.Validate(payload); errs != nil {
+	// 	return c.Status(400).JSON(fiber.Map{"errors": errs})
+	// }
+	result1 := D.DB().Where("id = ?", c.Params("id")).Find(&user)
+	if result1.Error != nil {
+		return U.DBError(c, result1.Error)
+	}
+	
+	D.DB().Where("id = ?", c.Params("id")).Find(&user)
+	passErr := CheckPasswordHash(payload.Password, user.Password)
+	
+	if passErr != false {
+		return U.ResErr(c, "پسورد وارد شده اشتباه است")
+	}
+	user.Name = payload.Name
+	user.NationalCode = payload.NationalCode
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
+	if err!=nil {
+		return err
+	}
+	user.Password = string(hashedPassword)
+	user.PhoneNumber = payload.PhoneNumber
+	user.PersonalCode = payload.PersonalCode
+	result := D.DB().Save(&user)
+	if result.Error != nil {
+		return U.ResErr(c, "ویرایش اطلاعات به مشکل خورد")
+	}
+	return c.JSON(fiber.Map{
+		"message": "اطلاعات با موفقیت ادیت شد",
+	})
+}
 // ! user by id with admin/users/{id}
 func UserByID(c *fiber.Ctx) error {
 	user := M.User{}
@@ -45,11 +99,18 @@ func UserByID(c *fiber.Ctx) error {
 	if user.Name == "" {
 		return U.ResErr(c, "کاربر وجود ندارد")
 	}
+	minUser := M.MinUser{
+		ID:           user.ID,
+		Name:         user.Name,
+		PhoneNumber:  user.PhoneNumber,
+		PersonalCode: user.PersonalCode,
+		NationalCode: user.NationalCode,
+	}
+
 	return c.JSON(fiber.Map{
-		"data": user,
+		"data": minUser,
 	})
 }
-
 // ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
 
@@ -62,7 +123,6 @@ func DeleteUser(c *fiber.Ctx) error {
 		"message": " کابر با موفقیت حذف شد",
 	})
 }
-
 // ! create two routes for verification, one for verify, second for unverify
 // ! there's no need to convert formValue to int
 // ! for verifying, you need to get the user first, if it was verified already, return error
@@ -86,7 +146,6 @@ func UserUnVerification(c *fiber.Ctx) error {
 		"message": " بروز رسانی با موفقیت انجام شد",
 	})
 }
-
 func UserSearch(c *fiber.Ctx) error {
 	user := []M.User{}
 	D.DB().Scopes(
@@ -99,7 +158,6 @@ func UserSearch(c *fiber.Ctx) error {
 		"data": user,
 	})
 }
-
 func AddUser(c *fiber.Ctx) error {
 	payload := new(M.SignUpInput)
 	// ! parse body
@@ -119,7 +177,7 @@ func AddUser(c *fiber.Ctx) error {
 	}
 	newUser := M.User{
 		Name:         payload.Name,
-		Email:        strings.ToLower(payload.Email),
+		PhoneNumber:  strings.ToLower(payload.PhoneNumber),
 		Password:     string(hashedPassword),
 		PersonalCode: payload.PersonalCode,
 		NationalCode: payload.NationalCode,
@@ -132,49 +190,14 @@ func AddUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "couldn't create the user"})
 	}
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "user has been created successfully"})
-
 }
-
 // ############################
 // ##########    LAW   #############
 // ############################
-func UpdateLaw(c *fiber.Ctx) error {
-	law := M.Law{}
-	payload := new(M.CreateLawInput)
-	// parsing the payload
-	if err := c.BodyParser(payload); err != nil {
-		U.ResErr(c, err.Error())
-	}
-	if errs := U.Validate(payload); errs != nil {
-		return c.Status(400).JSON(fiber.Map{"errors": errs})
-	}
-	result1 := D.DB().Where("id = ?", c.Params("id")).Find(&law)
-	if result1.Error != nil {
-		return U.DBError(c, result1.Error)
-	}
-	law.Body = payload.Body
-	law.Image = payload.Image
-	law.NotificationDate = payload.NotificationDate
-	law.NotificationNumber = payload.NotificationNumber
-	law.SessionDate = payload.SessionDate
-	law.SessionNumber = payload.SessionNumber
-	law.Title = payload.Title
-	law.Type = payload.Type
-	result := D.DB().Save(&law)
-	if result.Error != nil {
-		return U.ResErr(c, "مشکلی در به روز رسانی به وجود آمده")
-	}
-	return c.JSON(fiber.Map{
-		"message": "به روز رسانی با موفقیت انجام شد",
-	})
-}
-
-func DeleteLaw(c *fiber.Ctx) error {
-	result := D.DB().Delete(&M.Law{}, c.Params("id"))
-	if result.Error != nil {
-		return U.DBError(c, result.Error)
-	}
-	return c.JSON(fiber.Map{
-		"message": "حذف کردن با موفقیت انجام شد",
-	})
-}
+// user := []M.User{}
+//
+//	pagination := new(F.Pagination)
+//	if err := c.QueryParser(pagination); err != nil {
+//		U.ResErr(c, err.Error())
+//	}
+//	D.DB().Where("id > ?", 0).Scopes(F.Paginate(user, pagination)).Find(&user)

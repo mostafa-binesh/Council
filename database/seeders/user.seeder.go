@@ -6,50 +6,51 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 func UserSeeder() {
-	cities := []string{
-		"تهران",
-		"اصفهان",
-		"شیراز",
-		"تبریز",
-		"مشهد",
-		"کرمان",
-		"اهواز",
-		"رشت",
-		"قم",
-		"کرمانشاه",
-		"بندرعباس",
-		"یزد",
-		"اصفهان",
-		"کاشان",
-		"ساری",
-		"خرم‌آباد",
-		"زاهدان",
-		"اراک",
-		"همدان",
-		"قزوین",
-		"کرج",
-		"سقز",
-		"سنندج",
-		"لاهیجان",
-		"مراغه",
-		"ملایر",
-		"بروجرد",
-		"خمینی شهر",
-		"گنبد کاووس",
-		"سراخس",
-		"قزوین",
-		"نیشابور",
-		"آمل",
-		"خوی",
-		"گرگان",
-		"برجند",
-		"مهاباد",
-		"قائم‌شهر",
-		"آبادان",
-	}
+	// cities := []string{
+	// 	"تهران",
+	// 	"اصفهان",
+	// 	"شیراز",
+	// 	"تبریز",
+	// 	"مشهد",
+	// 	"کرمان",
+	// 	"اهواز",
+	// 	"رشت",
+	// 	"قم",
+	// 	"کرمانشاه",
+	// 	"بندرعباس",
+	// 	"یزد",
+	// 	"اصفهان",
+	// 	"کاشان",
+	// 	"ساری",
+	// 	"خرم‌آباد",
+	// 	"زاهدان",
+	// 	"اراک",
+	// 	"همدان",
+	// 	"قزوین",
+	// 	"کرج",
+	// 	"سقز",
+	// 	"سنندج",
+	// 	"لاهیجان",
+	// 	"مراغه",
+	// 	"ملایر",
+	// 	"بروجرد",
+	// 	"خمینی شهر",
+	// 	"گنبد کاووس",
+	// 	"سراخس",
+	// 	"قزوین",
+	// 	"نیشابور",
+	// 	"آمل",
+	// 	"خوی",
+	// 	"گرگان",
+	// 	"برجند",
+	// 	"مهاباد",
+	// 	"قائم‌شهر",
+	// 	"آبادان",
+	// }
 	names := []string{
 		"سارا اسدی",
 		"محمدرضا رحمانی",
@@ -104,14 +105,13 @@ func UserSeeder() {
 	}
 	rand.Seed(time.Now().UnixNano()) // Seed the random number generator with current time
 	for i := 0; i < 40; i++ {
-		cityRandomNumber := rand.Intn(len(cities))
+		// cityRandomNumber := rand.Intn(len(cities))
 		nameRandomNumber := rand.Intn(len(names))
 		D.DB().Create(&M.User{
 			Name:         names[nameRandomNumber],
-			Email:        "mostafa@gmail.com" + string(i),
+			PhoneNumber:  fmt.Sprintf("%08d", rand.Intn(100000000)),
 			Password:     "This is my password",
-			Role:         1,
-			City:         cities[cityRandomNumber],
+			Role:         2,
 			NationalCode: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
 			PersonalCode: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
 		})
