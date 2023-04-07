@@ -62,17 +62,11 @@ func EditUser(c *fiber.Ctx) error {
 	if result1.Error != nil {
 		return U.DBError(c, result1.Error)
 	}
-	D.DB().Where("id = ?", c.Params("id")).Find(&user)
-	passErr := CheckPasswordHash(payload.Password, user.Password)
-
-	if passErr != nil {
-		return U.ResErr(c, "پسورد وارد شده اشتباه است")
-	}
 	user.Name = payload.Name
 	user.NationalCode = payload.NationalCode
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return U.ResErr(c, "خطا در پردازش رمز عبور")
 	}
 	user.Password = string(hashedPassword)
 	user.PhoneNumber = payload.PhoneNumber
@@ -104,6 +98,7 @@ func UserByID(c *fiber.Ctx) error {
 		"data": minUser,
 	})
 }
+
 // ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
 	result := D.DB().Delete(&M.User{}, c.Params("id"))
@@ -114,6 +109,7 @@ func DeleteUser(c *fiber.Ctx) error {
 		"message": " کابر با موفقیت حذف شد",
 	})
 }
+
 // ! create two routes for verification, one for verify, second for unverify
 // ! there's no need to convert formValue to int
 // ! for verifying, you need to get the user first, if it was verified already, return error
