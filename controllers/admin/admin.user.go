@@ -51,7 +51,7 @@ func CheckPasswordHash(password string, hash string) error {
 func EditUser(c *fiber.Ctx) error {
 
 	user := M.User{}
-	payload := M.SignUpInput{}
+	payload := new(M.EditInput)
 	if err := c.BodyParser(payload); err != nil {
 		U.ResErr(c, err.Error())
 	}
@@ -104,7 +104,6 @@ func UserByID(c *fiber.Ctx) error {
 		"data": minUser,
 	})
 }
-
 // ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
 	result := D.DB().Delete(&M.User{}, c.Params("id"))
@@ -115,7 +114,6 @@ func DeleteUser(c *fiber.Ctx) error {
 		"message": " کابر با موفقیت حذف شد",
 	})
 }
-
 // ! create two routes for verification, one for verify, second for unverify
 // ! there's no need to convert formValue to int
 // ! for verifying, you need to get the user first, if it was verified already, return error
@@ -181,3 +179,14 @@ func AddUser(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "user has been created successfully"})
 }
+
+// ############################
+// ##########    LAW   #############
+// ############################
+// user := []M.User{}
+//
+//	pagination := new(F.Pagination)
+//	if err := c.QueryParser(pagination); err != nil {
+//		U.ResErr(c, err.Error())
+//	}
+//	D.DB().Where("id > ?", 0).Scopes(F.Paginate(user, pagination)).Find(&user)
