@@ -3,7 +3,7 @@ package routes
 import (
 	C "docker/controllers"
 	AC "docker/controllers/admin"
-
+	U "docker/utils"
 	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -20,7 +20,9 @@ func RouterInit() {
 		AppName:      "Higher Education Council",
 	})
 	// ! add middleware
-	router.Use(cors.New())
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3000",
+	}))
 	// router.Use(logger.New())
 	router.Use(recover.New())
 	// router.Use(csrf.New()) ! setup csrf token on production
@@ -30,21 +32,21 @@ func RouterInit() {
 	// ! routes
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"lastJobDone": "New file structure",
+			"msg": "freeman was here :)",
 		})
 	})
 	// ! Admin Route
 	admin := router.Group("/admin")
 	admin.Get("/users", AC.IndexUser)
 	admin.Get("/users/:id<int>", AC.UserByID)
-	admin.Put("/users/:id<int>",AC.EditUser)
+	admin.Put("/users/:id<int>", AC.EditUser)
 	admin.Get("/users/search", AC.UserSearch)
 	admin.Post("/users", AC.AddUser)
 	admin.Delete("/users/:id<int>", AC.DeleteUser)
-	admin.Get("/laws",AC.IndexLaw)
-	admin.Get("/laws/search",AC.LawSearch)
-	admin.Get("laws/:id<int>", C.LawByID) // get certain law by id
-	admin.Post("/laws",AC.CreateLaw)
+	admin.Get("/laws", AC.IndexLaw)
+	admin.Get("/laws/search", AC.LawSearch)
+	admin.Get("laws/:id<int>", C.LawByID)
+	admin.Post("/laws", AC.CreateLaw)
 	admin.Put("/laws/:id<int>", AC.UpdateLaw)
 	admin.Delete("/laws/:id<int>", AC.DeleteLaw)
 	// ! laws route
@@ -55,7 +57,7 @@ func RouterInit() {
 	laws.Get("/regulations", C.LawRegulations)
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
-	laws.Get("/:id<int>", C.LawByID) // get certain law by id
+	laws.Get("/:id<int>", C.LawByID)
 	// ! authentication routes
 	router.Post("/signup", C.SignUpUser)
 	router.Post("/login", C.Login)
@@ -74,5 +76,5 @@ func RouterInit() {
 	laws.Get("/advancedLawSearch", C.AdvancedLawSearch)
 
 	// ! listen
-	router.Listen(":" + "8070")
+	router.Listen(":" + U.Env("APP_PORT"))
 }

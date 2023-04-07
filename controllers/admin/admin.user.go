@@ -28,7 +28,12 @@ func IndexUser(c *fiber.Ctx) error {
 	if err := c.QueryParser(pagination); err != nil {
 		U.ResErr(c, err.Error())
 	}
-	D.DB().Where("id > ?", 0).Scopes(F.Paginate(user, pagination)).Find(&user)
+	D.DB().Where("id > ?", 0).Scopes(
+		F.FilterByType(c,
+			F.FilterType{QueryName: "name", Operator: "LIKE"},
+			F.FilterType{QueryName: "nationalCode", ColumnName: "national_code"},
+			F.FilterType{QueryName: "personalCode", ColumnName: "personal_code"}),
+		F.Paginate(user, pagination)).Find(&user)
 	pass_data := []M.MinUser{}
 	for i := 0; i < len(user); i++ {
 		pass_data = append(pass_data, M.MinUser{
@@ -132,18 +137,6 @@ func UserUnVerification(c *fiber.Ctx) error {
 	}
 	return c.Status(400).JSON(fiber.Map{
 		"message": " بروز رسانی با موفقیت انجام شد",
-	})
-}
-func UserSearch(c *fiber.Ctx) error {
-	user := []M.User{}
-	D.DB().Scopes(
-		F.FilterByType(c,
-			F.FilterType{QueryName: "name", Operator: "LIKE"},
-			F.FilterType{QueryName: "national_code", ColumnName: "national_code"},
-			F.FilterType{QueryName: "personal_code", ColumnName: "personal_code"})).
-		Find(&user)
-	return c.JSON(fiber.Map{
-		"data": user,
 	})
 }
 func AddUser(c *fiber.Ctx) error {
