@@ -37,7 +37,7 @@ func RouterInit() {
 	admin := router.Group("/admin")
 	admin.Get("/users", AC.IndexUser)
 	admin.Get("/users/:id<int>", AC.UserByID)
-	admin.Put("/user/:id<int>",AC.EditUser)
+	admin.Put("/users/:id<int>",AC.EditUser)
 	admin.Get("/users/search", AC.UserSearch)
 	admin.Post("/users", AC.AddUser)
 	admin.Delete("/users/:id<int>", AC.DeleteUser)
