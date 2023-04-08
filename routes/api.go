@@ -29,10 +29,12 @@ func RouterInit() {
 	// #######################
 	// ########## ROUTES #############
 	// #######################
+	router.Static("/public", "./public")
 	// ! routes
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"msg": "freeman was here :)",
+			"msg":        "freeman was here :)",
+			"lastChange": "add static files",
 		})
 	})
 	// ! Admin Route
@@ -40,7 +42,6 @@ func RouterInit() {
 	admin.Get("/users", AC.IndexUser)
 	admin.Get("/users/:id<int>", AC.UserByID)
 	admin.Put("/users/:id<int>", AC.EditUser)
-	admin.Get("/users/search", AC.UserSearch)
 	admin.Post("/users", AC.AddUser)
 	admin.Delete("/users/:id<int>", AC.DeleteUser)
 	admin.Get("/laws", AC.IndexLaw)
@@ -74,6 +75,8 @@ func RouterInit() {
 	dev.Get("/allUsers", C.DevAllUsers)      // ?: send limit and page in the query
 	dev.Get("/panic", func(c *fiber.Ctx) error { panic("PANIC!") })
 	laws.Get("/advancedLawSearch", C.AdvancedLawSearch)
+	dev.Post("/upload", C.UploadFile)
+	dev.Post("/fileExistenaceCheck", C.ExistenceCheck)
 
 	// ! listen
 	router.Listen(":" + U.Env("APP_PORT"))
