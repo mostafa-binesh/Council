@@ -53,6 +53,7 @@ func RouterInit() {
 	admin.Post("/laws", AC.CreateLaw)
 	admin.Put("/laws/:id<int>", AC.UpdateLaw)
 	admin.Delete("/laws/:id<int>", AC.DeleteLaw)
+	admin.Delete("/laws/:id<int>/files/:fileID<int>", AC.DeleteFile) // ! TODO : file az storage ham bayad paak she
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)

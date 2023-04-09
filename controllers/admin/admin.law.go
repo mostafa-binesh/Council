@@ -228,3 +228,15 @@ func LawByID(c *fiber.Ctx) error {
 		"data": LawByID,
 	})
 }
+func DeleteFile(c *fiber.Ctx) error {
+	result := D.DB().Delete(&M.File{}, c.Params("fileID"))
+	if result.Error != nil {
+		return U.DBError(c, result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return U.ResErr(c, "فایل یافت نشد")
+	}
+	return c.JSON(fiber.Map{
+		"message": "فایل حذف شد",
+	})
+}
