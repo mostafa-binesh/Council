@@ -12,7 +12,7 @@ type Law struct {
 	NotificationNumber string    `json:"notificationNumber" gorm:"not null"`
 	Body               string    `json:"body" gorm:"type:text;not null"`
 	Image              string    `json:"image" gorm:"type:varchar(255);not null"`
-	Comments           []Comment
+	Comments           []Comment `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	NumberItems        int       `json:"NumberItems" gorm:"type:int;not null"`
 	NumberNotes        int       `json:"NumberNotes" gorm:"type:int;not null"`
 	Recommender        string    `json:"Recommender" gorm:"not null"`
