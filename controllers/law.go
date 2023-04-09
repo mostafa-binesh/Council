@@ -112,21 +112,9 @@ func LawByID(c *fiber.Ctx) error {
 	if err := D.DB().Preload("Comments.User").First(law, c.Params("id")).Error; err != nil {
 		return U.DBError(c, err)
 	}
-	lawWithComment := M.LawWithMinimalComment{}
-	lawWithComment.ID = law.ID
-	lawWithComment.Type = law.Type
-	lawWithComment.Title = law.Title
-	lawWithComment.SessionNumber = law.SessionNumber
-	lawWithComment.SessionDate = law.SessionDate
-	lawWithComment.NotificationDate = law.NotificationDate
-	lawWithComment.NotificationNumber = law.NotificationNumber
-	lawWithComment.Body = law.Body
-	lawWithComment.Image = law.Image
-	lawWithComment.Comments = M.GetMinimalComment(law.Comments)
-	lawWithComment.CreatedAt = law.CreatedAt
-	lawWithComment.UpdatedAt = law.UpdatedAt
+	LawByID := M.LawToLawByID(law)
 	return c.JSON(fiber.Map{
-		"data": lawWithComment,
+		"data": LawByID,
 	})
 }
 
