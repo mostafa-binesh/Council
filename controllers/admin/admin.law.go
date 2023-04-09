@@ -4,6 +4,7 @@ import (
 	D "docker/database"
 	F "docker/database/filters"
 	U "docker/utils"
+	"fmt"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -68,16 +69,20 @@ func DeleteLaw(c *fiber.Ctx) error {
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
+	if result.RowsAffected == 0 {
+		return U.ResErr(c, "مصوبه یافت نشد")
+	}
 	return c.JSON(fiber.Map{
 		"message": "حذف کردن با موفقیت انجام شد",
 	})
 }
 func CreateLaw(c *fiber.Ctx) error {
 	payload := new(M.CreateLawInput)
-	// parsing the payload
+	// parse payload
 	if err := c.BodyParser(payload); err != nil {
 		U.ResErr(c, err.Error())
 	}
+	// validate payload
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
@@ -91,10 +96,12 @@ func CreateLaw(c *fiber.Ctx) error {
 		Body:               payload.Body,
 		Image:              payload.Image,
 	}
+	// store law in the db
 	result := D.DB().Create(&law)
 	if result.Error != nil {
 		return U.ResErr(c, result.Error.Error())
 	}
+	// parse tags and store them
 	var tags = strings.Split(payload.Tags, ",")
 	for i := 0; i < len(tags); i++ {
 		result2 := D.DB().Create(&M.Keyword{
@@ -104,9 +111,79 @@ func CreateLaw(c *fiber.Ctx) error {
 		if result2.Error != nil {
 			D.DB().Delete(&M.Law{}, law.ID)
 			return U.ResErr(c, result.Error.Error())
-			// return U.ResErr(c, "خطایی در اضافه کردن تگ ها پیش آمده است.")
 		}
 	}
+	// ! store ExplanatoryPlan is exists
+	file, _ := c.FormFile("explanatoryPlan")
+	// if formError != nil {
+	// 	return U.ResErr(c, formError.Error())
+	// }
+	if file != nil {
+		fmt.Println("till here")
+		// check if file with this name already exists
+		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+			return U.ResErr(c, "file already exists")
+		}
+		// ! file extension check
+		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		// 	return c.SendString("file should be image or pdf! please fix it")
+		// }
+		// Save file to disk
+		fileName := U.AddUUIDToString(file.Filename)
+		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		D.DB().Create(&M.File{
+			Type:  M.FileTypes["plan"],
+			Name:  fileName,
+			LawID: law.ID,
+		})
+	}
+	// ! certificate
+	file, _ = c.FormFile("certificate")
+	if file != nil {
+		// check if file with this name already exists
+		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+			return U.ResErr(c, "file already exists")
+		}
+		// ! file extension check
+		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		// 	return c.SendString("file should be image or pdf! please fix it")
+		// }
+		// Save file to disk
+		fileName := U.AddUUIDToString(file.Filename)
+		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		D.DB().Create(&M.File{
+			Type:  M.FileTypes["certificate"],
+			Name:  fileName,
+			LawID: law.ID,
+		})
+	}
+	// ! attachments
+	// attachments, _ := c.FormFile("explanatoryPlan")
+	form, _ := c.MultipartForm()
+	attachments := form.File["attachments"]
+	for _, file := range attachments {
+		// check if file with this name already exists
+		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+			return U.ResErr(c, "file already exists")
+		}
+		// ! file extension check
+		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		// 	return c.SendString("file should be image or pdf! please fix it")
+		// }
+		// Save file to disk
+		// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
+		fileName := U.AddUUIDToString(file.Filename)
+		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		D.DB().Create(&M.File{
+			Type:  M.FileTypes["attachment"],
+			Name:  fileName,
+			LawID: law.ID,
+		})
+		// if err != nil {
+		// 	return U.ResErr(c, "cannot save")
+		// }
+	}
+	// return response
 	return c.Status(200).JSON(fiber.Map{
 		"message": "مصوبه با موفقیت اضافه شد",
 	})
@@ -126,7 +203,7 @@ func LawSearch(c *fiber.Ctx) error {
 			F.FilterType{QueryName: "notification_endDate", ColumnName: "notification_date", Operator: "<="},
 			F.FilterType{QueryName: "session_startDate", ColumnName: "session_date", Operator: ">="},
 			F.FilterType{QueryName: "session_endDate", ColumnName: "session_date", Operator: "<="}),
-			F.Paginate(laws, pagination)).
+		F.Paginate(laws, pagination)).
 		Find(&laws)
 	pass_data := []M.LawMinimal_min{}
 	for i := 0; i < len(laws); i++ {

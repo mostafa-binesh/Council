@@ -109,7 +109,7 @@ func LawSearch(c *fiber.Ctx) error {
 }
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}
-	if err := D.DB().Preload("Comments.User").First(law, c.Params("id")).Error; err != nil {
+	if err := D.DB().Preload("Comments.User").Preload("Files").First(law, c.Params("id")).Error; err != nil {
 		return U.DBError(c, err)
 	}
 	LawByID := M.LawToLawByID(law)
