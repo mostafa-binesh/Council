@@ -60,6 +60,76 @@ func UpdateLaw(c *fiber.Ctx) error {
 	if result.Error != nil {
 		return U.ResErr(c, "مشکلی در به روز رسانی به وجود آمده")
 	}
+	// ! store ExplanatoryPlan is exists
+	file, _ := c.FormFile("explanatoryPlan")
+	// if formError != nil {
+	// 	return U.ResErr(c, formError.Error())
+	// }
+	if file != nil {
+		fmt.Println("till here")
+		// check if file with this name already exists
+		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+			return U.ResErr(c, "file already exists")
+		}
+		// ! file extension check
+		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		// 	return c.SendString("file should be image or pdf! please fix it")
+		// }
+		// Save file to disk
+		fileName := U.AddUUIDToString(file.Filename)
+		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		D.DB().Create(&M.File{
+			Type:  M.FileTypes["plan"],
+			Name:  fileName,
+			LawID: law.ID,
+		})
+	}
+	// ! certificate
+	file, _ = c.FormFile("certificate")
+	if file != nil {
+		// check if file with this name already exists
+		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+			return U.ResErr(c, "file already exists")
+		}
+		// ! file extension check
+		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		// 	return c.SendString("file should be image or pdf! please fix it")
+		// }
+		// Save file to disk
+		fileName := U.AddUUIDToString(file.Filename)
+		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		D.DB().Create(&M.File{
+			Type:  M.FileTypes["certificate"],
+			Name:  fileName,
+			LawID: law.ID,
+		})
+	}
+	// ! attachments
+	// attachments, _ := c.FormFile("explanatoryPlan")
+	form, _ := c.MultipartForm()
+	attachments := form.File["attachments"]
+	for _, file := range attachments {
+		// check if file with this name already exists
+		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+			return U.ResErr(c, "file already exists")
+		}
+		// ! file extension check
+		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		// 	return c.SendString("file should be image or pdf! please fix it")
+		// }
+		// Save file to disk
+		// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
+		fileName := U.AddUUIDToString(file.Filename)
+		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		D.DB().Create(&M.File{
+			Type:  M.FileTypes["attachment"],
+			Name:  fileName,
+			LawID: law.ID,
+		})
+		// if err != nil {
+		// 	return U.ResErr(c, "cannot save")
+		// }
+	}
 	return c.JSON(fiber.Map{
 		"message": "به روز رسانی با موفقیت انجام شد",
 	})
