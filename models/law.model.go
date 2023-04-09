@@ -19,22 +19,22 @@ type Law struct {
 	CreatedAt          time.Time `json:"createdAt" gorm:"not null;default:now()"`
 	UpdatedAt          time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
-type LawWithMinimalComment struct {
-	ID                 uint             `json:"id" gorm:"primary_key"`
-	Type               int              `json:"type" gorm:"type:int;not null"`
-	Title              string           `json:"title" gorm:"type:varchar(100);not null"`
-	SessionNumber      int              `json:"sessionNumber" gorm:"type:int;not null"`
-	SessionDate        time.Time        `json:"sessionDate" gorm:"not null;default:now()"`      // ! change default now later
-	NotificationDate   time.Time        `json:"notificationDate" gorm:"not null;default:now()"` // ! change default now later
-	NotificationNumber string           `json:"notificationNumber" gorm:"not null"`
-	Body               string           `json:"body" gorm:"type:text;not null"`
-	Image              string           `json:"image" gorm:"type:varchar(255);not null"`
+type LawByID struct {
+	ID                 uint             `json:"id"`
+	Type               int              `json:"type"`
+	Title              string           `json:"title"`
+	SessionNumber      int              `json:"sessionNumber"`
+	SessionDate        time.Time        `json:"sessionDate"`
+	NotificationDate   time.Time        `json:"notificationDate"`
+	NotificationNumber string           `json:"notificationNumber"`
+	Body               string           `json:"body"`
+	Image              string           `json:"image"`
 	Comments           []CommentMinimal `json:"comments"`
-	NumberItems        int              `json:"NumberItems" gorm:"type:int;not null"`
-	NumberNotes        int              `json:"NumberNotes" gorm:"type:int;not null"`
-	Recommender        string           `json:"Recommender" gorm:"not null"`
-	CreatedAt          time.Time        `json:"createdAt" gorm:"not null;default:now()"`
-	UpdatedAt          time.Time        `json:"updatedAt" gorm:"not null;default:now()"`
+	NumberItems        int              `json:"NumberItems"`
+	NumberNotes        int              `json:"NumberNotes"`
+	Recommender        string           `json:"Recommender"`
+	CreatedAt          time.Time        `json:"createdAt"`
+	UpdatedAt          time.Time        `json:"updatedAt"`
 }
 type LawMinimal struct {
 	ID               uint      `json:"id"`
@@ -146,4 +146,23 @@ func GetMinimalComment(comments []Comment) []CommentMinimal {
 
 	}
 	return minimalComments
+}
+func LawToLawByID(law *Law) *LawByID {
+	return &LawByID{
+		ID:                 law.ID,
+		Type:               law.Type,
+		Title:              law.Title,
+		SessionNumber:      law.SessionNumber,
+		SessionDate:        law.SessionDate,
+		NotificationDate:   law.NotificationDate,
+		NotificationNumber: law.NotificationNumber,
+		Body:               law.Body,
+		Image:              law.Image,
+		Comments:           GetMinimalComment(law.Comments),
+		NumberItems:        law.NumberItems,
+		NumberNotes:        law.NumberNotes,
+		Recommender:        law.Recommender,
+		CreatedAt:          law.CreatedAt,
+		UpdatedAt:          law.UpdatedAt,
+	}
 }
