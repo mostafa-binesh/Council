@@ -16,13 +16,13 @@ func AutoMigrate(c *fiber.Ctx) error {
 	// return c.JSON(fiber.Map{
 	// 	"message":c.Query("dropAllTables"),
 	// })
-	if c.Query("dropAllTables") == "" {
+	if c.Query("dropAllTables") == "1" {
 		fmt.Println("dropping all tables")
-		D.DB().Migrator().DropTable(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{}, &M.Comment{})
+		D.DB().Migrator().DropTable(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{}, &M.File{})
 	}
 	fmt.Println("Tables migration done...")
 	// ! migrate tables
-	err := D.DB().AutoMigrate(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{})
+	err := D.DB().AutoMigrate(&M.User{}, &M.Law{}, &M.Comment{}, &M.Keyword{}, &M.File{})
 	if err != nil {
 		return c.Status(400).SendString(err.Error())
 	}
