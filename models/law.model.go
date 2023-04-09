@@ -13,6 +13,7 @@ type Law struct {
 	Body               string    `json:"body" gorm:"type:text;not null"`
 	Image              string    `json:"image" gorm:"type:varchar(255);not null"`
 	Comments           []Comment `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Files              []File    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	NumberItems        int       `json:"NumberItems" gorm:"type:int;not null"`
 	NumberNotes        int       `json:"NumberNotes" gorm:"type:int;not null"`
 	Recommender        string    `json:"Recommender" gorm:"not null"`
@@ -30,6 +31,7 @@ type LawByID struct {
 	Body               string           `json:"body"`
 	Image              string           `json:"image"`
 	Comments           []CommentMinimal `json:"comments"`
+	Files              []FileMinimal    `json:"files"`
 	NumberItems        int              `json:"NumberItems"`
 	NumberNotes        int              `json:"NumberNotes"`
 	Recommender        string           `json:"Recommender"`
@@ -147,6 +149,7 @@ func GetMinimalComment(comments []Comment) []CommentMinimal {
 	}
 	return minimalComments
 }
+
 func LawToLawByID(law *Law) *LawByID {
 	return &LawByID{
 		ID:                 law.ID,
@@ -159,6 +162,7 @@ func LawToLawByID(law *Law) *LawByID {
 		Body:               law.Body,
 		Image:              law.Image,
 		Comments:           GetMinimalComment(law.Comments),
+		Files:              FileToFileMinimal(law.Files),
 		NumberItems:        law.NumberItems,
 		NumberNotes:        law.NumberNotes,
 		Recommender:        law.Recommender,
