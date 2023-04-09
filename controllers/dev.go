@@ -49,10 +49,28 @@ func DevAllUsers(c *fiber.Ctx) error {
 	})
 }
 func UploadFile(c *fiber.Ctx) error {
-	file, err := c.FormFile("file")
-	if err != nil {
-		return err
+	type Upload struct {
+		FirstName string `json:"firstName" validate:"required"`
+		LastName  string `json:"lastName" validate:"required"`
+		File      string `json:"file" validate:"required"`
 	}
+	payload := new(Upload)
+	if err := c.BodyParser(payload); err != nil {
+		return c.JSON(fiber.Map{
+			"error": err,
+		})
+	}
+	file, err := c.FormFile("file")
+	if file != nil {
+		payload.File = file.Filename
+	}
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
+	return c.JSON(fiber.Map{
+		"data": payload,
+	})
+
 	// check if file with this name already exists
 	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
 		return U.ResErr(c, "file already exists")
