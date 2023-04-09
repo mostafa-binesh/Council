@@ -5,5 +5,5 @@ import (
 )
 
 func AddUUIDToString(text string) string {
-	return uuid.New().String() + text
+	return uuid.New().String() + "-" + text
 }
