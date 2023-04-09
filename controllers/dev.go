@@ -61,16 +61,16 @@ func UploadFile(c *fiber.Ctx) error {
 		})
 	}
 	file, err := c.FormFile("file")
+	// if err != nil {
+	// ! if file not exists, we get error: there is no uploaded file associated with the given key
+	// 	return c.JSON(fiber.Map{"error": err.Error()})
+	// }
 	if file != nil {
 		payload.File = file.Filename
 	}
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
-	return c.JSON(fiber.Map{
-		"data": payload,
-	})
-
 	// check if file with this name already exists
 	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
 		return U.ResErr(c, "file already exists")
