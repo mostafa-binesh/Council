@@ -22,6 +22,10 @@ func RouterInit() {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: U.Env("APP_ALLOW_ORIGINS"),
 	}))
+	router.Use(func(c *fiber.Ctx) error {
+		U.BaseURL = c.BaseURL()
+		return c.Next()
+	})
 	// router.Use(logger.New())
 	router.Use(recover.New())
 	// router.Use(csrf.New()) ! setup csrf token on production
