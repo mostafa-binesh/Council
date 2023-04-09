@@ -1,6 +1,7 @@
 package utils
 
 import (
+	// F "docker/database/filters"
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -27,3 +28,11 @@ func DBError(c *fiber.Ctx, err error) error {
 		"error": errorText,
 	})
 }
+
+// ! cycle import error
+// func ResPagination(c *fiber.Ctx, data interface{}, pagination *F.Pagination) error {
+// 	return c.Status(400).JSON(fiber.Map{
+// 		"meta": pagination,
+// 		"data": data,
+// 	})
+// }

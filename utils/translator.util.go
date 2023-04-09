@@ -19,6 +19,9 @@ var (
 )
 var faTranslation = map[string]string{
 	"Name":               "نام",
+	"FirstName":          "نام",
+	"LastName":           "نام خانوادگی",
+	"File":               "فایل",
 	"Username":           "نام کاربری",
 	"Password":           "رمز عبور",
 	"Age":                "سن",

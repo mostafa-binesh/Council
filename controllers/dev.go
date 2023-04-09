@@ -5,6 +5,8 @@ import (
 	F "docker/database/filters"
 	M "docker/models"
 	U "docker/utils"
+	"fmt"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -45,4 +47,53 @@ func DevAllUsers(c *fiber.Ctx) error {
 		"meta": pagination,
 		"data": users,
 	})
+}
+func UploadFile(c *fiber.Ctx) error {
+	type Upload struct {
+		FirstName string `json:"firstName" validate:"required"`
+		LastName  string `json:"lastName" validate:"required"`
+		File      string `json:"file" validate:"required"`
+	}
+	payload := new(Upload)
+	if err := c.BodyParser(payload); err != nil {
+		return c.JSON(fiber.Map{
+			"error": err,
+		})
+	}
+	file, err := c.FormFile("file")
+	if file != nil {
+		payload.File = file.Filename
+	}
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
+	return c.JSON(fiber.Map{
+		"data": payload,
+	})
+
+	// check if file with this name already exists
+	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+		return U.ResErr(c, "file already exists")
+	}
+	// ! file extension check
+	if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		return c.SendString("file should be image or pdf! please fix it")
+
+	}
+	// Save file to disk
+	err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
+	if err != nil {
+		return U.ResErr(c, "cannot save")
+	}
+	return c.JSON(fiber.Map{"msg": "فایل آپلود شد"})
+}
+
+func ExistenceCheck(c *fiber.Ctx) error {
+	filename := c.FormValue("fileName")
+	directory := c.FormValue("dir")
+	if _, err := os.Stat(directory + "/" + filename); os.IsNotExist(err) {
+		return c.SendString("File does not exist")
+	} else {
+		return c.SendString("File exists")
+	}
 }

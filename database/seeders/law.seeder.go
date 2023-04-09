@@ -3,10 +3,12 @@ package seeders
 import (
 	D "docker/database"
 	M "docker/models"
+	"math/rand"
 	"time"
 )
 
 func LawSeeder() {
+	rand.Seed(time.Now().UnixNano())
 	x := `<p dir="RTL" style="text-align:right; margin-bottom:11px"><strong>ماده1 -تعریف</strong><br />كانون فرهنگی و تربیتی دانشآموزان به مركزی اطلاق میشود كه برای اجرای برنامـه هـا و<br />فعالیتهای فرهنگی، ادبی، هنری، ورزشی، اجتماعی، علمی و مهارتی در جهت رشد و شكوفایی<br />استعدادهای نوجوانان و جوانان دانشآموز به ویژه دورههای راهنمـا یی تحصـیلی و متوسـطه در<br />سراسر كشور تشكیل میگردد<br /><strong>ماده 2 -هدف</strong><br />الف- بارور كردن اوقات فراغت دانشآموزان به منظور رشد و شكوفایی استعدادهای معنوی،<br />فكری، جسمی و عاطفی آنان از طریق اجرای برنامهها و فعالیـت هـای فرهنگـ ی، ادبـ ی، هنـر ی،<br />ورزشی، اجتماعی، علمی و مهارتی<br />ب- پرورش تقویت روحیه تعاون و اخوت دینـ ی و ایجـاد همبسـتگیی بـ ین دانـش آمـوزان و<br />آموختن روش زندگی اجتماعی به آنان بر اساس موازین اسلامی<br /><strong>فصل دوم- خط مشی، اصول برنامهها و شیوه تأسیس كانون فرهنگی و تربیتی<br />ماده 3</strong> -خط مشی و اصول برنامهریزی كانونهای فرهنگی و تربیتـ ی توسـط معـاون پرورشـ ی<br />پیشنهاد میشود و پس از تأیید وزیر آموزشوپرورش اجرا میگردد<br /><strong>ماده 4 </strong>-تأسیسكانون فرهنگی و تربیتی در هر شهر، شهرستان، منطقه و ناحیه بنا به پیشنهاد<br />مدیركل استان مربوط و موافقـت معـاون پرورشـی وزارت آمـوزش وپـرورش در قالـب<br />برنامهها و اعتبارات مصوب خواهد بود</p>`
 	// statutes := []string{ // type 1
 	// 	"اساسنامه مصوبه شورای شهر درباره شهرسازی",
@@ -150,6 +152,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1989, 8, 3, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای جعفری",
 	})
 	D.DB().Create(&M.Law{
 		Type:               1,
@@ -160,6 +165,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1993, 3, 14, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای حسنی",
 	})
 	D.DB().Create(&M.Law{
 		Type:               1,
@@ -170,6 +178,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1995, 4, 10, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "خانم اکبری",
 	})
 	D.DB().Create(&M.Law{
 		Type:               1,
@@ -180,6 +191,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1997, 12, 28, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "خانم کبیری",
 	})
 	// for i := 0; i < len(regulations); i++ {
 	// 	D.DB().Create(&M.Law{
@@ -203,6 +217,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1990, 3, 14, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای حسنی",
 	})
 	D.DB().Create(&M.Law{
 		Type:               2,
@@ -213,6 +230,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1990, 9, 30, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای بینش",
 	})
 	D.DB().Create(&M.Law{
 		Type:               2,
@@ -223,6 +243,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1990, 2, 25, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "خانم علمداری",
 	})
 	D.DB().Create(&M.Law{
 		Type:               2,
@@ -233,6 +256,9 @@ func LawSeeder() {
 		NotificationDate:   time.Date(1993, 11, 10, 0, 0, 0, 0, time.UTC),
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای کاظمی",
 	})
 	// for i := 0; i < len(statutes); i++ {
 	// 	D.DB().Create(&M.Law{
@@ -254,6 +280,9 @@ func LawSeeder() {
 		NotificationNumber: "581/5841",
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای کاظم زاده",
 	})
 	D.DB().Create(&M.Law{
 		Type:               3,
@@ -262,6 +291,9 @@ func LawSeeder() {
 		NotificationNumber: "5522/9542",
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای حسنی نژاد",
 	})
 	D.DB().Create(&M.Law{
 		Type:               3,
@@ -270,6 +302,9 @@ func LawSeeder() {
 		NotificationNumber: "581/1238",
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "آقای رهنما",
 	})
 	D.DB().Create(&M.Law{
 		Type:               3,
@@ -278,6 +313,9 @@ func LawSeeder() {
 		NotificationNumber: "581/1238",
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "خانم میرسکندری",
 	})
 	D.DB().Create(&M.Law{
 		Type:               3,
@@ -286,6 +324,9 @@ func LawSeeder() {
 		NotificationNumber: "581/1238",
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "خانم میرحسنی",
 	})
 	D.DB().Create(&M.Law{
 		Type:               3,
@@ -294,6 +335,9 @@ func LawSeeder() {
 		NotificationNumber: "581/1238",
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "خانم حسینی",
 	})
 	D.DB().Create(&M.Law{
 		Type:               3,
@@ -302,6 +346,9 @@ func LawSeeder() {
 		NotificationNumber: "581/1238",
 		Body:               x,
 		Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+		NumberItems:        rand.Intn(20) + 1,
+		NumberNotes:        rand.Intn(20) + 1,
+		Recommender:        "خانم حسنی",
 	})
 	for i := 0; i < len(enactments); i++ {
 		D.DB().Create(&M.Law{
@@ -313,6 +360,9 @@ func LawSeeder() {
 			NotificationDate:   time.Date(1997, 12, 28, 0, 0, 0, 0, time.UTC),
 			Body:               x,
 			Image:              "https://s2.uupload.ir/files/placeholder-image_ux76.png",
+			NumberItems:        rand.Intn(20) + 1,
+			NumberNotes:        rand.Intn(20) + 1,
+			Recommender:        "خانم علمداری",
 		})
 	}
 

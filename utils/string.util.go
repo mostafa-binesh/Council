@@ -61,3 +61,15 @@ func ToCamel(s string) string {
 func ToLowerCamel(s string) string {
 	return toCamelInitCase(s, false)
 }
+func HasSuffixCheck(name string, checks []string) bool {
+	for _, check := range checks {
+		if !strings.HasSuffix(name, "."+check) {
+			return false
+		}
+	}
+	return true
+}
+func HasImageSuffixCheck(name string) bool {
+	imageExtensions := []string{"jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "webp"}
+	return HasSuffixCheck(name, imageExtensions)
+}
