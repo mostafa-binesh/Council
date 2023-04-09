@@ -112,6 +112,9 @@ func DeleteUser(c *fiber.Ctx) error {
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
+	if result.RowsAffected == 0 {
+		return U.ResErr(c, "کاربر یافت نشد")
+	}
 	return c.JSON(fiber.Map{
 		"message": " کابر با موفقیت حذف شد",
 	})
