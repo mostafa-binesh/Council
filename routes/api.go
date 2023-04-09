@@ -15,13 +15,12 @@ import (
 
 func RouterInit() {
 	router := fiber.New(fiber.Config{
-		// Prefork:       true,
 		ServerHeader: "Kurox",
 		AppName:      "Higher Education Council",
 	})
 	// ! add middleware
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000",
+		AllowOrigins: U.Env("APP_ALLOW_ORIGINS"),
 	}))
 	// router.Use(logger.New())
 	router.Use(recover.New())
