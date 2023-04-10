@@ -72,7 +72,7 @@ func UploadFile(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
 	// check if file with this name already exists
-	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+	if U.FileExistenceCheck(file.Filename, U.UploadLocation) {
 		return U.ResErr(c, "file already exists")
 	}
 	// ! file extension check
@@ -81,7 +81,7 @@ func UploadFile(c *fiber.Ctx) error {
 
 	}
 	// Save file to disk
-	err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
+	err = c.SaveFile(file, fmt.Sprintf(U.UploadLocation+"/%s", file.Filename))
 	if err != nil {
 		return U.ResErr(c, "cannot save | "+err.Error())
 	}
