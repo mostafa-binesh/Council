@@ -107,6 +107,8 @@ func LawSearch(c *fiber.Ctx) error {
 		"data": pass_data,
 	})
 }
+
+// ! CHECK: files ham preload mishe. aya niazi?
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}
 	if err := D.DB().Preload("Comments.User").Preload("Files").First(law, c.Params("id")).Error; err != nil {

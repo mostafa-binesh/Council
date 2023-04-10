@@ -83,7 +83,7 @@ func UploadFile(c *fiber.Ctx) error {
 	// Save file to disk
 	err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
 	if err != nil {
-		return U.ResErr(c, "cannot save")
+		return U.ResErr(c, "cannot save | "+err.Error())
 	}
 	return c.JSON(fiber.Map{"msg": "فایل آپلود شد"})
 }
