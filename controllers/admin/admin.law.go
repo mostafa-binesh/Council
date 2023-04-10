@@ -261,6 +261,9 @@ func CreateLaw(c *fiber.Ctx) error {
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	pagination := new(F.Pagination)
+	if err := c.QueryParser(pagination); err != nil {
+		U.ResErr(c, err.Error())
+	}
 	D.DB().Scopes(
 		F.FilterByType(c,
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
