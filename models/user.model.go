@@ -15,12 +15,12 @@ type User struct {
 	Name         string `gorm:"type:varchar(100);not null"`
 	PhoneNumber  string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password     string `gorm:"type:varchar(100);not null"`
-	Role         uint   `gorm:"default:1;not null"`
+	Role         uint   `gorm:"default:1;not null"` // 1: normal user, 2: moderator, 3: admin
 	PersonalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	NationalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	// Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`
 	// Photo     *string    `gorm:"not null;default:'default.png'"`
-	Verified  *bool      `gorm:"not null;default:false"`
+	Verified  bool      `gorm:"not null;default:false"`
 	CreatedAt *time.Time `gorm:"not null;default:now()"`
 	UpdatedAt *time.Time `gorm:"not null;default:now()"`
 }
@@ -55,8 +55,8 @@ type EditInput struct {
 
 // ! this model has been used in login handler
 type SignInInput struct {
-	PersonalCode string `json:"personal_code"  validate:"required"`
-	Password     string `json:"password"  validate:"required"`
+	PersonalCode string `json:"personal_code" validate:"required"`
+	Password     string `json:"password" validate:"required"`
 }
 
 // ! not been used
