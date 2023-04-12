@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	// "docker/config"
 	U "docker/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -33,7 +34,7 @@ func ConnectToDB() {
 			Colorful:                  true,        // Disable color
 		},
 	)
-	DB_SERVER := U.Env("DB_SERVER") // localhost name and port
+	DB_SERVER := U.Env("DB_HOST") // localhost name and port
 	DB_USERNAME := U.Env("DB_USERNAME")
 	DB_PASSWORD := U.Env("DB_PASSWORD")
 	DB_NAME := U.Env("DB_NAME") // database name
