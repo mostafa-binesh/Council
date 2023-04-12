@@ -1,8 +1,9 @@
 package utils
 
 import (
-	// F "docker/database/filters"
 	"errors"
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -18,21 +19,12 @@ func DBError(c *fiber.Ctx, err error) error {
 	} else {
 		errorText = "خطای پیش بینی نشده ی پایگاه داده"
 	}
+	fmt.Printf("Database error: %s\n", err.Error())
 	if Env("APP_DEBUG") == "true" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": errorText,
 			"debug": err,
 		})
 	}
-	return c.Status(400).JSON(fiber.Map{
-		"error": errorText,
-	})
+	return ResErr(c,errorText)
 }
-
-// ! cycle import error
-// func ResPagination(c *fiber.Ctx, data interface{}, pagination *F.Pagination) error {
-// 	return c.Status(400).JSON(fiber.Map{
-// 		"meta": pagination,
-// 		"data": data,
-// 	})
-// }

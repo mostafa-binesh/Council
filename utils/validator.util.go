@@ -4,11 +4,12 @@ import (
 	"reflect"
 
 	// "github.com/go-playground/locales/en"
+	// D "docker/database"
+	// "gorm.io/gorm"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/fa"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-
 	fa_translations "github.com/go-playground/validator/v10/translations/fa"
 	// en_translations "github.com/go-playground/validator/v10/translations/en"
 )
@@ -55,13 +56,13 @@ func Validate(fields interface{}) map[string]string {
 		return faTranslation[field.Name]
 	})
 	// ! custom translations
+	// ? required
 	validate.RegisterTranslation("required", trans, func(ut ut.Translator) error {
 		return ut.Add("required", "{0} الزامی است", true) // see universal-translator for details
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, _ := ut.T("required", fe.Field())
 		return t
 	})
-
 	// ! possible issues: if fields have another struct in it, getJSONTag
 	// ! > won't work properly
 	err := validate.Struct(fields)
@@ -79,5 +80,4 @@ func Validate(fields interface{}) map[string]string {
 		return responseError
 	}
 	return nil
-
 }
