@@ -13,7 +13,6 @@ import (
 func main() {
 	D.ConnectToDB() // initialize database
 	C.Initilize()   // initialize controllers value
-	R.RouterInit()
 	// ! session
 	U.Store = session.New(session.Config{
 		CookieHTTPOnly: true,
@@ -29,5 +28,6 @@ func main() {
 			return sessionID
 		},
 	})
+	R.RouterInit()
 
 }
