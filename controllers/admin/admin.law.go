@@ -16,23 +16,17 @@ import (
 
 func IndexLaw(c *fiber.Ctx) error {
 	laws := []M.Law{}
-	pagination := new(F.Pagination)
-	if err := c.QueryParser(pagination); err != nil {
-		U.ResErr(c, err.Error())
-	}
-	D.DB().Where("id > ?", 0).Scopes(F.Paginate(laws, pagination)).Find(&laws)
-	pass_data := []M.LawMinimal_min{}
+	pagination := U.ParsedPagination(c)
+	D.DB().Scopes(U.Paginate(laws, pagination)).Find(&laws)
+	responseLaws := []M.LawMinimal_min{}
 	for i := 0; i < len(laws); i++ {
-		pass_data = append(pass_data, M.LawMinimal_min{
+		responseLaws = append(responseLaws, M.LawMinimal_min{
 			ID:    laws[i].ID,
 			Title: laws[i].Title,
 			Image: laws[i].Image,
 		})
 	}
-	return c.JSON(fiber.Map{
-		"meta": pagination,
-		"data": pass_data,
-	})
+	return U.ResWithPagination(c, responseLaws, *pagination)
 }
 func UpdateLaw(c *fiber.Ctx) error {
 	law := M.Law{}
@@ -260,10 +254,7 @@ func CreateLaw(c *fiber.Ctx) error {
 }
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
-	pagination := new(F.Pagination)
-	if err := c.QueryParser(pagination); err != nil {
-		U.ResErr(c, err.Error())
-	}
+	pagination := U.ParsedPagination(c)
 	D.DB().Scopes(
 		F.FilterByType(c,
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
@@ -276,7 +267,7 @@ func LawSearch(c *fiber.Ctx) error {
 			F.FilterType{QueryName: "notification_endDate", ColumnName: "notification_date", Operator: "<="},
 			F.FilterType{QueryName: "session_startDate", ColumnName: "session_date", Operator: ">="},
 			F.FilterType{QueryName: "session_endDate", ColumnName: "session_date", Operator: "<="}),
-		F.Paginate(laws, pagination)).
+		U.Paginate(laws, pagination)).
 		Find(&laws)
 	pass_data := []M.LawMinimal_min{}
 	for i := 0; i < len(laws); i++ {

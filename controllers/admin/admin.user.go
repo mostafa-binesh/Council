@@ -24,7 +24,7 @@ import (
 // ! Index User with admin/users route
 func IndexUser(c *fiber.Ctx) error {
 	user := []M.User{}
-	pagination := new(F.Pagination)
+	pagination := new(U.Pagination)
 	if err := c.QueryParser(pagination); err != nil {
 		U.ResErr(c, err.Error())
 	}
@@ -33,7 +33,7 @@ func IndexUser(c *fiber.Ctx) error {
 			F.FilterType{QueryName: "name", Operator: "LIKE"},
 			F.FilterType{QueryName: "nationalCode", ColumnName: "national_code"},
 			F.FilterType{QueryName: "personalCode", ColumnName: "personal_code"}),
-		F.Paginate(user, pagination)).Find(&user)
+		U.Paginate(user, pagination)).Find(&user)
 	pass_data := []M.MinUser{}
 	for i := 0; i < len(user); i++ {
 		pass_data = append(pass_data, M.MinUser{
@@ -83,7 +83,7 @@ func EditUser(c *fiber.Ctx) error {
 		return U.DBError(c, result.Error)
 	}
 	return c.JSON(fiber.Map{
-		"message": "اطلاعات با موفقیت ادیت شد",
+		"message": "کاربر ویرایش شد",
 	})
 }
 
@@ -169,18 +169,7 @@ func AddUser(c *fiber.Ctx) error {
 	result := D.DB().Create(&newUser)
 	// ! if any error exist in the create process, write the error
 	if result.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "couldn't create the user"})
+		return U.DBError(c, result.Error)
 	}
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "user has been created successfully"})
 }
-
-// ############################
-// ##########    LAW   #############
-// ############################
-// user := []M.User{}
-//
-//	pagination := new(F.Pagination)
-//	if err := c.QueryParser(pagination); err != nil {
-//		U.ResErr(c, err.Error())
-//	}
-//	D.DB().Where("id > ?", 0).Scopes(F.Paginate(user, pagination)).Find(&user)

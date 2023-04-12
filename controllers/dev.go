@@ -2,7 +2,7 @@ package controllers
 
 import (
 	D "docker/database"
-	F "docker/database/filters"
+	// F "docker/database/filters"
 	M "docker/models"
 	U "docker/utils"
 	"fmt"
@@ -25,11 +25,11 @@ func TranslationTest(c *fiber.Ctx) error {
 }
 func PaginationTest(c *fiber.Ctx) error {
 	enactments := []M.Law{}
-	pagination := new(F.Pagination)
+	pagination := new(U.Pagination)
 	if err := c.QueryParser(pagination); err != nil {
 		U.ResErr(c, err.Error())
 	}
-	D.DB().Where("type = ?", 3).Scopes(F.Paginate(enactments, pagination)).Find(&enactments)
+	D.DB().Where("type = ?", 3).Scopes(U.Paginate(enactments, pagination)).Find(&enactments)
 	return c.JSON(fiber.Map{
 		"meta": pagination,
 		"data": enactments,
@@ -38,11 +38,11 @@ func PaginationTest(c *fiber.Ctx) error {
 
 func DevAllUsers(c *fiber.Ctx) error {
 	users := []M.User{}
-	pagination := new(F.Pagination)
+	pagination := new(U.Pagination)
 	if err := c.QueryParser(pagination); err != nil {
 		U.ResErr(c, err.Error())
 	}
-	D.DB().Scopes(F.Paginate(users, pagination)).Find(&users)
+	D.DB().Scopes(U.Paginate(users, pagination)).Find(&users)
 	return c.JSON(fiber.Map{
 		"meta": pagination,
 		"data": users,
