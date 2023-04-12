@@ -39,10 +39,10 @@ func SignUpUser(c *fiber.Ctx) error {
 	}
 	newUser := M.User{
 		Name:         payload.Name,
-		PhoneNumber:        strings.ToLower(payload.PhoneNumber), // ! can use fiber toLower function that has better performance
+		PhoneNumber:  strings.ToLower(payload.PhoneNumber), // ! can use fiber toLower function that has better performance
 		Password:     string(hashedPassword),
 		PersonalCode: payload.PersonalCode,
-		NationalCode:  payload.NationalCode,
+		NationalCode: payload.NationalCode,
 		// Photo:    &payload.Photo, // ? don't know why add & in the payload for photo
 	}
 	// ! add user to the database
@@ -57,42 +57,39 @@ func SignUpUser(c *fiber.Ctx) error {
 
 func Login(c *fiber.Ctx) error {
 	payload := new(M.SignInInput)
-	// ! parse body
-	res, err := BodyParserHandle(c, payload)
-	if err != nil {
-		fmt.Println("inside error")
-		return res
+	// ! parse payload
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
 	}
-	fmt.Println("body parser pass")
 	// ! validate request
-	err = validate.Struct(payload)
-	if err != nil {
-		return ValidationHandle(c, err)
+	if errs := U.Validate(payload); errs != nil {
+		return U.ResValidationErr(c, errs)
 	}
 	var user M.User
 	result := D.DB().First(&user, "personal_code = ?", strings.ToLower(payload.PersonalCode))
-	// ! result.error will not be null if no row returned, so i commented it
-	// ! i guess the way that i handled it is not the best and i should create a method and check if the error is
-	// ! no row found, ignore the error
-	// ! maybe can handle it in this way
-	// ! https://gorm.io/docs/error_handling.html
+	// ! the reason we didn't handle the error first,
+	// ! - is because not found return error option is disabled
 	if result.RowsAffected == 0 {
-		return ReturnError(c, "Invalid email or password")
+		// return ReturnError(c, "ایمیل یا رمز عبور اشتباه است")
+		return U.ResErr(c, "کد پرسنلی یا رمز عبور اشتباه است")
+	}
+	if result.Error != nil {
+		return U.DBError(c, result.Error)
 	}
 	// ! compare the password of payload and returned user from database
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid email or Password"})
+		return U.ResErr(c, "کد پرسنلی یا رمز عبور اشتباه است")
 	}
 	sess := U.Session(c)
 	sess.Set(U.USER_ID, user.ID)
 	if err := sess.Save(); err != nil {
-		return ReturnError(c, "server error", 500)
+		return U.ResErr(c, "خطا در ورود")
 	}
-	return c.SendString("you can now access /dashboard")
+	return U.ResMessage(c, "ورود انجام شد")
 }
 func Logout(c *fiber.Ctx) error {
-	// ! just remove the session
+	// ! just removing the session
 	sess, err := U.Store.Get(c)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
