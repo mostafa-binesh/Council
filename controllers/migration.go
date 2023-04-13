@@ -24,8 +24,9 @@ func AutoMigrate(c *fiber.Ctx) error {
 			&M.Comment{},
 			&M.Keyword{},
 			&M.File{},
-			&M.Guest{},
-			&M.GuestMessage{})
+			&M.GuestMessage{},
+			&M.GuestChat{},
+		)
 	}
 	fmt.Println("Tables migration done...")
 	// ! migrate tables
@@ -35,8 +36,9 @@ func AutoMigrate(c *fiber.Ctx) error {
 		&M.Comment{},
 		&M.Keyword{},
 		&M.File{},
-		&M.Guest{},
-		&M.GuestMessage{})
+		&M.GuestMessage{},
+		&M.GuestChat{},
+	)
 	if err != nil {
 		return c.Status(400).SendString(err.Error())
 	}

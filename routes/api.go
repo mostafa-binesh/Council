@@ -7,9 +7,9 @@ import (
 	// U "docker/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	// "github.com/gofiber/fiber/v2/middleware/csrf"
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
@@ -28,7 +28,6 @@ func RouterInit() {
 	})
 	router.Use(logger.New())
 	router.Use(recover.New())
-	// router.Use(csrf.New()) ! setup csrf token on production
 	// #######################
 	// ########## ROUTES #############
 	// #######################
@@ -66,6 +65,18 @@ func RouterInit() {
 	router.Post("/signup", C.SignUpUser)
 	router.Post("/login", C.Login)
 	router.Get("/logout", C.Logout)
+	// ! messaging
+	msg := router.Group("correspondence")
+	msg.Use(encryptcookie.New(encryptcookie.Config{
+		// ! only base64 charasters
+		// ! A-Z | a-z | 0-9 | + | /
+		Key: "S6e5+xc65+4dfs/nb4/f56+EW+56N4d6",
+	}))
+	// msg.Post("/register", C.GuestRegister)
+	// msg.Get("/messages", C.GuestMessages)
+	msg.Post("/messages", C.GuestSendMessage)
+	msg.Post("/chats", C.CreateGuestChat)
+	msg.Get("/chats", C.GuestChats)
 	// ! dashboard routes
 	dashboard := router.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
@@ -81,7 +92,6 @@ func RouterInit() {
 	dev.Post("/upload", C.UploadFile)
 	dev.Post("/fileExistenaceCheck", C.ExistenceCheck)
 	dev.Post("/gormUnique", C.GormG)
-
 	// ! listen
 	router.Listen(":" + U.Env("APP_PORT"))
 }
