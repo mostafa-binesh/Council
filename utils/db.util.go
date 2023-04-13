@@ -19,7 +19,7 @@ func DBError(c *fiber.Ctx, err error) error {
 	} else {
 		errorText = "خطای پیش بینی نشده ی پایگاه داده"
 	}
-	fmt.Printf("Database error: %s\n", err.Error())
+	fmt.Printf("Database error: %v\n", err)
 	if Env("APP_DEBUG") == "true" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": errorText,
