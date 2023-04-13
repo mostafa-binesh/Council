@@ -20,7 +20,7 @@ type User struct {
 	NationalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	// Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`
 	// Photo     *string    `gorm:"not null;default:'default.png'"`
-	Verified  bool      `gorm:"not null;default:false"`
+	Verified  bool       `gorm:"not null;default:false"`
 	CreatedAt *time.Time `gorm:"not null;default:now()"`
 	UpdatedAt *time.Time `gorm:"not null;default:now()"`
 }
@@ -46,9 +46,9 @@ type SignUpInput struct {
 // ! this model has been used in Edit user handler
 type EditInput struct {
 	Name         string `json:"name" validate:"required"`
-	PhoneNumber  string `json:"phoneNumber" validate:"required"`
-	PersonalCode string `json:"personalCode" validate:"required,max=10,numeric"`
-	NationalCode string `json:"nationalCode" validate:"required,len=10,numeric"`
+	PhoneNumber  string `json:"phoneNumber" validate:"required,dunique=users"`
+	PersonalCode string `json:"personalCode" validate:"required,max=10,numeric,dunique=users"`
+	NationalCode string `json:"nationalCode" validate:"required,len=10,numeric,dunique=users"`
 	Password     string `json:"password"`
 	// Photo string `json:"photo"`
 }
