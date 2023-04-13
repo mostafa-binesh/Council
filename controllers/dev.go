@@ -97,3 +97,23 @@ func ExistenceCheck(c *fiber.Ctx) error {
 		return c.SendString("File exists")
 	}
 }
+func GormG(c *fiber.Ctx) error {
+	type pashm struct {
+		Name         string `json:"name" validate:"required,dunique=users.name"` // users table, name column
+		PersonalCode string `json:"personalCode" validate:"required,dexists=users"`
+	}
+	payload := new(pashm)
+	// parse payload
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	// ! if you're in edit and wanna ignore the user's information rows
+	// ! - you need to pass the id to validation function as well
+	// ! -- eg. the user's phoneNumber is 1234 and you've used dunique in phoneNumber field
+	// ! --- but if you check the user's row, you'll get the user's phoneNumber and unique validation will fail
+	// ! ---- but you don't want this. so you need to ignore that specific id
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
+	return c.SendString("no error")
+}

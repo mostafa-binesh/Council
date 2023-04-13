@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 
-	// "github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	// "github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
@@ -26,14 +26,13 @@ func RouterInit() {
 		U.BaseURL = c.BaseURL()
 		return c.Next()
 	})
-	// router.Use(logger.New())
+	router.Use(logger.New())
 	router.Use(recover.New())
 	// router.Use(csrf.New()) ! setup csrf token on production
 	// #######################
 	// ########## ROUTES #############
 	// #######################
 	router.Static("/public", "./public")
-	// ! routes
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"msg":        "freeman was here :)",
@@ -81,6 +80,7 @@ func RouterInit() {
 	laws.Get("/advancedLawSearch", C.AdvancedLawSearch)
 	dev.Post("/upload", C.UploadFile)
 	dev.Post("/fileExistenaceCheck", C.ExistenceCheck)
+	dev.Post("/gormUnique", C.GormG)
 
 	// ! listen
 	router.Listen(":" + U.Env("APP_PORT"))
