@@ -7,7 +7,7 @@ import (
 	"time"
 
 	// "docker/config"
-	U "docker/utils"
+	// U "docker/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -19,11 +19,12 @@ func DB() *gorm.DB {
 	if gormDatabase != nil {
 		return gormDatabase
 	}
-	ConnectToDB()
+	// ConnectToDB()
 	return gormDatabase
 }
 
-func ConnectToDB() {
+// func ConnectToDB() {
+func ConnectToDB(DB_HOST string, DB_USERNAME string, DB_PASSWORD string, DB_NAME string, DB_PORT string) {
 	var err error
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
@@ -34,12 +35,7 @@ func ConnectToDB() {
 			Colorful:                  true,        // Disable color
 		},
 	)
-	DB_SERVER := U.Env("DB_HOST") // localhost name and port
-	DB_USERNAME := U.Env("DB_USERNAME")
-	DB_PASSWORD := U.Env("DB_PASSWORD")
-	DB_NAME := U.Env("DB_NAME") // database name
-	DB_PORT := U.Env("DB_PORT")
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", DB_USERNAME, DB_PASSWORD, DB_SERVER, DB_PORT, DB_NAME)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
 	gormDatabase, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})
@@ -48,7 +44,7 @@ func ConnectToDB() {
 	}
 	fmt.Println("database connection stablished")
 }
-func RowsCount(query string, searchValue string) int {
+func RowsCount(query string, searchValue string, ignoreID ...uint64) int {
 	rows, err := gormDatabase.Raw(query, searchValue).Rows()
 	if err != nil {
 		panic(err)
@@ -56,10 +52,16 @@ func RowsCount(query string, searchValue string) int {
 	defer rows.Close()
 
 	count := 0
+	var id uint64
 	for rows.Next() {
-		count++
-		break
+		if err := rows.Scan(&id); err != nil {
+			if len(ignoreID) > 0 {
+				if id != ignoreID[0] {
+					count++
+					break
+				}
+			}
+		}
 	}
-
 	return count
 }

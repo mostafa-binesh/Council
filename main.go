@@ -11,8 +11,14 @@ import (
 )
 
 func main() {
-	D.ConnectToDB() // initialize database
-	C.Initilize()   // initialize controllers value
+	D.ConnectToDB(
+		U.Env("DB_HOST"),
+		U.Env("DB_USERNAME"),
+		U.Env("DB_PASSWORD"),
+		U.Env("DB_NAME"),
+		U.Env("DB_PORT"),
+	) // initialize database
+	C.Initilize() // initialize controllers value
 	// ! session
 	U.Store = session.New(session.Config{
 		CookieHTTPOnly: true,
