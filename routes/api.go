@@ -75,8 +75,8 @@ func RouterInit() {
 	// msg.Post("/register", C.GuestRegister)
 	// msg.Get("/messages", C.GuestMessages)
 	msg.Post("/messages", C.GuestSendMessage)
-	msg.Post("/chats", C.CreateGuestChat)
 	msg.Get("/chats", C.GuestChats)
+	msg.Post("/chats", C.CreateGuestChat)
 	// ! dashboard routes
 	dashboard := router.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)

@@ -26,6 +26,9 @@ func GuestMessages(c *fiber.Ctx) error {
 	})
 }
 func GuestSendMessage(c *fiber.Ctx) error {
+	if c.Cookies("guest") == "" {
+		return U.ResErr(c, "لطفا ابتدا چتی ایجاد کنید")
+	}
 	guestID, err := strconv.Atoi(c.Cookies("guest"))
 	if err != nil {
 		panic("guest messages atoi panic")
@@ -45,6 +48,9 @@ func GuestSendMessage(c *fiber.Ctx) error {
 }
 
 func GuestChats(c *fiber.Ctx) error {
+	if c.Cookies("guest") == "" {
+		return U.ResErr(c, "لطفا ابتدا چتی ایجاد کنید")
+	}
 	guestID, err := strconv.Atoi(c.Cookies("guest"))
 	if err != nil {
 		panic("guest messages atoi panic")
