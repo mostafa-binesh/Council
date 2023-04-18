@@ -80,7 +80,7 @@ func LawRegulations(c *fiber.Ctx) error {
 func AdvancedLawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	D.DB().Scopes(
-		F.FilterByType(c,
+		F.FilterByType(
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
 			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="})).
 		Find(&laws)
@@ -90,7 +90,7 @@ func AdvancedLawSearch(c *fiber.Ctx) error {
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	D.DB().Scopes(
-		F.FilterByType(c,
+		F.FilterByType(
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
 			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="},
 			F.FilterType{QueryName: "endDate", ColumnName: "notification_date", Operator: "<="})).

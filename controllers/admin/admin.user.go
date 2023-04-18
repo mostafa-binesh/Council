@@ -19,7 +19,7 @@ func IndexUser(c *fiber.Ctx) error {
 	user := []M.User{}
 	pagination := U.ParsedPagination(c)
 	D.DB().Scopes(
-		F.FilterByType(c,
+		F.FilterByType(
 			F.FilterType{QueryName: "name", Operator: "LIKE"},
 			F.FilterType{QueryName: "nationalCode", ColumnName: "national_code"},
 			F.FilterType{QueryName: "personalCode", ColumnName: "personal_code"}),
@@ -47,7 +47,7 @@ func EditUser(c *fiber.Ctx) error {
 	user := M.User{}
 	payload := new(M.EditInput)
 	if err := c.BodyParser(payload); err != nil {
-		U.ResErr(c, err.Error())
+		return U.ResErr(c, err.Error())
 	}
 	if errs := U.Validate(payload, c.Params("id")); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
