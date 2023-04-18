@@ -26,6 +26,10 @@ func RouterInit() {
 		U.BaseURL = c.BaseURL()
 		return c.Next()
 	})
+	router.Use(func(c *fiber.Ctx) error {
+		U.SetFiberContext(c)
+		return c.Next()
+	})
 	router.Use(logger.New())
 	router.Use(recover.New())
 	// #######################
@@ -72,11 +76,9 @@ func RouterInit() {
 		// ! A-Z | a-z | 0-9 | + | /
 		Key: "S6e5+xc65+4dfs/nb4/f56+EW+56N4d6",
 	}))
-	// msg.Post("/register", C.GuestRegister)
-	// msg.Get("/messages", C.GuestMessages)
-	msg.Post("/messages", C.GuestSendMessage)
 	msg.Get("/chats", C.GuestChats)
 	msg.Post("/chats", C.CreateGuestChat)
+	msg.Post("/messages", C.GuestSendMessage)
 	// ! dashboard routes
 	dashboard := router.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
