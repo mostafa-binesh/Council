@@ -2,9 +2,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/go-playground/validator/v10"
-	// "github.com/google/uuid"
 )
 
 // ! the model that been used for migration and retrieve and add data to the database
@@ -69,29 +66,4 @@ type UserResponse struct {
 	Provider    string    `json:"provider"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-}
-
-var validate = validator.New()
-
-// ! not been used
-type ErrorResponse struct {
-	Field string `json:"field"`
-	Tag   string `json:"tag"`
-	Value string `json:"value,omitempty"`
-}
-
-// ! not been used
-func ValidateStruct[T any](payload T) []*ErrorResponse {
-	var errors []*ErrorResponse
-	err := validate.Struct(payload)
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			var element ErrorResponse
-			element.Field = err.StructNamespace()
-			element.Tag = err.Tag()
-			element.Value = err.Param()
-			errors = append(errors, &element)
-		}
-	}
-	return errors
 }

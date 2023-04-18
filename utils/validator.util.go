@@ -52,7 +52,7 @@ func Validate(fields interface{}, ignoreID ...string) map[string]string {
 	if len(ignoreID) > 0 {
 		ignoreIDUint64, err := strconv.ParseUint(ignoreID[0], 10, 64)
 		if err != nil {
-			panic("validate function, cannot parse")
+			panic("validate function, cannot parse ignoreID")
 		}
 		IgnoreID = ignoreIDUint64
 	}
