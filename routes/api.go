@@ -3,46 +3,19 @@ package routes
 import (
 	C "docker/controllers"
 	AC "docker/controllers/admin"
-	U "docker/utils"
-	// U "docker/utils"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	// "github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-func RouterInit() {
-	router := fiber.New(fiber.Config{
-		ServerHeader: "Kurox",
-		AppName:      "Higher Education Council",
-	})
-	// ! add middleware
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: U.Env("APP_ALLOW_ORIGINS"),
-	}))
-	router.Use(func(c *fiber.Ctx) error {
-		U.BaseURL = c.BaseURL()
-		return c.Next()
-	})
-	router.Use(func(c *fiber.Ctx) error {
-		U.SetFiberContext(c)
-		return c.Next()
-	})
-	router.Use(logger.New())
-	router.Use(recover.New())
-	// #######################
-	// ########## ROUTES #############
-	// #######################
-	router.Static("/public", "./public")
+func APIInit(router *fiber.App) {
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"msg":        "freeman was here :)",
 			"lastChange": "add static files",
 		})
 	})
-	// ! Admin Route
+	// ! admin Route
 	admin := router.Group("/admin")
 	admin.Get("/users", AC.IndexUser)
 	admin.Get("/users/:id<int>", AC.UserByID)
@@ -82,7 +55,6 @@ func RouterInit() {
 	// ! dashboard routes
 	dashboard := router.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
-	// APP_PORT, _ := U.Env("APP_PORT")
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)
@@ -94,6 +66,4 @@ func RouterInit() {
 	dev.Post("/upload", C.UploadFile)
 	dev.Post("/fileExistenaceCheck", C.ExistenceCheck)
 	dev.Post("/gormUnique", C.GormG)
-	// ! listen
-	router.Listen(":" + U.Env("APP_PORT"))
 }
