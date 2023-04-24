@@ -3,10 +3,10 @@ package seeders
 import (
 	D "docker/database"
 	M "docker/models"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
-	"fmt"
 )
 
 func UserSeeder() {
@@ -107,9 +107,12 @@ func UserSeeder() {
 	for i := 0; i < 40; i++ {
 		// cityRandomNumber := rand.Intn(len(cities))
 		nameRandomNumber := rand.Intn(len(names))
+		randomPhoneNumber := rand.Intn(100000000)                         // generate random number between 0 and 99999999
+		randomIranPhoneNumber := fmt.Sprintf("09%08d", randomPhoneNumber) // print formatted string with leading zeros
 		D.DB().Create(&M.User{
-			Name:         names[nameRandomNumber],
-			PhoneNumber:  fmt.Sprintf("%08d", rand.Intn(100000000)),
+			Name: names[nameRandomNumber],
+			// PhoneNumber:  fmt.Sprintf("%08d", rand.Intn(100000000)),
+			PhoneNumber:  randomIranPhoneNumber,
 			Password:     "This is my password",
 			Role:         2,
 			NationalCode: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
