@@ -108,7 +108,7 @@ func UserSeeder() {
 		// cityRandomNumber := rand.Intn(len(cities))
 		nameRandomNumber := rand.Intn(len(names))
 		randomPhoneNumber := rand.Intn(100000000)                         // generate random number between 0 and 99999999
-		randomIranPhoneNumber := fmt.Sprintf("09%08d", randomPhoneNumber) // print formatted string with leading zeros
+		randomIranPhoneNumber := fmt.Sprintf("09%09d", randomPhoneNumber) // print formatted string with leading zeros
 		D.DB().Create(&M.User{
 			Name: names[nameRandomNumber],
 			// PhoneNumber:  fmt.Sprintf("%08d", rand.Intn(100000000)),
