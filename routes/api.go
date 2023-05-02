@@ -38,6 +38,7 @@ func APIInit(router *fiber.App) {
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
 	laws.Get("/:id<int>", C.LawByID)
+	laws.Get("/offline", C.OfflineLaws)
 	// ! authentication routes
 	router.Post("/signup", C.SignUpUser)
 	router.Post("/login", C.Login)
@@ -66,4 +67,7 @@ func APIInit(router *fiber.App) {
 	dev.Post("/upload", C.UploadFile)
 	dev.Post("/fileExistenaceCheck", C.ExistenceCheck)
 	dev.Post("/gormUnique", C.GormG)
+	router.Get("/contextMemoryAddress", C.FiberContextMemoryAddress)
+	devPanel := dev.Group("/admin")
+	devPanel.Get("/structInfo", C.StructInfo)
 }
