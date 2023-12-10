@@ -19,8 +19,7 @@ func DB() *gorm.DB {
 	if gormDatabase != nil {
 		return gormDatabase
 	}
-	// ConnectToDB()
-	return gormDatabase
+	panic("CANNOT CONNECT TO THE DATABASE")
 }
 
 // func ConnectToDB() {

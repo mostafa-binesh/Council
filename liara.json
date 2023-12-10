@@ -4,5 +4,8 @@
         "name": "publicdisk",
         "mountTo": "/app/public/uploads"
       }
-    ]
+    ],
+    "app": "council-srttu",
+    "platform": "docker",
+    "port": 8070
   }

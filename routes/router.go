@@ -2,6 +2,7 @@ package routes
 
 import (
 	U "docker/utils"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -35,6 +36,7 @@ func RouterInit() {
 	// #######################
 	router.Static("/public", "./public") // static files, local public folder to public url
 
+	// ! api routes
 	APIInit(router)
 	// ! listen
 	router.Listen(":" + U.Env("APP_PORT"))

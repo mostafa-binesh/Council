@@ -38,6 +38,21 @@ type LawByID struct {
 	CreatedAt          time.Time        `json:"createdAt"`
 	UpdatedAt          time.Time        `json:"updatedAt"`
 }
+type LawOffline struct {
+	ID                 uint      `json:"id"`
+	Type               int       `json:"type"`
+	Title              string    `json:"title"`
+	SessionNumber      int       `json:"sessionNumber"`
+	SessionDate        time.Time `json:"sessionDate"`
+	NotificationDate   time.Time `json:"notificationDate"`
+	NotificationNumber string    `json:"notificationNumber"`
+	Body               string    `json:"body"`
+	NumberItems        int       `json:"numberItems"`
+	NumberNotes        int       `json:"numberNotes"`
+	Recommender        string    `json:"recommender"`
+	CreatedAt          time.Time `json:"createdAt"`
+	UpdatedAt          time.Time `json:"updatedAt"`
+}
 type LawMinimal struct {
 	ID               uint      `json:"id"`
 	Title            string    `json:"title"`
@@ -64,10 +79,10 @@ type CreateLawInput struct {
 	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
 	NotificationNumber string    `json:"notificationNumber" validate:"required"`
 	Body               string    `json:"body" validate:"required"`
-	Image              string    `json:"image" validate:"required"`
-	NumberItems        int       `json:"NumberItems" validate:"required"`
-	NumberNotes        int       `json:"NumberNotes" validate:"required"`
-	Recommender        string    `json:"Recommender" validate:"required"`
+	Image              string    `json:"image"`
+	NumberItems        int       `json:"NumberItems"`
+	NumberNotes        int       `json:"NumberNotes"`
+	Recommender        string    `json:"Recommender"`
 	Tags               string    `json:"tags" validate:"required"`
 }
 type Comment struct {
