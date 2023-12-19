@@ -44,6 +44,7 @@ func CheckPasswordHash(password string, hash string) error {
 	return err
 }
 func EditUser(c *fiber.Ctx) error {
+	// return c.SendString("wtf")
 	user := M.User{}
 	payload := new(M.EditInput)
 	if err := c.BodyParser(payload); err != nil {

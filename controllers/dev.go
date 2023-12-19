@@ -2,13 +2,14 @@ package controllers
 
 import (
 	D "docker/database"
-	// F "docker/database/filters"
 	M "docker/models"
 	U "docker/utils"
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func TranslationTest(c *fiber.Ctx) error {
@@ -116,4 +117,85 @@ func GormG(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
 	return c.SendString("no error")
+}
+
+// messaing
+type Guest struct {
+	Name  string `json:"name" validate:"required"`
+	Email string `json:"email" validate:"required,email"`
+}
+
+func MessageRegister(c *fiber.Ctx) error {
+	payload := new(Guest)
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
+	sess := U.Session(c)
+	sess.Set("type", "guest")
+	sess.Set("guest", payload)
+	if err := sess.Save(); err != nil {
+		return U.ResErr(c, err.Error())
+	}
+	return U.ResMessage(c, "ورود انجام شد")
+}
+func SeeMessages(c *fiber.Ctx) error {
+	sess := U.Session(c)
+	// sess, err := U.Store.Get(c)
+	// if err != nil {
+	// 	panic("cannot get the session")
+	// }
+
+	// return c.SendString(fmt.Sprintf("%s", sess.Get("type")))
+	// userID := sess.Get(U.USER_TYPE)
+	// if userID == nil {
+	// 	return ReturnError(c, "not authenticated", fiber.StatusUnauthorized) // ! notAuthorized is notAuthenticated
+	// } else {
+	// 	return c.SendString(fmt.Sprintf("user id is: %s", sess.Get(U.USER_ID)))
+	// }
+	// session := U.Session(c)
+	if sess != nil {
+		fmt.Printf("session type: %v\n", sess.Get("guest"))
+		fmt.Printf("session: %v\n", sess)
+		return U.ResMessage(c, fmt.Sprintf("type: %v, guest: %v", sess.Get("type"), sess.Get("guest")))
+	}
+	// return U.ResMessage(c, "session KHALIE")
+	// if sess.Get("type") == "guest" {
+	// 	guest := sess.Get("guest").(Guest)
+	// 	return c.JSON(fiber.Map{
+	// 		"data":      guest,
+	// 		"sessionID": sess.ID(),
+	// 	})
+	// }
+	return U.ResErr(c, "شما باید وارد شوید")
+}
+func FiberContextMemoryAddress(c *fiber.Ctx) error {
+	fmt.Printf("utility memory: %p\n, function context memory ad.: %p\n", U.FiberCtx(), c)
+	return c.SendString("ss")
+}
+func StructInfo(c *fiber.Ctx) error {
+	type Post struct {
+		PostName string
+	}
+	type User struct {
+		Name     string `gorm:"varchar(255)"`
+		LastName string
+		Body     string `gorm:"type:text"`
+		Posts    Post
+	}
+
+	u := User{}
+	s := reflect.TypeOf(u)
+
+	for i := 0; i < s.NumField(); i++ {
+		field := s.Field(i)
+		fmt.Printf("%s %s %s\n", field.Name, field.Type, field.Tag.Get("gorm"))
+	}
+	return c.SendString("sdassds")
+}
+func ChangePhotoofData(c *fiber.Ctx) error {
+	D.DB().Session(&gorm.Session{AllowGlobalUpdate: true}).Model(M.Law{}).Updates(M.Law{Image: "https://www.sce.ir/media/newsletter/%D8%B4%D9%88%D8%B1%D8%A7%DB%8C_%D8%B9%D8%A7%D9%84%DB%8C_dQ6T1gl.png"})
+	return U.ResMessage(c, "nigga is done")
 }

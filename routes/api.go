@@ -59,6 +59,7 @@ func APIInit(router *fiber.App) {
 	// ! devs route
 	dev := router.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)
+	dev.Get("/changePhotoOfData", C.ChangePhotoofData)
 	dev.Get("/translation", C.TranslationTest)
 	dev.Get("/pagination", C.PaginationTest) // ?: send limit and page in the query
 	dev.Get("/allUsers", C.DevAllUsers)      // ?: send limit and page in the query

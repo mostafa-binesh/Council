@@ -17,7 +17,8 @@ type Pagination struct {
 func ParsedPagination(c *fiber.Ctx) *Pagination {
 	pagination := new(Pagination)
 	if err := c.QueryParser(pagination); err != nil {
-		ResErr(c, err.Error())
+		// ResErr(c, err.Error())
+		panic("FAILED TO PARSE PAGINATION QUERY")
 	}
 	return pagination
 }

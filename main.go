@@ -1,7 +1,7 @@
 package main
 
 import (
-	C "docker/controllers"
+	// C "docker/controllers"
 	D "docker/database"
 	R "docker/routes"
 	U "docker/utils"
@@ -18,7 +18,7 @@ func main() {
 		U.Env("DB_NAME"),
 		U.Env("DB_PORT"),
 	) // initialize database
-	C.Initilize() // initialize controllers value
+	// C.Initilize() // initialize controllers value
 	// ! session
 	U.Store = session.New(session.Config{
 		CookieHTTPOnly: true,

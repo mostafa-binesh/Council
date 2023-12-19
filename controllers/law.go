@@ -93,7 +93,8 @@ func LawSearch(c *fiber.Ctx) error {
 		F.FilterByType(
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
 			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="},
-			F.FilterType{QueryName: "endDate", ColumnName: "notification_date", Operator: "<="})).
+			F.FilterType{QueryName: "endDate", ColumnName: "notification_date", Operator: "<="},
+			F.FilterType{QueryName: "body", ColumnName: "body", Operator: "LIKE"})).
 		Find(&laws)
 	pass_data := []M.LawMinimal_min{}
 	for i := 0; i < len(laws); i++ {
@@ -159,26 +160,27 @@ func CreateLaw(c *fiber.Ctx) error {
 		"message": "مصوبه با موفقیت اضافه شد",
 	})
 }
+
 // offline one hundered laws
-func OfflineLaws(c *fiber.Ctx) error { 
+func OfflineLaws(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	D.DB().Limit(100).Find(&laws)
 	responseLaws := []M.LawOffline{}
 	for i := 0; i < len(laws); i++ {
 		responseLaws = append(responseLaws, M.LawOffline{
-			ID:    laws[i].ID,
-			Type:  laws[i].Type,
-			Title: laws[i].Title,
-			SessionNumber: laws[i].SessionNumber,
-			SessionDate: laws[i].SessionDate,
-			NotificationDate: laws[i].NotificationDate,
+			ID:                 laws[i].ID,
+			Type:               laws[i].Type,
+			Title:              laws[i].Title,
+			SessionNumber:      laws[i].SessionNumber,
+			SessionDate:        laws[i].SessionDate,
+			NotificationDate:   laws[i].NotificationDate,
 			NotificationNumber: laws[i].NotificationNumber,
-			Body: laws[i].Body,
-			NumberItems: laws[i].NumberItems,	
-			NumberNotes: laws[i].NumberNotes,
-			Recommender: laws[i].Recommender,
-			CreatedAt: laws[i].CreatedAt,
-			UpdatedAt: laws[i].UpdatedAt,
+			Body:               laws[i].Body,
+			NumberItems:        laws[i].NumberItems,
+			NumberNotes:        laws[i].NumberNotes,
+			Recommender:        laws[i].Recommender,
+			CreatedAt:          laws[i].CreatedAt,
+			UpdatedAt:          laws[i].UpdatedAt,
 		})
 	}
 	return c.JSON(fiber.Map{"data": responseLaws})
