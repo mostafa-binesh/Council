@@ -12,7 +12,9 @@ type User struct {
 	Name         string `gorm:"type:varchar(100);not null"`
 	PhoneNumber  string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password     string `gorm:"type:varchar(100);not null"`
-	Role         uint   `gorm:"default:1;not null"` // 1: normal user, 2: moderator, 3: admin
+	RoleID       uint   `gorm:"not null"`
+    Role         Role   `gorm:"foreignKey:RoleID"`
+	// Role         uint   `gorm:"default:1;not null"` // 1: normal user, 2: moderator, 3: admin
 	PersonalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	NationalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	// Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`

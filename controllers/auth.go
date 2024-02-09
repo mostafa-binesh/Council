@@ -6,9 +6,8 @@ import (
 	D "docker/database"
 	M "docker/models"
 	U "docker/utils"
-
 	"github.com/gofiber/fiber/v2"
-
+	// "github.com/golang-jwt/jwt"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -81,12 +80,30 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		return U.ResErr(c, "کد پرسنلی یا رمز عبور اشتباه است")
 	}
+	if !user.Verified {
+		return c.JSON(fiber.Map{
+			"Error": "این فرد هنوز تایید نشده است",
+		})
+	}
 	sess := U.Session(c)
 	sess.Set(U.USER_ID, user.ID)
 	if err := sess.Save(); err != nil {
 		return U.ResErr(c, "خطا در ورود")
 	}
-	return U.ResMessage(c, "ورود انجام شد")
+	token, err := createToken(user)
+	if err != nil {
+		// در صورت بروز خطا در ایجاد توکن، پاسخ مناسب را به مشتری ارسال کنید
+		return U.ResErr(c, "خطا در ایجاد توکن")
+	}
+	return c.JSON(fiber.Map{
+		"Name":         user.Name,
+		"PersonalCode": user.PersonalCode,
+		"PhoneNumber":  user.PhoneNumber,
+		"NationalCode": user.NationalCode,
+		"Permissions":  getPermissions(user),
+		"token": token,
+	})
+
 }
 func Logout(c *fiber.Ctx) error {
 	// ! just removing the session

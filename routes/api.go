@@ -28,6 +28,7 @@ func APIInit(router *fiber.App) {
 	admin.Post("/laws", AC.CreateLaw)
 	admin.Put("/laws/:id<int>", AC.UpdateLaw)
 	admin.Delete("/laws/:id<int>", AC.DeleteLaw)
+	admin.Get("/laws/offline",C.OfflineLaws)
 	admin.Delete("/laws/:id<int>/files/:fileID<int>", AC.DeleteFile) // ! TODO : file az storage ham bayad paak she
 	// ! laws route
 	laws := router.Group("/laws")
@@ -38,7 +39,7 @@ func APIInit(router *fiber.App) {
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
 	laws.Get("/:id<int>", C.LawByID)
-	laws.Get("/offline", C.OfflineLaws)
+	laws.Get("/offline", C.OfflineLawsNormally)
 	// ! authentication routes
 	router.Post("/signup", C.SignUpUser)
 	router.Post("/login", C.Login)

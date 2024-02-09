@@ -179,8 +179,25 @@ func OfflineLaws(c *fiber.Ctx) error {
 			NumberItems:        laws[i].NumberItems,
 			NumberNotes:        laws[i].NumberNotes,
 			Recommender:        laws[i].Recommender,
-			CreatedAt:          laws[i].CreatedAt,
-			UpdatedAt:          laws[i].UpdatedAt,
+			// CreatedAt:          laws[i].CreatedAt,
+			// UpdatedAt:          laws[i].UpdatedAt,
+		})
+	}
+	return c.JSON(fiber.Map{"data": responseLaws})
+}
+
+func OfflineLawsNormally(c *fiber.Ctx) error {
+	// return c.JSON(fiber.Map{"data": "odv"})
+	laws := []M.Law{}
+	D.DB().Limit(100).Find(&laws)
+	responseLaws := []M.LawOffline{}
+	for i := 0; i < len(laws); i++ {
+		responseLaws = append(responseLaws, M.LawOffline{
+			ID:                 laws[i].ID,
+			Type:               laws[i].Type,
+			Title:              laws[i].Title,
+			NotificationDate:   laws[i].NotificationDate,
+			Body:               laws[i].Body,
 		})
 	}
 	return c.JSON(fiber.Map{"data": responseLaws})
