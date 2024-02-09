@@ -34,7 +34,7 @@ func ConnectToDB(DB_HOST string, DB_USERNAME string, DB_PASSWORD string, DB_NAME
 			Colorful:                  true,        // Disable color
 		},
 	)
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Tehran", DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT)
 	gormDatabase, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})

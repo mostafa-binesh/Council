@@ -12,11 +12,11 @@ import (
 
 func main() {
 	D.ConnectToDB(
-		U.Env("DB_HOST"),
-		U.Env("DB_USERNAME"),
-		U.Env("DB_PASSWORD"),
-		U.Env("DB_NAME"),
-		U.Env("DB_PORT"),
+		U.Env("POSTGRES_HOST"),
+		U.Env("POSTGRES_USER"),
+		U.Env("POSTGRES_PASSWORD"),
+		U.Env("POSTGRES_DB"),
+		U.Env("POSTGRES_PORT"),
 	) // initialize database
 	// C.Initilize() // initialize controllers value
 	// ! session
