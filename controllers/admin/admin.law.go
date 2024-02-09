@@ -129,7 +129,12 @@ func UpdateLaw(c *fiber.Ctx) error {
 	})
 }
 func DeleteLaw(c *fiber.Ctx) error {
-	result := D.DB().Delete(&M.Law{}, c.Params("id"))
+	// just to pass the bug
+	result := D.DB().Delete(&M.Keyword{}, "law_id = ?", c.Params("id"))
+	if result.Error != nil {
+		return U.DBError(c, result.Error)
+	}
+	result = D.DB().Delete(&M.Law{}, c.Params("id"))
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
