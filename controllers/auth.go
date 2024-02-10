@@ -117,6 +117,45 @@ func Logout(c *fiber.Ctx) error {
 	}
 	return c.SendString("logged out successfully")
 }
+
+// refreshToken handles token refreshing by extracting the refresh token from POST parameters
+func RefreshToken(c *fiber.Ctx) error {
+	// Extract the refresh token from POST parameters
+	refreshToken := c.FormValue("refreshToken")
+
+	// Parse the refresh token
+	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
+		// Ensure the token's algorithm matches "HS256"
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fiber.NewError(fiber.StatusUnauthorized, "Unexpected signing method")
+		}
+		return U.JWTRefreshSecretKey, nil
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid refresh token"})
+	}
+
+	// Validate the token
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID, ok := claims["user_id"].(float64)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid refresh token claims"})
+		}
+		// Generate new tokens
+		newToken, err := U.CreateToken(uint(userID))
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create tokens"})
+		}
+		return c.JSON(fiber.Map{
+			"refreshToken": refreshToken,
+			"accessToken":  newToken.AccessToken,
+		})
+	} else {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid refresh token"})
+	}
+}
+
 func Dashboard(c *fiber.Ctx) error {
 	// ! has a AuthMiddleware before here
 	// ! if session and user exists, client can access here
