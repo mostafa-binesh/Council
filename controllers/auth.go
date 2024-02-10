@@ -68,7 +68,6 @@ func Login(c *fiber.Ctx) error {
 	// ! the reason we didn't handle the error first,
 	// ! - is because not found return error option is disabled
 	if result.RowsAffected == 0 {
-		// return ReturnError(c, "ایمیل یا رمز عبور اشتباه است")
 		return U.ResErr(c, "کد پرسنلی یا رمز عبور اشتباه است")
 	}
 	if result.Error != nil {
@@ -80,26 +79,22 @@ func Login(c *fiber.Ctx) error {
 		return U.ResErr(c, "کد پرسنلی یا رمز عبور اشتباه است")
 	}
 	if !user.Verified {
-		return c.JSON(fiber.Map{
-			"Error": "این فرد هنوز تایید نشده است",
-		})
+		return U.ResErr(c, "این فرد هنوز تایید نشده است")
 	}
-	sess := U.Session(c)
-	sess.Set(U.USER_ID, user.ID)
-	if err := sess.Save(); err != nil {
-		return U.ResErr(c, "خطا در ورود")
-	}
-	token, err := createToken(user)
+	// create sign-in token
+	token, err := U.CreateToken(user.ID)
 	if err != nil {
-		// در صورت بروز خطا در ایجاد توکن، پاسخ مناسب را به مشتری ارسال کنید
-		return U.ResErr(c, "خطا در ایجاد توکن")
+		// return U.ResErr(c, "خطا در ایجاد توکن")
+		return U.ResErr(c, err.Error())
 	}
 	return c.JSON(fiber.Map{
-		"Name":         user.Name,
-		"PersonalCode": user.PersonalCode,
-		"PhoneNumber":  user.PhoneNumber,
-		"NationalCode": user.NationalCode,
-		"Permissions":  getPermissions(user),
+		"user": fiber.Map{
+			"name":         user.Name,
+			"personalCode": user.PersonalCode,
+			"phoneNumber":  user.PhoneNumber,
+			"nationalCode": user.NationalCode,
+			"permissions":  getPermissions(user),
+		},
 		"token": token,
 	})
 
