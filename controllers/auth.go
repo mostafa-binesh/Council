@@ -144,3 +144,49 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	return c.Next()
 
 }
+
+// Assuming jwtSecretKey and jwtRefreshSecretKey are defined and hold the secret keys for signing JWT tokens
+
+// TokenDetails struct and CreateToken function should be defined as per your existing code
+
+// Authenticate is a middleware for validating access tokens in the Authorization header
+func JWTAuthentication(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "No authorization token provided"})
+	}
+
+	// Extract the token from the Authorization header
+	splitToken := strings.Split(authHeader, "Bearer ")
+	if len(splitToken) != 2 {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid authorization token format"})
+	}
+	tokenString := splitToken[1]
+
+	// Parse the token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Ensure the token's algorithm matches "HS256"
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fiber.NewError(fiber.StatusUnauthorized, "Unexpected signing method in auth token")
+		}
+		return U.JWTSecretKey, nil
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid authorization token"})
+	}
+
+	// Validate the token
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// You can add additional checks on the claims here if needed
+
+		// For example, extracting and setting the user ID in the Fiber context
+		userID := claims["user_id"]
+		c.Locals("userID", userID)
+
+		// Proceed to the next middleware/handler
+		return c.Next()
+	}
+
+	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid authorization token"})
+}
