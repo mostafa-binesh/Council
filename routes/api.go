@@ -11,12 +11,41 @@ import (
 func APIInit(router *fiber.App) {
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"msg":        "freeman was here :)",
-			"lastChange": "add static files",
+			"msg": "freeman was here :)",
 		})
 	})
+	router.Post("/signup", C.SignUpUser)
+	router.Post("/login", C.Login)
+	// ! laws route
+	laws := router.Group("/laws")
+	laws.Get("/", C.AllLaws)
+	laws.Post("/", C.CreateLaw)
+	laws.Get("/search", C.LawSearch)
+	laws.Get("/regulations", C.LawRegulations)
+	laws.Get("/statutes", C.LawStatutes)
+	laws.Get("/enactments", C.LawEnactments)
+	laws.Get("/:id<int>", C.LawByID)
+	laws.Get("/offline", C.OfflineLawsNormally)
+
+	// ! messaging
+	msg := router.Group("correspondence")
+	msg.Use(encryptcookie.New(encryptcookie.Config{
+		// ! only base64 charasters
+		// ! A-Z | a-z | 0-9 | + | /
+		Key: "S6e5+xc65+4dfs/nb4/f56+EW+56N4d6",
+	}))
+	msg.Get("/chats", C.GuestChats)
+	msg.Post("/chats", C.CreateGuestChat)
+	msg.Post("/messages", C.GuestSendMessage)
+
+	// authentication required endpoints
+	authRequired := router.Group("/", C.JWTAuthentication)
+
+	router.Post("/login/token/refresh", C.RefreshToken)
+	authRequired.Get("/logout", C.Logout)
+
 	// ! admin Route
-	admin := router.Group("/admin")
+	admin := authRequired.Group("/admin")
 	admin.Get("/users", AC.IndexUser)
 	admin.Get("/users/:id<int>", AC.UserByID)
 	admin.Put("/users/:id<int>", AC.EditUser)
@@ -28,37 +57,15 @@ func APIInit(router *fiber.App) {
 	admin.Post("/laws", AC.CreateLaw)
 	admin.Put("/laws/:id<int>", AC.UpdateLaw)
 	admin.Delete("/laws/:id<int>", AC.DeleteLaw)
-	admin.Get("/laws/offline",C.OfflineLaws)
+	admin.Get("/laws/offline", C.OfflineLaws)
 	admin.Delete("/laws/:id<int>/files/:fileID<int>", AC.DeleteFile) // ! TODO : file az storage ham bayad paak she
-	// ! laws route
-	laws := router.Group("/laws")
-	laws.Get("/", C.AllLaws)
-	laws.Post("/", C.CreateLaw)
-	laws.Get("/search", C.LawSearch)
-	laws.Get("/regulations", C.LawRegulations)
-	laws.Get("/statutes", C.LawStatutes)
-	laws.Get("/enactments", C.LawEnactments)
-	laws.Get("/:id<int>", C.LawByID)
-	laws.Get("/offline", C.OfflineLawsNormally)
-	// ! authentication routes
-	router.Post("/signup", C.SignUpUser)
-	router.Post("/login", C.Login)
-	router.Get("/logout", C.Logout)
-	// ! messaging
-	msg := router.Group("correspondence")
-	msg.Use(encryptcookie.New(encryptcookie.Config{
-		// ! only base64 charasters
-		// ! A-Z | a-z | 0-9 | + | /
-		Key: "S6e5+xc65+4dfs/nb4/f56+EW+56N4d6",
-	}))
-	msg.Get("/chats", C.GuestChats)
-	msg.Post("/chats", C.CreateGuestChat)
-	msg.Post("/messages", C.GuestSendMessage)
+
 	// ! dashboard routes
-	dashboard := router.Group("/dashboard", C.AuthMiddleware)
+	dashboard := authRequired.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
+
 	// ! devs route
-	dev := router.Group("/devs")
+	dev := authRequired.Group("/devs")
 	dev.Get("/autoMigrate", C.AutoMigrate)
 	dev.Get("/changePhotoOfData", C.ChangePhotoofData)
 	dev.Get("/translation", C.TranslationTest)
