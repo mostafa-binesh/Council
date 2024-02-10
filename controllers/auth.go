@@ -20,16 +20,14 @@ type Person struct {
 
 func SignUpUser(c *fiber.Ctx) error {
 	payload := new(M.SignUpInput)
-	// ! parse body
-	res, err := BodyParserHandle(c, payload)
-	if err != nil {
-		return res
+	// payload := new(M.SignInInput)
+	// ! parse payload
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
 	}
 	// ! validate request
-	// ! todo: create a shorter function for the validation, like payload.validate(), validate function can get a T template
-	err = validate.Struct(payload)
-	if err != nil {
-		return ValidationHandle(c, err)
+	if errs := U.Validate(payload); errs != nil {
+		return U.ResValidationErr(c, errs)
 	}
 	// hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
@@ -42,6 +40,7 @@ func SignUpUser(c *fiber.Ctx) error {
 		Password:     string(hashedPassword),
 		PersonalCode: payload.PersonalCode,
 		NationalCode: payload.NationalCode,
+		RoleID:       3,
 		// Photo:    &payload.Photo, // ? don't know why add & in the payload for photo
 	}
 	// ! add user to the database
