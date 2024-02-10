@@ -80,7 +80,7 @@ func LawRegulations(c *fiber.Ctx) error {
 func AdvancedLawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	D.DB().Scopes(
-		F.FilterByType(
+		F.FilterByType(c,
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
 			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="})).
 		Find(&laws)
@@ -90,7 +90,7 @@ func AdvancedLawSearch(c *fiber.Ctx) error {
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	D.DB().Scopes(
-		F.FilterByType(
+		F.FilterByType(c,
 			F.FilterType{QueryName: "title", Operator: "LIKE"},
 			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="},
 			F.FilterType{QueryName: "endDate", ColumnName: "notification_date", Operator: "<="},
@@ -106,6 +106,12 @@ func LawSearch(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{
 		"data": pass_data,
+		"params": fiber.Map{
+			"title":     c.Query("title"),
+			"startDate": c.Query("startDate"),
+			"endDate":   c.Query("endDate"),
+			"body":      c.Query("body"),
+		},
 	})
 }
 
@@ -193,11 +199,11 @@ func OfflineLawsNormally(c *fiber.Ctx) error {
 	responseLaws := []M.LawOffline{}
 	for i := 0; i < len(laws); i++ {
 		responseLaws = append(responseLaws, M.LawOffline{
-			ID:                 laws[i].ID,
-			Type:               laws[i].Type,
-			Title:              laws[i].Title,
-			NotificationDate:   laws[i].NotificationDate,
-			Body:               laws[i].Body,
+			ID:               laws[i].ID,
+			Type:             laws[i].Type,
+			Title:            laws[i].Title,
+			NotificationDate: laws[i].NotificationDate,
+			Body:             laws[i].Body,
 		})
 	}
 	return c.JSON(fiber.Map{"data": responseLaws})

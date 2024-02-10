@@ -5,9 +5,10 @@ import (
 	F "docker/database/filters"
 	M "docker/models"
 	U "docker/utils"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"strings"
 )
 
 // ############################
@@ -19,7 +20,7 @@ func IndexUser(c *fiber.Ctx) error {
 	user := []M.User{}
 	pagination := U.ParsedPagination(c)
 	D.DB().Scopes(
-		F.FilterByType(
+		F.FilterByType(c,
 			F.FilterType{QueryName: "name", Operator: "LIKE"},
 			F.FilterType{QueryName: "nationalCode", ColumnName: "national_code"},
 			F.FilterType{QueryName: "personalCode", ColumnName: "personal_code"}),
