@@ -163,7 +163,30 @@ func CreateLaw(c *fiber.Ctx) error {
 		NotificationDate:   payload.NotificationDate,
 		NotificationNumber: payload.NotificationNumber,
 		Body:               payload.Body,
-		Image:              payload.Image,
+		// Image:              payload.Image,
+	}
+	// ! store ExplanatoryPlan is exists
+	imageFile, _ := c.FormFile("image")
+
+	if imageFile == nil {
+		return U.ResValidationErr(c, map[string]string{"image": "آپلود عکس ضروری است"})
+	}
+	if imageFile != nil {
+		fmt.Println("till here")
+		// check if imageFile with this name already exists
+		if U.FileExistenceCheck(imageFile.Filename, "./public/uploads") {
+			return U.ResErr(c, "imageFile already exists")
+		}
+		// ! imageFile extension check
+		// if !(U.HasImageSuffixCheck(imageFile.Filename) || U.HasSuffixCheck(imageFile.Filename, []string{"pdf"})) {
+		// 	return c.SendString("imageFile should be image or pdf! please fix it")
+		// }
+		// Save imageFile to disk
+		fileName := U.AddUUIDToString(imageFile.Filename)
+		err := c.SaveFile(imageFile, fmt.Sprintf("./public/uploads/%s", fileName))
+		if err != nil {
+			return U.ResErr(c, err.Error())
+		}
 	}
 	// store law in the db
 	result := D.DB().Create(&law)
@@ -182,6 +205,7 @@ func CreateLaw(c *fiber.Ctx) error {
 			return U.ResErr(c, result.Error.Error())
 		}
 	}
+
 	// ! store ExplanatoryPlan is exists
 	file, _ := c.FormFile("explanatoryPlan")
 	// if formError != nil {
@@ -199,7 +223,10 @@ func CreateLaw(c *fiber.Ctx) error {
 		// }
 		// Save file to disk
 		fileName := U.AddUUIDToString(file.Filename)
-		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		if err != nil {
+			return U.ResErr(c, err.Error())
+		}
 		D.DB().Create(&M.File{
 			Type:  M.FileTypes["plan"],
 			Name:  fileName,
@@ -219,7 +246,10 @@ func CreateLaw(c *fiber.Ctx) error {
 		// }
 		// Save file to disk
 		fileName := U.AddUUIDToString(file.Filename)
-		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		if err != nil {
+			return U.ResErr(c, "خطا در ذخیره ی فایل")
+		}
 		D.DB().Create(&M.File{
 			Type:  M.FileTypes["certificate"],
 			Name:  fileName,
@@ -242,7 +272,10 @@ func CreateLaw(c *fiber.Ctx) error {
 		// Save file to disk
 		// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
 		fileName := U.AddUUIDToString(file.Filename)
-		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		if err != nil {
+			return U.ResErr(c, "خطا در ذخیره ی فایل")
+		}
 		D.DB().Create(&M.File{
 			Type:  M.FileTypes["attachment"],
 			Name:  fileName,
