@@ -3,12 +3,13 @@ package routes
 import (
 	C "docker/controllers"
 	AC "docker/controllers/admin"
-
+	
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 )
 
 func APIInit(router *fiber.App) {
+	router.Get("/migrate", C.AutoMigrate)
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"msg": "freeman was here :)",
