@@ -50,8 +50,8 @@ type LawOffline struct {
 	NumberItems        int       `json:"numberItems"`
 	NumberNotes        int       `json:"numberNotes"`
 	Recommender        string    `json:"recommender"`
-	CreatedAt          time.Time `json:"createdAt"`
-	UpdatedAt          time.Time `json:"updatedAt"`
+	// CreatedAt          time.Time `json:"createdAt"`
+	// UpdatedAt          time.Time `json:"updatedAt"`
 }
 type LawMinimal struct {
 	ID               uint      `json:"id"`
@@ -85,6 +85,9 @@ type CreateLawInput struct {
 	Recommender        string    `json:"Recommender"`
 	Tags               string    `json:"tags" validate:"required"`
 }
+type UpdatedLaws struct {
+	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
+}
 type Comment struct {
 	ID              uint   `json:"id" gorm:"primary_key"`
 	Body            string `json:"body" gorm:"type:text;not null"`
@@ -103,6 +106,9 @@ type CommentMinimal struct {
 	Body            string `json:"body"`
 	FullName        string `json:"fullName"`
 	ParentCommentID uint   `json:"parentCommentID"`
+}
+type OfflineLaws struct{
+	
 }
 
 // type UserMigration struct {
