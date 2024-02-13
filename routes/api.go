@@ -26,7 +26,7 @@ func APIInit(router *fiber.App) {
 	laws.Get("/statutes", C.LawStatutes)
 	laws.Get("/enactments", C.LawEnactments)
 	laws.Get("/:id<int>", C.LawByID)
-	laws.Get("/offline", C.OfflineLawsNormally)
+	laws.Get("/offline", C.OfflineLaws)
 	laws.Put("/offilne/update",C.UpdateLawOffline)
 	// ! messaging
 	msg := router.Group("correspondence")

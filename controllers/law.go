@@ -177,14 +177,14 @@ func OfflineLaws(c *fiber.Ctx) error {
 			ID:                 laws[i].ID,
 			Type:               laws[i].Type,
 			Title:              laws[i].Title,
-			SessionNumber:      laws[i].SessionNumber,
-			SessionDate:        laws[i].SessionDate,
+			// SessionNumber:      laws[i].SessionNumber,
+			// SessionDate:        laws[i].SessionDate,
 			NotificationDate:   laws[i].NotificationDate,
 			NotificationNumber: laws[i].NotificationNumber,
 			Body:               laws[i].Body,
-			NumberItems:        laws[i].NumberItems,
-			NumberNotes:        laws[i].NumberNotes,
-			Recommender:        laws[i].Recommender,
+			// NumberItems:        laws[i].NumberItems,
+			// NumberNotes:        laws[i].NumberNotes,
+			// Recommender:        laws[i].Recommender,
 			// CreatedAt:          laws[i].CreatedAt,
 			// UpdatedAt:          laws[i].UpdatedAt,
 		})
@@ -192,19 +192,3 @@ func OfflineLaws(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"data": responseLaws})
 }
 
-func OfflineLawsNormally(c *fiber.Ctx) error {
-	// return c.JSON(fiber.Map{"data": "odv"})
-	laws := []M.Law{}
-	D.DB().Limit(100).Find(&laws)
-	responseLaws := []M.LawOffline{}
-	for i := 0; i < len(laws); i++ {
-		responseLaws = append(responseLaws, M.LawOffline{
-			ID:               laws[i].ID,
-			Type:             laws[i].Type,
-			Title:            laws[i].Title,
-			NotificationDate: laws[i].NotificationDate,
-			Body:             laws[i].Body,
-		})
-	}
-	return c.JSON(fiber.Map{"data": responseLaws})
-}
