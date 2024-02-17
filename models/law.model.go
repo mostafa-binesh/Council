@@ -39,9 +39,9 @@ type LawByID struct {
 	UpdatedAt          time.Time        `json:"updatedAt"`
 }
 type LawOffline struct {
-	ID                 uint      `json:"id"`
-	Type               int       `json:"type"`
-	Title              string    `json:"title"`
+	ID    uint   `json:"id"`
+	Type  int    `json:"type"`
+	Title string `json:"title"`
 	// SessionNumber      int       `json:"sessionNumber"`
 	// SessionDate        time.Time `json:"sessionDate"`
 	NotificationDate   time.Time `json:"notificationDate"`
@@ -80,10 +80,13 @@ type CreateLawInput struct {
 	NotificationNumber string    `json:"notificationNumber" validate:"required"`
 	Body               string    `json:"body" validate:"required"`
 	Image              string    `json:"image"`
-	NumberItems        int       `json:"NumberItems"`
-	NumberNotes        int       `json:"NumberNotes"`
-	Recommender        string    `json:"Recommender"`
+	NumberItems        int       `json:"numberItems"`
+	NumberNotes        int       `json:"numberNotes"`
+	Recommender        string    `json:"recommender"`
 	Tags               string    `json:"tags" validate:"required"`
+	ExplanatoryPlan    string    `json:"explanatoryPlan"  validate:"required"`
+	Certificate        string    `json:"certificate" validate:"required"`
+	Attachment         []string  `json:"attachment" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
@@ -107,8 +110,7 @@ type CommentMinimal struct {
 	FullName        string `json:"fullName"`
 	ParentCommentID uint   `json:"parentCommentID"`
 }
-type OfflineLaws struct{
-	
+type OfflineLaws struct {
 }
 
 // type UserMigration struct {

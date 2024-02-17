@@ -136,6 +136,11 @@ func CreateLaw(c *fiber.Ctx) error {
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
+	return c.JSON(fiber.Map{
+		"att":         payload.Attachment,
+		"exp":         payload.ExplanatoryPlan,
+		"certificate": payload.Certificate,
+	})
 	law := M.Law{
 		Type:               payload.Type,
 		Title:              payload.Title,
@@ -174,9 +179,9 @@ func OfflineLaws(c *fiber.Ctx) error {
 	responseLaws := []M.LawOffline{}
 	for i := 0; i < len(laws); i++ {
 		responseLaws = append(responseLaws, M.LawOffline{
-			ID:                 laws[i].ID,
-			Type:               laws[i].Type,
-			Title:              laws[i].Title,
+			ID:    laws[i].ID,
+			Type:  laws[i].Type,
+			Title: laws[i].Title,
 			// SessionNumber:      laws[i].SessionNumber,
 			// SessionDate:        laws[i].SessionDate,
 			NotificationDate:   laws[i].NotificationDate,
@@ -191,4 +196,3 @@ func OfflineLaws(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{"data": responseLaws})
 }
-
