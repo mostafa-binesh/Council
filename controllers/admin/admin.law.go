@@ -43,17 +43,38 @@ func UpdateLaw(c *fiber.Ctx) error {
 		return U.DBError(c, result1.Error)
 	}
 	law.Body = payload.Body
-	law.Image = payload.Image
+	// law.Image = payload.Image
 	law.NotificationDate = payload.NotificationDate
 	law.NotificationNumber = payload.NotificationNumber
 	law.SessionDate = payload.SessionDate
 	law.SessionNumber = payload.SessionNumber
 	law.Title = payload.Title
 	law.Type = payload.Type
+
+	imageFile, _ := c.FormFile("image")
+	if imageFile != nil {
+		fmt.Println("till here")
+		// check if imageFile with this name already exists
+		if U.FileExistenceCheck(imageFile.Filename, "./public/uploads") {
+			return U.ResErr(c, "imageFile already exists")
+		}
+		// ! imageFile extension check
+		// if !(U.HasImageSuffixCheck(imageFile.Filename) || U.HasSuffixCheck(imageFile.Filename, []string{"pdf"})) {
+		// 	return c.SendString("imageFile should be image or pdf! please fix it")
+		// }
+		// Save imageFile to disk
+		fileName := U.AddUUIDToString(imageFile.Filename)
+		err := c.SaveFile(imageFile, fmt.Sprintf("./public/uploads/%s", fileName))
+		if err != nil {
+			return U.ResErr(c, err.Error())
+		}
+		law.Image = fileName
+	}
 	result := D.DB().Save(&law)
 	if result.Error != nil {
 		return U.ResErr(c, "مشکلی در به روز رسانی به وجود آمده")
 	}
+
 	// ! store ExplanatoryPlan is exists
 	file, _ := c.FormFile("explanatoryPlan")
 	// if formError != nil {
@@ -101,7 +122,7 @@ func UpdateLaw(c *fiber.Ctx) error {
 	// ! attachments
 	// attachments, _ := c.FormFile("explanatoryPlan")
 	form, _ := c.MultipartForm()
-	attachments := form.File["attachments"]
+	attachments := form.File["attachment"]
 	for _, file := range attachments {
 		// check if file with this name already exists
 		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
@@ -187,6 +208,7 @@ func CreateLaw(c *fiber.Ctx) error {
 		if err != nil {
 			return U.ResErr(c, err.Error())
 		}
+		law.Image = fileName
 	}
 	// store law in the db
 	result := D.DB().Create(&law)
@@ -259,7 +281,7 @@ func CreateLaw(c *fiber.Ctx) error {
 	// ! attachments
 	// attachments, _ := c.FormFile("explanatoryPlan")
 	form, _ := c.MultipartForm()
-	attachments := form.File["attachments"]
+	attachments := form.File["attachment"]
 	for _, file := range attachments {
 		// check if file with this name already exists
 		if U.FileExistenceCheck(file.Filename, "./public/uploads") {

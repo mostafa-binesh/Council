@@ -79,14 +79,14 @@ type CreateLawInput struct {
 	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
 	NotificationNumber string    `json:"notificationNumber" validate:"required"`
 	Body               string    `json:"body" validate:"required"`
-	Image              string    `json:"image"`
-	NumberItems        int       `json:"numberItems"`
-	NumberNotes        int       `json:"numberNotes"`
-	Recommender        string    `json:"recommender"`
-	Tags               string    `json:"tags" validate:"required"`
-	ExplanatoryPlan    string    `json:"explanatoryPlan"  validate:"required"`
-	Certificate        string    `json:"certificate" validate:"required"`
-	Attachment         []string  `json:"attachment" validate:"required"`
+	// Image              string    `json:"image"`
+	NumberItems int    `json:"numberItems"`
+	NumberNotes int    `json:"numberNotes"`
+	Recommender string `json:"recommender"`
+	Tags        string `json:"tags" validate:"required"`
+	// ExplanatoryPlan    string    `json:"explanatoryPlan"  validate:"required"`
+	// Certificate        string    `json:"certificate" validate:"required"`
+	// Attachment         []string  `json:"attachment" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later

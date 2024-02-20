@@ -136,11 +136,6 @@ func CreateLaw(c *fiber.Ctx) error {
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
-	return c.JSON(fiber.Map{
-		"att":         payload.Attachment,
-		"exp":         payload.ExplanatoryPlan,
-		"certificate": payload.Certificate,
-	})
 	law := M.Law{
 		Type:               payload.Type,
 		Title:              payload.Title,
@@ -149,7 +144,7 @@ func CreateLaw(c *fiber.Ctx) error {
 		NotificationDate:   payload.NotificationDate,
 		NotificationNumber: payload.NotificationNumber,
 		Body:               payload.Body,
-		Image:              payload.Image,
+		// Image:              payload.Image,
 	}
 	result := D.DB().Create(&law)
 	if result.Error != nil {
