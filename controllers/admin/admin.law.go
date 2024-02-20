@@ -122,7 +122,7 @@ func UpdateLaw(c *fiber.Ctx) error {
 	// ! attachments
 	// attachments, _ := c.FormFile("explanatoryPlan")
 	form, _ := c.MultipartForm()
-	attachments := form.File["attachment"]
+	attachments := form.File["attachment[]"]
 	for _, file := range attachments {
 		// check if file with this name already exists
 		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
@@ -281,7 +281,7 @@ func CreateLaw(c *fiber.Ctx) error {
 	// ! attachments
 	// attachments, _ := c.FormFile("explanatoryPlan")
 	form, _ := c.MultipartForm()
-	attachments := form.File["attachment"]
+	attachments := form.File["attachment[]"]
 	for _, file := range attachments {
 		// check if file with this name already exists
 		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
