@@ -92,17 +92,16 @@ type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
 }
 type Comment struct {
-	ID              uint   `json:"id" gorm:"primary_key"`
-	Body            string `json:"body" gorm:"type:text;not null"`
-	UserID          uint   `json:"userID"`
-	User            User   `json:"user" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
-	ParentCommentID uint   `json:"parentCommentID" gorm:"foreignKey:UserID;"`
-	// ParentComment   *Comment   `gorm:"foreignKey:ParentCommentID"`
-
-	LawID     uint      `json:"lawID"`
-	ParentLaw *Law      `json:"parentLaw" gorm:"foreignKey:LawID"`
-	CreatedAt time.Time `json:"createdAt" gorm:"not null;default:now()"`
-	UpdatedAt time.Time `json:"updatedAt" gorm:"not null;default:now()"`
+	ID              uint      `json:"id" gorm:"primary_key"`
+	Body            string    `json:"body" gorm:"type:text;not null"`
+	FirstName        string    `json:"firstName" gorm:"type:varchar(100)"`
+	LastName        string    `json:"lastName"  gorm:"type:varchar(100)"`
+	Email           string    `json:"email" gorm:"type:varchar(100)"`
+	ParentCommentID uint      `json:"parentCommentID" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
+	LawID           uint      `json:"lawID"`
+	ParentLaw       *Law      `json:"parentLaw" gorm:"foreignKey:LawID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
+	CreatedAt       time.Time `json:"createdAt" gorm:"not null;default:now()"`
+	UpdatedAt       time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type CommentMinimal struct {
 	ID              uint   `json:"id"`
@@ -131,7 +130,7 @@ type Keyword struct {
 	ID        uint   `gorm:"primary_key"`
 	Keyword   string `gorm:"type:varchar(70)"`
 	LawID     uint
-	Law       *Law      `gorm:"foreignKey:LawID"`
+	Law       *Law      `gorm:"foreignKey:LawID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	CreatedAt time.Time `gorm:"not null;default:now()"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
@@ -141,7 +140,7 @@ type Attachment struct {
 	FileName  string `gorm:"type:varchar(255);not null"`
 	LawID     uint
 	Type      int       `gorm:"type:int;not null"`
-	Law       *Law      `gorm:"foreignKey:LawID"`
+	Law       *Law      `gorm:"foreignKey:LawID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	CreatedAt time.Time `gorm:"not null;default:now()"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
@@ -153,7 +152,7 @@ type FAQ struct {
 	QuestionerID uint
 	Questioner   *User `gorm:"foreignKey:QuestionerID;not null"`
 	AnswererID   uint
-	Answerer     *User     `gorm:"foreignKey:AnswererID;not null"`
+	Answerer     *User     `gorm:"foreignKey:AnswererID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE;not null"`
 	CreatedAt    time.Time `gorm:"not null;default:now()"`
 	UpdatedAt    time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
@@ -163,7 +162,7 @@ func GetMinimalComment(comments []Comment) []CommentMinimal {
 	for i := 0; i < len(comments); i++ {
 		minimalComment := CommentMinimal{
 			ID:              comments[i].ID,
-			FullName:        comments[i].User.Name,
+			FullName:        comments[i].FirstName + " " + comments[i].LastName,
 			ParentCommentID: comments[i].ParentCommentID,
 			Body:            comments[i].Body,
 		}

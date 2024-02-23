@@ -7,9 +7,9 @@ import (
 )
 
 func LawCommentsSeeder() {
-	users := []M.User{}
+	// users := []M.User{}
 	laws := []M.Law{}
-	D.DB().Select("id").Find(&users)
+	// D.DB().Select("id").Find(&users)
 	D.DB().Select("id").Find(&laws)
 	comments := []string{
 		"از این سامانه راضیم",
@@ -33,11 +33,11 @@ func LawCommentsSeeder() {
 	for i := 0; i < 20; i++ {
 		// commentRandomNumber := rand.Intn(11) + 10 // generates a random integer between 10 and 20 (inclusive)
 		commentRandomNumber := rand.Intn(len(comments))
-		userRandomNumber := rand.Intn(len(users))
+		// userRandomNumber := rand.Intn(len(users))
 		lawRandomNumber := rand.Intn(len(laws))
 		D.DB().Create(&M.Comment{
 			Body:   comments[commentRandomNumber],
-			UserID: users[userRandomNumber].ID,
+			// UserID: users[userRandomNumber].ID,
 			LawID:  laws[lawRandomNumber].ID,
 		})
 	}

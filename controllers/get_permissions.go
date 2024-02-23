@@ -37,3 +37,4 @@ func getPermissions(user M.User) [] string {
     // ارسال لیست permissions به عنوان خروجی تابع
     return permissions_id
 }
+    

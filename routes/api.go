@@ -56,7 +56,7 @@ func APIInit(router *fiber.App) {
 	admin.Delete("/users/:id<int>", AC.DeleteUser)
 	admin.Get("/laws", AC.IndexLaw)
 	admin.Get("/laws/search", AC.LawSearch)
-	admin.Get("laws/:id<int>", C.LawByID)
+	admin.Get("laws/:id<int>", AC.LawByID)
 	admin.Post("/laws", AC.CreateLaw)
 	admin.Put("/laws/:id<int>", AC.UpdateLaw)
 	admin.Delete("/laws/:id<int>", AC.DeleteLaw)

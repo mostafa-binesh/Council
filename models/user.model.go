@@ -13,7 +13,7 @@ type User struct {
 	PhoneNumber string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password    string `gorm:"type:varchar(100);not null"`
 	RoleID      uint   `gorm:"not null"`
-	Role        Role   `gorm:"foreignKey:RoleID"`
+	Role        Role   `gorm:"foreignKey:RoleID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	// Role         uint   `gorm:"default:1;not null"` // 1: normal user, 2: moderator, 3: admin
 	PersonalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	NationalCode string `gorm:"type:varchar(10);uniqueIndex"`
