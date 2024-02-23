@@ -29,16 +29,17 @@ type MinUser struct {
 	PhoneNumber  string `json:"PhoneNumber"`
 	PersonalCode string `json:"PersonalCode"`
 	NationalCode string `json:"NationalCode"`
+	Verified     bool   `json:"Verified"`
 }
 
 // ! this model has been used in signup handler
 type SignUpInput struct {
-	Name            string `json:"name" validate:"required"`
-	PhoneNumber     string `json:"PhoneNumber" validate:"required"`
-	Password        string `json:"password" validate:"required,min=8"`
-	PasswordConfirm string `json:"passwordConfirm" validate:"required,min=8,eqfield=Password"`
-	PersonalCode    string `json:"PersonalCode" validate:"required,max=8"`
-	NationalCode    string `json:"NationalCode" validate:"required,len=10"`
+	Name             string `json:"name" validate:"required"`
+	PhoneNumber      string `json:"PhoneNumber" validate:"required,dunique=users.phone_number"`
+	Password         string `json:"password" validate:"required,min=8"`
+	repeatedPassword string `json:"repeatedPassword" validate:"required,min=8,eqfield=Password"`
+	PersonalCode     string `json:"PersonalCode" validate:"required,max=8,dunique=users.personal_code"`
+	NationalCode     string `json:"NationalCode" validate:"required,len=10,dunique=users.national_code"`
 	// Photo string `json:"photo"`
 }
 

@@ -19,7 +19,7 @@ import (
 func IndexUser(c *fiber.Ctx) error {
 	user := []M.User{}
 	pagination := U.ParsedPagination(c)
-	D.DB().Scopes(
+	D.DB().Where("role_id = ?", 2).Scopes(
 		F.FilterByType(c,
 			F.FilterType{QueryName: "name", Operator: "LIKE"},
 			F.FilterType{QueryName: "nationalCode", ColumnName: "national_code"},
@@ -33,6 +33,7 @@ func IndexUser(c *fiber.Ctx) error {
 			PhoneNumber:  user[i].PhoneNumber,
 			PersonalCode: user[i].PersonalCode,
 			NationalCode: user[i].NationalCode,
+			Verified:     user[i].Verified,
 		})
 	}
 	return c.JSON(fiber.Map{
@@ -97,6 +98,10 @@ func UserByID(c *fiber.Ctx) error {
 
 // ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
+	result1 := D.DB().Where("user_id = ? ", c.Params("id")).Delete(&M.Comment{})
+	if result1.Error != nil {
+		return U.DBError(c, result1.Error)
+	}
 	result := D.DB().Delete(&M.User{}, c.Params("id"))
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
@@ -128,7 +133,7 @@ func AddUser(c *fiber.Ctx) error {
 		return U.ResErr(c, err.Error())
 	}
 	// ! validate request
-	if errs := U.Validate(payload, c.Params("id")); errs != nil {
+	if errs := U.Validate(payload); errs != nil {
 		return U.ResValidationErr(c, errs)
 	}
 	// hash the password
@@ -142,10 +147,12 @@ func AddUser(c *fiber.Ctx) error {
 		Password:     string(hashedPassword),
 		PersonalCode: payload.PersonalCode,
 		NationalCode: payload.NationalCode,
+		RoleID:       2,
 	}
 	result := D.DB().Create(&newUser)
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
+
 	return U.ResMessage(c, "کاربر ایجاد شد") // ! TODO talk with mohsen: should i send statusCreated or 200 ?
 }

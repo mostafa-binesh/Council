@@ -74,7 +74,7 @@ type LawStatutesMinimal struct {
 type CreateLawInput struct {
 	Type               int       `json:"type" validate:"required"`
 	Title              string    `json:"title"  validate:"required"`
-	SessionNumber      int       `json:"sessionNumber" validate:"required"`
+	SessionNumber      int       `json:"sessionNumber"`
 	SessionDate        time.Time `json:"sessionDate" validate:"required"`      // ! change default now later
 	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
 	NotificationNumber string    `json:"notificationNumber" validate:"required"`
