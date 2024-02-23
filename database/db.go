@@ -49,7 +49,6 @@ func RowsCount(query string, searchValue string, ignoreID ...uint64) int {
 		panic(err)
 	}
 	defer rows.Close()
-
 	count := 0
 	var id uint64
 	for rows.Next() {

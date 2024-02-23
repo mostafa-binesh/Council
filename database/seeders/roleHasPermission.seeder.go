@@ -16,14 +16,30 @@ import(
 // 	"create",->4
 // 	"delete",->5
 func RoleHasPermissionSeeder(){
-	D.DB().Create(&M.RoleHasPermission{
-		RoleID: 3,
-		PermissionID: 1,
-	})
+
+	//! roleId = 2  
 	D.DB().Create(&M.RoleHasPermission{
 		RoleID: 2,
 		PermissionID: 1,
 	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 2,
+		PermissionID: 2,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 2,
+		PermissionID: 3,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 2,
+		PermissionID: 4,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 2,
+		PermissionID: 5,
+	})
+
+	//! roleId = 1
 	D.DB().Create(&M.RoleHasPermission{
 		RoleID: 1,
 		PermissionID: 1,
@@ -42,6 +58,27 @@ func RoleHasPermissionSeeder(){
 	})
 	D.DB().Create(&M.RoleHasPermission{
 		RoleID: 1,
-		PermissionID: 1,
+		PermissionID: 6,
 	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 1,
+		PermissionID: 7,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 1,
+		PermissionID: 8,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 1,
+		PermissionID: 9,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 1,
+		PermissionID: 10,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 1,
+		PermissionID: 11,
+	})
+	
 }

@@ -30,10 +30,10 @@ func getPermissions(user M.User) [] string {
         // در صورت وجود خطا، آن را به عنوان خروجی تابع برمی‌گردانیم
         return nil
     }
-	var permissions_name [] string
+	var permissions_id [] string
 	for i := 0; i < len(permissions); i++ {
-		permissions_name = append(permissions_name, permissions[i].Name)
+		permissions_id = append(permissions_id, permissions[i].RandomID)
 	}
     // ارسال لیست permissions به عنوان خروجی تابع
-    return permissions_name
+    return permissions_id
 }
