@@ -28,6 +28,7 @@ func APIInit(router *fiber.App) {
 	laws.Get("/:id<int>", C.LawByID)
 	laws.Get("/offline", C.OfflineLaws)
 	laws.Put("/offilne/update",C.UpdateLawOffline)
+	laws.Post("/comment",C.AddComment)
 	// ! messaging
 	msg := router.Group("correspondence")
 	msg.Use(encryptcookie.New(encryptcookie.Config{

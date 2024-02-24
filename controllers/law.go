@@ -177,17 +177,35 @@ func OfflineLaws(c *fiber.Ctx) error {
 			ID:    laws[i].ID,
 			Type:  laws[i].Type,
 			Title: laws[i].Title,
-			// SessionNumber:      laws[i].SessionNumber,
-			// SessionDate:        laws[i].SessionDate,
 			NotificationDate:   laws[i].NotificationDate,
 			NotificationNumber: laws[i].NotificationNumber,
 			Body:               laws[i].Body,
-			// NumberItems:        laws[i].NumberItems,
-			// NumberNotes:        laws[i].NumberNotes,
-			// Recommender:        laws[i].Recommender,
-			// CreatedAt:          laws[i].CreatedAt,
-			// UpdatedAt:          laws[i].UpdatedAt,
 		})
 	}
 	return c.JSON(fiber.Map{"data": responseLaws})
+}
+
+func AddComment(c *fiber.Ctx) error{
+	payload := new(M.CommentMinimal)
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
+	comment := M.Comment{
+		Body: payload.Body,
+		FullName: payload.Email,
+		Email: payload.Email,
+		LawID: payload.LawID,
+		ParentCommentID: 0,
+		Status: false,
+	}
+	result := D.DB().Create(&comment)
+	if result.Error != nil {
+		return U.ResErr(c, result.Error.Error())
+	}
+	return c.Status(200).JSON(fiber.Map{
+		"message": "کامنت با موفقیت اضافه شد",
+	})
 }

@@ -3,6 +3,6 @@
 tmp/main.exe
 .env.liara
 .env.local
-
+./public
 docker.exe
 /.vscode

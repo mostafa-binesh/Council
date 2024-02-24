@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	U "docker/utils"
+	"time"
+)
 
 type Law struct {
 	ID                 uint      `json:"id" gorm:"primary_key"`
@@ -94,20 +97,20 @@ type UpdatedLaws struct {
 type Comment struct {
 	ID              uint      `json:"id" gorm:"primary_key"`
 	Body            string    `json:"body" gorm:"type:text;not null"`
-	FirstName        string    `json:"firstName" gorm:"type:varchar(100)"`
-	LastName        string    `json:"lastName"  gorm:"type:varchar(100)"`
+	FullName        string    `json:"fullName" gorm:"type:varchar(100)"`
 	Email           string    `json:"email" gorm:"type:varchar(100)"`
 	ParentCommentID uint      `json:"parentCommentID" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	LawID           uint      `json:"lawID"`
+	Status          bool      `json:"status" gorm:"boolean"`
 	ParentLaw       *Law      `json:"parentLaw" gorm:"foreignKey:LawID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	CreatedAt       time.Time `json:"createdAt" gorm:"not null;default:now()"`
 	UpdatedAt       time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type CommentMinimal struct {
-	ID              uint   `json:"id"`
-	Body            string `json:"body"`
-	FullName        string `json:"fullName"`
-	ParentCommentID uint   `json:"parentCommentID"`
+	Body     string `json:"body" validate:"required"`
+	FullName string `json:"fullName"`
+	Email    string `json:"email"`
+	LawID    uint   `json:"law_id" validate:"required"`
 }
 type OfflineLaws struct {
 }
@@ -161,10 +164,9 @@ func GetMinimalComment(comments []Comment) []CommentMinimal {
 	var minimalComments []CommentMinimal
 	for i := 0; i < len(comments); i++ {
 		minimalComment := CommentMinimal{
-			ID:              comments[i].ID,
-			FullName:        comments[i].FirstName + " " + comments[i].LastName,
-			ParentCommentID: comments[i].ParentCommentID,
-			Body:            comments[i].Body,
+			LawID:    comments[i].LawID,
+			FullName: comments[i].FullName,
+			Body:     comments[i].Body,
 		}
 		minimalComments = append(minimalComments, minimalComment)
 
@@ -182,7 +184,7 @@ func LawToLawByID(law *Law) *LawByID {
 		NotificationDate:   law.NotificationDate,
 		NotificationNumber: law.NotificationNumber,
 		Body:               law.Body,
-		Image:              law.Image,
+		Image:              U.BaseURL + "/public/uploads/" + law.Image,
 		Comments:           GetMinimalComment(law.Comments),
 		Files:              FileToFileMinimal(law.Files),
 		NumberItems:        law.NumberItems,

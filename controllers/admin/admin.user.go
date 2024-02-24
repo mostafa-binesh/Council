@@ -24,7 +24,7 @@ func IndexUser(c *fiber.Ctx) error {
 			F.FilterType{QueryName: "name", Operator: "LIKE"},
 			F.FilterType{QueryName: "nationalCode", ColumnName: "national_code"},
 			F.FilterType{QueryName: "personalCode", ColumnName: "personal_code"}),
-		U.Paginate(user, pagination)).Find(&user)
+		U.Paginate(user, pagination)).Order("updated_at desc").Find(&user)
 	pass_data := []M.MinUser{}
 	for i := 0; i < len(user); i++ {
 		pass_data = append(pass_data, M.MinUser{

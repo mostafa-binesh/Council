@@ -23,7 +23,7 @@ func IndexLaw(c *fiber.Ctx) error {
 		responseLaws = append(responseLaws, M.LawMinimal_min{
 			ID:    laws[i].ID,
 			Title: laws[i].Title,
-			Image: laws[i].Image,
+			Image: U.BaseURL + "/public/uploads/" + laws[i].Image,
 		})
 	}
 	return U.ResWithPagination(c, responseLaws, *pagination)
