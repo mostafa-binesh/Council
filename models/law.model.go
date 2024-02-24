@@ -1,6 +1,7 @@
 package models
 
 import (
+	D "docker/database"
 	U "docker/utils"
 	"time"
 )
@@ -100,7 +101,7 @@ type Comment struct {
 	FullName        string    `json:"fullName" gorm:"type:varchar(100)"`
 	Email           string    `json:"email" gorm:"type:varchar(100)"`
 	ParentCommentID uint      `json:"parentCommentID" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
-	LawID           uint      `json:"lawID"`
+	LawID           uint      `gorm:"foreignKey:LawID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	Status          bool      `json:"status" gorm:"boolean"`
 	ParentLaw       *Law      `json:"parentLaw" gorm:"foreignKey:LawID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	CreatedAt       time.Time `json:"createdAt" gorm:"not null;default:now()"`
@@ -160,11 +161,12 @@ type FAQ struct {
 	UpdatedAt    time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 
-func GetMinimalComment(comments []Comment) []CommentMinimal {
+func GetMinimalComment(lawID uint) []CommentMinimal {
+	comments := []Comment{}
+	D.DB().Where("law_id = ?",lawID).Where("status = true").Find(&comments)
 	var minimalComments []CommentMinimal
 	for i := 0; i < len(comments); i++ {
 		minimalComment := CommentMinimal{
-			LawID:    comments[i].LawID,
 			FullName: comments[i].FullName,
 			Body:     comments[i].Body,
 		}
@@ -185,7 +187,7 @@ func LawToLawByID(law *Law) *LawByID {
 		NotificationNumber: law.NotificationNumber,
 		Body:               law.Body,
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
-		Comments:           GetMinimalComment(law.Comments),
+		Comments:           GetMinimalComment(law.ID),
 		Files:              FileToFileMinimal(law.Files),
 		NumberItems:        law.NumberItems,
 		NumberNotes:        law.NumberNotes,
