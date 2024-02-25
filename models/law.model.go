@@ -46,16 +46,9 @@ type LawOffline struct {
 	ID    uint   `json:"id"`
 	Type  int    `json:"type"`
 	Title string `json:"title"`
-	// SessionNumber      int       `json:"sessionNumber"`
-	// SessionDate        time.Time `json:"sessionDate"`
 	NotificationDate   time.Time `json:"notificationDate"`
 	NotificationNumber string    `json:"notificationNumber"`
 	Body               string    `json:"body"`
-	// NumberItems        int       `json:"numberItems"`
-	// NumberNotes        int       `json:"numberNotes"`
-	// Recommender        string    `json:"recommender"`
-	// CreatedAt          time.Time `json:"createdAt"`
-	// UpdatedAt          time.Time `json:"updatedAt"`
 }
 type LawMinimal struct {
 	ID               uint      `json:"id"`

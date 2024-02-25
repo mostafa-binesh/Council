@@ -90,6 +90,12 @@ func Login(c *fiber.Ctx) error {
 		// return U.ResErr(c, "خطا در ایجاد توکن")
 		return U.ResErr(c, err.Error())
 	}
+	userLog := &M.UserLog{
+		UserID: user.ID,
+	}
+	if err := D.DB().Create(&userLog).Error; err != nil {
+		return U.DBError(c, err)
+	}
 	return c.JSON(fiber.Map{
 		"user": fiber.Map{
 			"name":         user.Name,

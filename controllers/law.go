@@ -122,8 +122,17 @@ func LawByID(c *fiber.Ctx) error {
 		return U.DBError(c, err)
 	}
 	LawByID := M.LawToLawByID(law)
+	lawLog := &M.LawLog{
+		LawID: LawByID.ID,
+	}
+	if err := D.DB().Create(&lawLog).Error; err != nil {
+		return U.DBError(c, err)
+	}
+	var count int64
+	D.DB().Model(&M.LawLog{}).Where("law_id = ?",LawByID.ID).Count(&count)
 	return c.JSON(fiber.Map{
 		"data": LawByID,
+		"countSeen": count,
 	})
 }
 
