@@ -20,7 +20,6 @@ func APIInit(router *fiber.App) {
 	// ! laws route
 	laws := router.Group("/laws")
 	laws.Get("/", C.AllLaws)
-	laws.Post("/", C.CreateLaw)
 	laws.Get("/search", C.LawSearch)
 	laws.Get("/regulations", C.LawRegulations)
 	laws.Get("/statutes", C.LawStatutes)
@@ -29,6 +28,7 @@ func APIInit(router *fiber.App) {
 	laws.Get("/offline", C.OfflineLaws)
 	laws.Put("/offilne/update",C.UpdateLawOffline)
 	laws.Post("/comment",C.AddComment)
+
 	// ! messaging
 	msg := router.Group("correspondence")
 	msg.Use(encryptcookie.New(encryptcookie.Config{

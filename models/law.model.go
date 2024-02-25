@@ -42,13 +42,16 @@ type LawByID struct {
 	CreatedAt          time.Time        `json:"createdAt"`
 	UpdatedAt          time.Time        `json:"updatedAt"`
 }
-type LawOffline struct {
-	ID    uint   `json:"id"`
-	Type  int    `json:"type"`
-	Title string `json:"title"`
-	NotificationDate   time.Time `json:"notificationDate"`
-	NotificationNumber string    `json:"notificationNumber"`
-	Body               string    `json:"body"`
+type LawMain struct {
+	ID                 uint             `json:"id"`
+	Type               int              `json:"type"`
+	Title              string           `json:"title"`
+	NotificationDate   time.Time        `json:"notificationDate"`
+	NotificationNumber string           `json:"notificationNumber"`
+	Body               string           `json:"body"`
+	Image              string           `json:"image"`
+	SeenCount          int64            `json:"seenCount"` 
+	Comments           []CommentMinimal `json:"comments"`
 }
 type LawMinimal struct {
 	ID               uint      `json:"id"`
@@ -76,14 +79,10 @@ type CreateLawInput struct {
 	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
 	NotificationNumber string    `json:"notificationNumber" validate:"required"`
 	Body               string    `json:"body" validate:"required"`
-	// Image              string    `json:"image"`
-	NumberItems int    `json:"numberItems"`
-	NumberNotes int    `json:"numberNotes"`
-	Recommender string `json:"recommender"`
-	Tags        string `json:"tags" validate:"required"`
-	// ExplanatoryPlan    string    `json:"explanatoryPlan"  validate:"required"`
-	// Certificate        string    `json:"certificate" validate:"required"`
-	// Attachment         []string  `json:"attachment" validate:"required"`
+	NumberItems        int       `json:"numberItems"`
+	NumberNotes        int       `json:"numberNotes"`
+	Recommender        string    `json:"recommender"`
+	Tags               string    `json:"tags" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
@@ -123,7 +122,6 @@ type OfflineLaws struct {
 // }
 
 type Keyword struct {
-	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ID        uint   `gorm:"primary_key"`
 	Keyword   string `gorm:"type:varchar(70)"`
 	LawID     uint
@@ -132,7 +130,6 @@ type Keyword struct {
 	UpdatedAt time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type Attachment struct {
-	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ID        uint   `gorm:"primary_key"`
 	FileName  string `gorm:"type:varchar(255);not null"`
 	LawID     uint
@@ -142,7 +139,6 @@ type Attachment struct {
 	UpdatedAt time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type FAQ struct {
-	// ID        *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	ID           uint   `gorm:"primary_key"`
 	Question     string `gorm:"type:varchar(255);not null"`
 	Answer       string `gorm:"type:varchar(255);not null"`
@@ -156,7 +152,7 @@ type FAQ struct {
 
 func GetMinimalComment(lawID uint) []CommentMinimal {
 	comments := []Comment{}
-	D.DB().Where("law_id = ?",lawID).Where("status = true").Find(&comments)
+	D.DB().Where("law_id = ?", lawID).Where("status = true").Find(&comments)
 	var minimalComments []CommentMinimal
 	for i := 0; i < len(comments); i++ {
 		minimalComment := CommentMinimal{
@@ -168,24 +164,21 @@ func GetMinimalComment(lawID uint) []CommentMinimal {
 	}
 	return minimalComments
 }
-
-func LawToLawByID(law *Law) *LawByID {
-	return &LawByID{
+func getSeenCount(lawID uint) int64 {
+	var count int64
+	D.DB().Model(&LawLog{}).Where("law_id = ?", lawID).Count(&count)
+	return count
+}
+func LawToLawByID(law *Law) *LawMain {
+	return &LawMain{
 		ID:                 law.ID,
 		Type:               law.Type,
 		Title:              law.Title,
-		SessionNumber:      law.SessionNumber,
-		SessionDate:        law.SessionDate,
 		NotificationDate:   law.NotificationDate,
 		NotificationNumber: law.NotificationNumber,
 		Body:               law.Body,
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
 		Comments:           GetMinimalComment(law.ID),
-		Files:              FileToFileMinimal(law.Files),
-		NumberItems:        law.NumberItems,
-		NumberNotes:        law.NumberNotes,
-		Recommender:        law.Recommender,
-		CreatedAt:          law.CreatedAt,
-		UpdatedAt:          law.UpdatedAt,
+		SeenCount:          getSeenCount(law.ID),
 	}
 }
