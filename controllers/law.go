@@ -18,39 +18,39 @@ func AllLaws(c *fiber.Ctx) error {
 	pagination := U.ParsedPagination(c)
 
 	lawsType1 := []M.Law{}
-	D.DB().Where("type = ?",1).Scopes(U.Paginate(lawsType1,pagination)).Find(&lawsType1).Order("created_at asc")
+	D.DB().Where("type = ?", 1).Scopes(U.Paginate(lawsType1, pagination)).Find(&lawsType1).Order("created_at asc")
 	// ! filtering
 	for i := 0; i < len(lawsType1); i++ {
 		if lawsType1[i].Type == 1 {
 			regulations = append(regulations, M.LawMinimal{
 				ID:               lawsType1[i].ID,
 				Title:            lawsType1[i].Title,
-				Image:            U.BaseURL+"/public/uploads/"+lawsType1[i].Image,
+				Image:            U.BaseURL + "/public/uploads/" + lawsType1[i].Image,
 				NotificationDate: lawsType1[i].NotificationDate,
 			})
 		}
 	}
 	lawsType2 := []M.Law{}
-	D.DB().Where("type = ?",2).Scopes(U.Paginate(lawsType2,pagination)).Find(&lawsType2).Order("created_at asc")
+	D.DB().Where("type = ?", 2).Scopes(U.Paginate(lawsType2, pagination)).Find(&lawsType2).Order("created_at asc")
 	for i := 0; i < len(lawsType2); i++ {
 		if lawsType2[i].Type == 2 {
 			statutes = append(statutes, M.LawStatutesMinimal{
 				ID:               lawsType2[i].ID,
 				Title:            lawsType2[i].Title,
-				Image:            U.BaseURL+"/public/uploads/"+lawsType2[i].Image,
+				Image:            U.BaseURL + "/public/uploads/" + lawsType2[i].Image,
 				SessionNumber:    lawsType2[i].SessionNumber,
 				NotificationDate: lawsType2[i].NotificationDate,
 			})
 		}
 	}
 	lawsType3 := []M.Law{}
-	D.DB().Where("type = ?",3).Scopes(U.Paginate(lawsType3,pagination)).Find(&lawsType3).Order("created_at asc")
+	D.DB().Where("type = ?", 3).Scopes(U.Paginate(lawsType3, pagination)).Find(&lawsType3).Order("created_at asc")
 	for i := 0; i < len(lawsType3); i++ {
 		if lawsType3[i].Type == 3 {
 			enactments = append(enactments, M.LawMinimal{
 				ID:               lawsType3[i].ID,
 				Title:            lawsType3[i].Title,
-				Image:            U.BaseURL+"/public/uploads/"+lawsType3[i].Image,
+				Image:            U.BaseURL + "/public/uploads/" + lawsType3[i].Image,
 				NotificationDate: lawsType3[i].NotificationDate,
 			})
 		}
@@ -61,27 +61,34 @@ func AllLaws(c *fiber.Ctx) error {
 			"statutes":    statutes,
 			"enactments":  enactments,
 		},
+		"meta": pagination,
 	})
 }
 func LawEnactments(c *fiber.Ctx) error {
 	enactments := []M.Law{}
-	D.DB().Where("type = ?", 3).Find(&enactments)
+	pagination := U.ParsedPagination(c)
+	D.DB().Scopes(U.Paginate(&M.Law{}, pagination)).Where("type = ?", 3).Find(&enactments)
 	return c.JSON(fiber.Map{
 		"data": enactments,
+		"meta": pagination,
 	})
 }
 func LawStatutes(c *fiber.Ctx) error {
 	statutes := []M.Law{}
-	D.DB().Where("type = ?", 2).Find(&statutes)
+	pagination := U.ParsedPagination(c)
+	D.DB().Scopes(U.Paginate(&M.Law{}, pagination)).Where("type = ?", 2).Find(&statutes)
 	return c.JSON(fiber.Map{
 		"data": statutes,
+		"meta": pagination,
 	})
 }
 func LawRegulations(c *fiber.Ctx) error {
 	regulations := []M.Law{}
-	D.DB().Where("type = ?", 1).Find(&regulations)
+	pagination := U.ParsedPagination(c)
+	D.DB().Scopes(U.Paginate(&M.Law{}, pagination)).Where("type = ?", 1).Find(&regulations)
 	return c.JSON(fiber.Map{
 		"data": regulations,
+		"meta": pagination,
 	})
 }
 func AdvancedLawSearch(c *fiber.Ctx) error {
@@ -121,6 +128,7 @@ func LawSearch(c *fiber.Ctx) error {
 			"endDate":   c.Query("endDate"),
 			"body":      c.Query("body"),
 		},
+		"meta": pagination,
 	})
 }
 
