@@ -185,7 +185,7 @@ func LawByID(c *fiber.Ctx) error {
 // offline one hundered laws
 func OfflineLaws(c *fiber.Ctx) error {
 	laws := []M.Law{}
-	D.DB().Limit(100).Find(&laws)
+	D.DB().Find(&laws)
 	responseLaws := []M.LawMain{}
 	for i := 0; i < len(laws); i++ {
 		responseLaws = append(responseLaws, M.LawMain{
