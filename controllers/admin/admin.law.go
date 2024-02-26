@@ -38,7 +38,8 @@ func UpdateLaw(c *fiber.Ctx) error {
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
-	result1 := D.DB().Where("id = ?", c.Params("id")).Find(&law)
+	lawId := c.Params("id")
+	result1 := D.DB().Where("id = ?", lawId).Find(&law)
 	if result1.Error != nil {
 		return U.DBError(c, result1.Error)
 	}
@@ -121,30 +122,39 @@ func UpdateLaw(c *fiber.Ctx) error {
 	}
 	// ! attachments
 	// attachments, _ := c.FormFile("explanatoryPlan")
-	form, _ := c.MultipartForm()
-	attachments := form.File["attachment[]"]
-	for _, file := range attachments {
-		// check if file with this name already exists
-		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
-			return U.ResErr(c, "file already exists")
-		}
-		// ! file extension check
-		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
-		// 	return c.SendString("file should be image or pdf! please fix it")
-		// }
-		// Save file to disk
-		// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
-		fileName := U.AddUUIDToString(file.Filename)
-		c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
-		D.DB().Create(&M.File{
-			Type:  M.FileTypes["attachment"],
-			Name:  fileName,
-			LawID: law.ID,
-		})
-		// if err != nil {
-		// 	return U.ResErr(c, "cannot save")
-		// }
+	// form, _ := c.MultipartForm()
+	// attachments := form.File["attachment[]"]
+	// for _, file := range attachments {
+	// 	// check if file with this name already exists
+	// 	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+	// 		return U.ResErr(c, "file already exists")
+	// 	}
+	// 	// ! file extension check
+	// 	// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+	// 	// 	return c.SendString("file should be image or pdf! please fix it")
+	// 	// }
+	// 	// Save file to disk
+	// 	// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
+	// 	fileName := U.AddUUIDToString(file.Filename)
+	// 	c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+	// 	D.DB().Create(&M.File{
+	// 		Type:  M.FileTypes["attachment"],
+	// 		Name:  fileName,
+	// 		LawID: law.ID,
+	// 	})
+	// 	// if err != nil {
+	// 	// 	return U.ResErr(c, "cannot save")
+	// 	// }
+	// }
+	var attachmentFilesId []uint64
+	if result := D.DB().Where("law_id = ? AND type = ?", lawId, M.FileTypes["attachment"]).Pluck("id", attachmentFilesId); result.Error != nil {
+		return U.DBError(c, result.Error)
 	}
+	shouldRemoveFile := U.Difference(attachmentFilesId, payload.AttachmentsId)
+	if result := D.DB().Where("id IN ?", shouldRemoveFile).Delete(&M.File{}); result.Error != nil {
+		return U.DBError(c, result.Error)
+	}
+	// todo: handle removing the file from the storage later
 	return c.JSON(fiber.Map{
 		"message": "به روز رسانی با موفقیت انجام شد",
 	})
@@ -196,7 +206,6 @@ func CreateLaw(c *fiber.Ctx) error {
 		return U.ResValidationErr(c, map[string]string{"image": "آپلود عکس ضروری است"})
 	}
 	if imageFile != nil {
-		fmt.Println("till here")
 		// check if imageFile with this name already exists
 		if U.FileExistenceCheck(imageFile.Filename, "./public/uploads") {
 			return U.ResErr(c, "imageFile already exists")
@@ -283,33 +292,33 @@ func CreateLaw(c *fiber.Ctx) error {
 	}
 	// ! attachments
 	// attachments, _ := c.FormFile("explanatoryPlan")
-	form, _ := c.MultipartForm()
-	attachments := form.File["attachment[]"]
-	for _, file := range attachments {
-		// check if file with this name already exists
-		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
-			return U.ResErr(c, "file already exists")
-		}
-		// ! file extension check
-		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
-		// 	return c.SendString("file should be image or pdf! please fix it")
-		// }
-		// Save file to disk
-		// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
-		fileName := U.AddUUIDToString(file.Filename)
-		err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
-		if err != nil {
-			return U.ResErr(c, "خطا در ذخیره ی فایل")
-		}
-		D.DB().Create(&M.File{
-			Type:  M.FileTypes["attachment"],
-			Name:  fileName,
-			LawID: law.ID,
-		})
-		// if err != nil {
-		// 	return U.ResErr(c, "cannot save")
-		// }
-	}
+	// form, _ := c.MultipartForm()
+	// attachments := form.File["attachment[]"]
+	// for _, file := range attachments {
+	// 	// check if file with this name already exists
+	// 	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+	// 		return U.ResErr(c, "file already exists")
+	// 	}
+	// 	// ! file extension check
+	// 	// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+	// 	// 	return c.SendString("file should be image or pdf! please fix it")
+	// 	// }
+	// 	// Save file to disk
+	// 	// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
+	// 	fileName := U.AddUUIDToString(file.Filename)
+	// 	err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+	// 	if err != nil {
+	// 		return U.ResErr(c, "خطا در ذخیره ی فایل")
+	// 	}
+	// 	D.DB().Create(&M.File{
+	// 		Type:  M.FileTypes["attachment"],
+	// 		Name:  fileName,
+	// 		LawID: law.ID,
+	// 	})
+	// 	// if err != nil {
+	// 	// 	return U.ResErr(c, "cannot save")
+	// 	// }
+	// }
 	// return response
 	return c.Status(200).JSON(fiber.Map{
 		"message": "مصوبه با موفقیت اضافه شد",
