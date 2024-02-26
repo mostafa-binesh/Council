@@ -30,7 +30,7 @@ func IndexLaw(c *fiber.Ctx) error {
 }
 func UpdateLaw(c *fiber.Ctx) error {
 	law := M.Law{}
-	payload := new(M.CreateLawInput)
+	payload := new(M.EditLawInput)
 	// parsing the payload
 	if err := c.BodyParser(payload); err != nil {
 		U.ResErr(c, err.Error())
@@ -407,4 +407,5 @@ func UploadFile(c *fiber.Ctx) error {
 		Name:  fileName,
 		LawID: payload.LawId,
 	})
+	return U.ResMessage(c, "فایل آپلود شد")
 }

@@ -36,8 +36,8 @@ type FileMinimal struct {
 	UpdatedAt *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type UploadFile struct {
-	LawId uint   `json:"id"`
-	Type  string `json:"type"`
+	LawId uint   `json:"lawId" validate:"required"`
+	Type  string `json:"type" validate:"required"`
 }
 
 // tips: if convert is array, no need to call be reference
