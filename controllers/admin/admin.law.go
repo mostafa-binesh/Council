@@ -6,6 +6,7 @@ import (
 	U "docker/utils"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	// "strconv"
@@ -366,4 +367,24 @@ func DeleteFile(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "فایل حذف شد",
 	})
+}
+
+func Statics(c *fiber.Ctx) error {
+
+	var results []struct {
+		LawID uint
+		Count int64
+		Title string
+	}
+	D.DB().Model(&M.LawLog{}).
+		Select("law_logs.law_id, laws.title, count(law_logs.law_id) as count").
+		Joins("INNER JOIN laws ON laws.id = law_logs.law_id").
+		Where("law_logs.created_at >= ?", time.Now().AddDate(0, 0, -10)).
+		Group("law_logs.law_id, laws.title").
+		Limit(10).
+		Scan(&results)
+	return c.JSON(fiber.Map{
+		"data":results,
+	});
+
 }
