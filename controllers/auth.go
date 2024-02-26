@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"fmt"
+
 	// "github.com/go-playground/validator/v10"
 	D "docker/database"
 	M "docker/models"
 	U "docker/utils"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -166,6 +167,13 @@ func Dashboard(c *fiber.Ctx) error {
 	user := c.Locals("user").(M.User)
 	return c.JSON(fiber.Map{"dashboard": "heres the dashboard", "user": user})
 }
+func UserInfo(c *fiber.Ctx) error {
+	user := c.Locals("user").(M.User)
+	return c.JSON(fiber.Map{
+		"user": user,
+	})
+}
+
 func AuthMiddleware(c *fiber.Ctx) error {
 	sess := U.Session(c)
 	userID := sess.Get(U.USER_ID)
@@ -225,7 +233,13 @@ func JWTAuthentication(c *fiber.Ctx) error {
 
 		// For example, extracting and setting the user ID in the Fiber context
 		userID := claims["user_id"]
+		var user M.User
+		if result := D.DB().Preload("Role").First(&user, userID); result.Error != nil {
+			return U.DBError(c, result.Error)
+		}
+		// set the variables to context's locals
 		c.Locals("userID", userID)
+		c.Locals("user", user)
 
 		// Proceed to the next middleware/handler
 		return c.Next()

@@ -3,7 +3,7 @@ package routes
 import (
 	C "docker/controllers"
 	AC "docker/controllers/admin"
-	
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 )
@@ -26,8 +26,8 @@ func APIInit(router *fiber.App) {
 	laws.Get("/enactments", C.LawEnactments)
 	laws.Get("/:id<int>", C.LawByID)
 	laws.Get("/offline", C.OfflineLaws)
-	laws.Put("/offilne/update",C.UpdateLawOffline)
-	laws.Post("/comment",C.AddComment)
+	laws.Put("/offilne/update", C.UpdateLawOffline)
+	laws.Post("/comment", C.AddComment)
 
 	// ! messaging
 	msg := router.Group("correspondence")
@@ -41,10 +41,11 @@ func APIInit(router *fiber.App) {
 	msg.Post("/messages", C.GuestSendMessage)
 
 	// authentication required endpoints
+	router.Post("/login/token/refresh", C.RefreshToken)
 	authRequired := router.Group("/", C.JWTAuthentication)
 
-	router.Post("/login/token/refresh", C.RefreshToken)
 	authRequired.Get("/logout", C.Logout)
+	authRequired.Get("/userInfo", C.UserInfo)
 
 	// ! admin Route
 	admin := authRequired.Group("/admin")
@@ -52,8 +53,8 @@ func APIInit(router *fiber.App) {
 	admin.Get("/users/:id<int>", AC.UserByID)
 	admin.Put("/users/:id<int>", AC.EditUser)
 	admin.Post("/users", AC.AddUser)
-	admin.Put("/users/:id<int>/verify",AC.UserVerification)
-	admin.Put("/users/:id<int>/unverify",AC.UserUnVerification)
+	admin.Put("/users/:id<int>/verify", AC.UserVerification)
+	admin.Put("/users/:id<int>/unverify", AC.UserUnVerification)
 	admin.Delete("/users/:id<int>", AC.DeleteUser)
 	admin.Get("/laws", AC.IndexLaw)
 	admin.Get("/laws/search", AC.LawSearch)
