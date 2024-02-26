@@ -291,34 +291,33 @@ func CreateLaw(c *fiber.Ctx) error {
 		})
 	}
 	// ! attachments
-	// attachments, _ := c.FormFile("explanatoryPlan")
-	// form, _ := c.MultipartForm()
-	// attachments := form.File["attachment[]"]
-	// for _, file := range attachments {
-	// 	// check if file with this name already exists
-	// 	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
-	// 		return U.ResErr(c, "file already exists")
-	// 	}
-	// 	// ! file extension check
-	// 	// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
-	// 	// 	return c.SendString("file should be image or pdf! please fix it")
-	// 	// }
-	// 	// Save file to disk
-	// 	// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
-	// 	fileName := U.AddUUIDToString(file.Filename)
-	// 	err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
-	// 	if err != nil {
-	// 		return U.ResErr(c, "خطا در ذخیره ی فایل")
-	// 	}
-	// 	D.DB().Create(&M.File{
-	// 		Type:  M.FileTypes["attachment"],
-	// 		Name:  fileName,
-	// 		LawID: law.ID,
-	// 	})
-	// 	// if err != nil {
-	// 	// 	return U.ResErr(c, "cannot save")
-	// 	// }
-	// }
+	form, _ := c.MultipartForm()
+	attachments := form.File["attachment[]"]
+	for _, file := range attachments {
+		// check if file with this name already exists
+		if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+			return U.ResErr(c, "file already exists")
+		}
+		// ! file extension check
+		// if !(U.HasImageSuffixCheck(file.Filename) || U.HasSuffixCheck(file.Filename, []string{"pdf"})) {
+		// 	return c.SendString("file should be image or pdf! please fix it")
+		// }
+		// Save file to disk
+		// err = c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", file.Filename))
+		fileName := U.AddUUIDToString(file.Filename)
+		err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+		if err != nil {
+			return U.ResErr(c, "خطا در ذخیره ی فایل")
+		}
+		D.DB().Create(&M.File{
+			Type:  M.FileTypes["attachment"],
+			Name:  fileName,
+			LawID: law.ID,
+		})
+		// if err != nil {
+		// 	return U.ResErr(c, "cannot save")
+		// }
+	}
 	// return response
 	return c.Status(200).JSON(fiber.Map{
 		"message": "مصوبه با موفقیت اضافه شد",
