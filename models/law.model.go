@@ -50,7 +50,7 @@ type LawMain struct {
 	NotificationNumber string           `json:"notificationNumber"`
 	Body               string           `json:"body"`
 	Image              string           `json:"image"`
-	SeenCount          int64            `json:"seenCount"` 
+	SeenCount          int64            `json:"seenCount"`
 	Comments           []CommentMinimal `json:"comments"`
 }
 type LawMinimal struct {
@@ -83,6 +83,20 @@ type CreateLawInput struct {
 	NumberNotes        int       `json:"numberNotes"`
 	Recommender        string    `json:"recommender"`
 	Tags               string    `json:"tags" validate:"required"`
+}
+type EditLawInput struct {
+	Type               int       `json:"type" validate:"required"`
+	Title              string    `json:"title"  validate:"required"`
+	SessionNumber      int       `json:"sessionNumber"`
+	SessionDate        time.Time `json:"sessionDate" validate:"required"`      // ! change default now later
+	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
+	NotificationNumber string    `json:"notificationNumber" validate:"required"`
+	Body               string    `json:"body" validate:"required"`
+	NumberItems        int       `json:"numberItems"`
+	NumberNotes        int       `json:"numberNotes"`
+	Recommender        string    `json:"recommender"`
+	Tags               string    `json:"tags" validate:"required"`
+	AttachmentsId      []uint64  `json:"attachmentsId" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
