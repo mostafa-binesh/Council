@@ -367,3 +367,35 @@ func DeleteFile(c *fiber.Ctx) error {
 		"message": "فایل حذف شد",
 	})
 }
+func UploadFile(c *fiber.Ctx) error {
+	// create payload
+	payload := new(M.UploadFile)
+	// parse payload
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	// validate payload
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
+	// check file existence
+	file, _ := c.FormFile("file")
+	if file == nil {
+		return U.ResValidationErr(c, map[string]string{"file": "فایل ضروری است"})
+	}
+	// check if file with this name already exists
+	if U.FileExistenceCheck(file.Filename, "./public/uploads") {
+		return U.ResErr(c, "file already exists")
+	}
+	// Save file to disk
+	fileName := U.AddUUIDToString(file.Filename)
+	err := c.SaveFile(file, fmt.Sprintf("./public/uploads/%s", fileName))
+	if err != nil {
+		return U.ResErr(c, err.Error())
+	}
+	D.DB().Create(&M.File{
+		Type:  M.FileTypes[payload.Type],
+		Name:  fileName,
+		LawID: payload.LawId,
+	})
+}

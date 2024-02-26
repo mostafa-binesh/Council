@@ -65,6 +65,8 @@ func APIInit(router *fiber.App) {
 	admin.Get("/laws/offline", C.OfflineLaws)
 	admin.Delete("/laws/:id<int>/files/:fileID<int>", AC.DeleteFile) // ! TODO : file az storage ham bayad paak she
 
+	admin.Post("/uploadFile", AC.UploadFile) // ! TODO : file az storage ham bayad paak she
+
 	// ! dashboard routes
 	dashboard := authRequired.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
