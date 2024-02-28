@@ -35,12 +35,11 @@ type LawByID struct {
 	Body               string           `json:"body"`
 	Image              string           `json:"image"`
 	Comments           []CommentMinimal `json:"comments"`
+	SeenCount          int64            `json:"seenCount"`
 	Files              []FileMinimal    `json:"files"`
 	NumberItems        int              `json:"NumberItems"`
 	NumberNotes        int              `json:"NumberNotes"`
 	Recommender        string           `json:"Recommender"`
-	CreatedAt          time.Time        `json:"createdAt"`
-	UpdatedAt          time.Time        `json:"updatedAt"`
 }
 type LawMain struct {
 	ID                 uint             `json:"id"`
@@ -114,9 +113,11 @@ type Comment struct {
 	UpdatedAt       time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type CommentMinimal struct {
+	ID       uint   `json:"id"`
 	Body     string `json:"body" validate:"required"`
 	FullName string `json:"fullName"`
 	Email    string `json:"email"`
+	Status   bool   `json:"status"`
 	LawID    uint   `json:"law_id" validate:"required"`
 }
 type OfflineLaws struct {
@@ -164,14 +165,22 @@ type FAQ struct {
 	UpdatedAt    time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 
-func GetMinimalComment(lawID uint) []CommentMinimal {
+func GetMinimalComment(lawID uint, flag bool) []CommentMinimal {
 	comments := []Comment{}
-	D.DB().Where("law_id = ?", lawID).Where("status = true").Find(&comments)
+	if !flag {
+		D.DB().Where("law_id = ?", lawID).Where("status = true").Find(&comments)
+	}
+	if flag {
+		D.DB().Where("law_id = ?", lawID).Find(&comments)
+	}
 	var minimalComments []CommentMinimal
 	for i := 0; i < len(comments); i++ {
 		minimalComment := CommentMinimal{
+			ID:       comments[i].ID,
+			Email:    comments[i].Email,
 			FullName: comments[i].FullName,
 			Body:     comments[i].Body,
+			Status:   comments[i].Status,
 		}
 		minimalComments = append(minimalComments, minimalComment)
 
@@ -192,7 +201,41 @@ func LawToLawByID(law *Law) *LawMain {
 		NotificationNumber: law.NotificationNumber,
 		Body:               law.Body,
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
-		Comments:           GetMinimalComment(law.ID),
+		Comments:           GetMinimalComment(law.ID, false),
 		SeenCount:          getSeenCount(law.ID),
+	}
+}
+func getFilesMini(lawID uint) []FileMinimal {
+	files := []File{}
+	D.DB().Where("law_id = ?", lawID).Find(&files)
+	var fileArray []FileMinimal
+	for i := 0; i < len(files); i++ {
+		file := FileMinimal{
+			ID:   files[i].ID,
+			Type: files[i].Type,
+			URL:  U.BaseURL + "/public/uploads/" + files[i].Name,
+		}
+		fileArray = append(fileArray, file)
+
+	}
+	return fileArray
+}
+func LawToSeenAdmin(law *Law) *LawByID {
+	return &LawByID{
+		ID:                 law.ID,
+		Type:               law.Type,
+		Title:              law.Title,
+		SessionNumber:      law.SessionNumber,
+		SessionDate:        law.SessionDate,
+		NotificationDate:   law.NotificationDate,
+		NotificationNumber: law.NotificationNumber,
+		Body:               law.Body,
+		Image:              U.BaseURL + "/public/uploads/" + law.Image,
+		Comments:           GetMinimalComment(law.ID, true),
+		SeenCount:          getSeenCount(law.ID),
+		Files:              getFilesMini(law.ID),
+		NumberItems:        law.NumberItems,
+		NumberNotes:        law.NumberNotes,
+		Recommender:        law.Recommender,
 	}
 }

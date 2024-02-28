@@ -137,10 +137,9 @@ func AdvancedLawSearch(c *fiber.Ctx) error {
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	pagination := U.ParsedPagination(c)
-
 	D.DB().Scopes(
 		F.FilterByType(c,
-			F.FilterType{QueryName: "title", Operator: "LIKE"},
+			F.FilterType{QueryName: "title", ColumnName: "title", Operator: "LIKE"},
 			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="},
 			F.FilterType{QueryName: "endDate", ColumnName: "notification_date", Operator: "<="},
 			F.FilterType{QueryName: "body", ColumnName: "body", Operator: "LIKE"}),
@@ -252,7 +251,7 @@ func AddComment(c *fiber.Ctx) error {
 	}
 	comment := M.Comment{
 		Body:            payload.Body,
-		FullName:        payload.Email,
+		FullName:        payload.FullName,
 		Email:           payload.Email,
 		LawID:           payload.LawID,
 		ParentCommentID: 0,

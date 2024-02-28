@@ -356,10 +356,10 @@ func LawSearch(c *fiber.Ctx) error {
 }
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}
-	if err := D.DB().Preload("Files").First(law, c.Params("id")).Error; err != nil {
+	if err := D.DB().First(law, c.Params("id")).Error; err != nil {
 		return U.DBError(c, err)
 	}
-	LawByID := M.LawToLawByID(law)
+	LawByID := M.LawToSeenAdmin(law)
 	return c.JSON(fiber.Map{
 		"data": LawByID,
 	})
@@ -425,5 +425,21 @@ func Statics(c *fiber.Ctx) error {
 		Limit(10).
 		Scan(&results)
 	return c.JSON(fiber.Map{
-		"data":results,
-	});
+		"data": results,
+	})
+}
+
+func VerifyComment(c *fiber.Ctx) error {
+	result := D.DB().Model(&M.Comment{}).Where("id = ?", c.Params("id")).Update("status", true)
+	if result.Error != nil {
+		U.DBError(c, result.Error)
+	}
+	return U.ResMessage(c, "کاربر تایید شد")
+}
+func UnVerifyComment(c *fiber.Ctx) error {
+	result := D.DB().Model(&M.Comment{}).Where("id = ?", c.Params("id")).Update("status", false)
+	if result.Error != nil {
+		U.DBError(c, result.Error)
+	}
+	return U.ResMessage(c, "کاربر تایید شد")
+}
