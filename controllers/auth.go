@@ -165,12 +165,24 @@ func Dashboard(c *fiber.Ctx) error {
 	// ! has a AuthMiddleware before here
 	// ! if session and user exists, client can access here
 	user := c.Locals("user").(M.User)
-	return c.JSON(fiber.Map{"dashboard": "heres the dashboard", "user": user})
+	return c.JSON(fiber.Map{"dashboard": "heres the dashboard", "user": fiber.Map{
+		"name":         user.Name,
+		"personalCode": user.PersonalCode,
+		"phoneNumber":  user.PhoneNumber,
+		"nationalCode": user.NationalCode,
+		"permissions":  getPermissions(user),
+	}})
 }
 func UserInfo(c *fiber.Ctx) error {
 	user := c.Locals("user").(M.User)
 	return c.JSON(fiber.Map{
-		"user": user,
+		"user": fiber.Map{
+			"name":         user.Name,
+			"personalCode": user.PersonalCode,
+			"phoneNumber":  user.PhoneNumber,
+			"nationalCode": user.NationalCode,
+			"permissions":  getPermissions(user),
+		},
 	})
 }
 

@@ -68,6 +68,7 @@ func APIInit(router *fiber.App) {
 	admin.Post("/uploadFile", AC.UploadFile) 
 	admin.Put("/comment/:id<int>/verify",AC.VerifyComment)
 	admin.Put("/comment/:id<int>/unverify",AC.UnVerifyComment)
+	admin.Get("/current/user",C.Dashboard)
 	// ! dashboard routes
 	dashboard := authRequired.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
