@@ -235,7 +235,8 @@ func OfflineLaws(c *fiber.Ctx) error {
 			NotificationDate:   laws[i].NotificationDate,
 			NotificationNumber: laws[i].NotificationNumber,
 			Body:               laws[i].Body,
-			Image:              U.BaseURL + "public/uploads/" + laws[i].Image,
+			CreatedAt:          laws[i].CreatedAt,
+			UpdatedAt:          laws[i].UpdatedAt,
 		})
 	}
 	return c.JSON(fiber.Map{"data": responseLaws})

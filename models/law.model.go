@@ -51,6 +51,8 @@ type LawMain struct {
 	Image              string           `json:"image"`
 	SeenCount          int64            `json:"seenCount"`
 	Comments           []CommentMinimal `json:"comments"`
+	CreatedAt          time.Time        `json:"created_at"`
+	UpdatedAt          time.Time        `json:"updated_at"`
 }
 type LawMinimal struct {
 	ID               uint      `json:"id"`
@@ -231,7 +233,7 @@ func LawToSeenAdmin(law *Law) *LawByID {
 		NotificationNumber: law.NotificationNumber,
 		Body:               law.Body,
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
-		Comments:           GetMinimalComment(law.ID, true),
+		// Comments:           GetMinimalComment(law.ID, true),
 		SeenCount:          getSeenCount(law.ID),
 		Files:              getFilesMini(law.ID),
 		NumberItems:        law.NumberItems,

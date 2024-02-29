@@ -364,6 +364,26 @@ func LawByID(c *fiber.Ctx) error {
 		"data": LawByID,
 	})
 }
+func CommentsByLawID(c *fiber.Ctx) error {
+	comments := []M.Comment{}
+	pagination := U.ParsedPagination(c)
+	D.DB().Where("law_id = ?", c.Params("id")).Scopes(U.Paginate(comments, pagination)).Find(&comments)
+	var minimalComments []M.CommentMinimal
+	for i := 0; i < len(comments); i++ {
+		minimalComment := M.CommentMinimal{
+			ID:       comments[i].ID,
+			Email:    comments[i].Email,
+			FullName: comments[i].FullName,
+			Body:     comments[i].Body,
+			Status:   comments[i].Status,
+		}
+		minimalComments = append(minimalComments, minimalComment)
+
+	}
+	return c.JSON(fiber.Map{
+		"data": minimalComments,
+	})
+}
 func DeleteFile(c *fiber.Ctx) error {
 	result := D.DB().Delete(&M.File{}, c.Params("fileID"))
 	if result.Error != nil {

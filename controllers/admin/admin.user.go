@@ -98,10 +98,10 @@ func UserByID(c *fiber.Ctx) error {
 
 // ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
-	result1 := D.DB().Where("user_id = ? ", c.Params("id")).Delete(&M.Comment{})
-	if result1.Error != nil {
-		return U.DBError(c, result1.Error)
-	}
+	// result1 := D.DB().Where("user_id = ? ", c.Params("id")).Delete(&M.Comment{})
+	// if result1.Error != nil {
+	// 	return U.DBError(c, result1.Error)
+	// }
 	result := D.DB().Delete(&M.User{}, c.Params("id"))
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
