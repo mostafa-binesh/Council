@@ -346,7 +346,7 @@ func LawSearch(c *fiber.Ctx) error {
 		pass_data = append(pass_data, M.LawMinimal_min{
 			ID:    laws[i].ID,
 			Title: laws[i].Title,
-			Image: laws[i].Image,
+			// Image: laws[i].Image,
 		})
 	}
 	return c.JSON(fiber.Map{

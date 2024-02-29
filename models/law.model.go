@@ -36,10 +36,14 @@ type LawByID struct {
 	Image              string           `json:"image"`
 	Comments           []CommentMinimal `json:"comments"`
 	SeenCount          int64            `json:"seenCount"`
-	Files              []FileMinimal    `json:"files"`
+	ExplanatoryPlan    string           `json:"explanatoryPlan"`
+	Certificate        string           `json:"certificate"`
+	Attachment         []string         `json:"attachment"`
 	NumberItems        int              `json:"NumberItems"`
 	NumberNotes        int              `json:"NumberNotes"`
 	Recommender        string           `json:"Recommender"`
+	Tags               string           `json:"tags"`
+	// Files              []FileMinimal    `json:"files"`
 }
 type LawMain struct {
 	ID                 uint             `json:"id"`
@@ -207,22 +211,29 @@ func LawToLawByID(law *Law) *LawMain {
 		SeenCount:          getSeenCount(law.ID),
 	}
 }
-func getFilesMini(lawID uint) []FileMinimal {
+func getFilesMini(lawID uint) []string {
 	files := []File{}
-	D.DB().Where("law_id = ?", lawID).Find(&files)
-	var fileArray []FileMinimal
+	D.DB().Where("law_id = ? and type=3", lawID).Find(&files)
+	var fileArray []string
 	for i := 0; i < len(files); i++ {
-		file := FileMinimal{
-			ID:   files[i].ID,
-			Type: files[i].Type,
-			URL:  U.BaseURL + "/public/uploads/" + files[i].Name,
-		}
-		fileArray = append(fileArray, file)
-
+		fileArray = append(fileArray, U.BaseURL+"/public/uploads/"+files[i].Name)
 	}
 	return fileArray
 }
+func keyWord(lawID uint) string {
+	words := []Keyword{}
+	D.DB().Where("law_id = ? ", lawID).Find(&words)
+	tags := ""
+	for i := 0; i < len(words); i++ {
+		tags += words[i].Keyword + ","
+	}
+	return tags
+}
 func LawToSeenAdmin(law *Law) *LawByID {
+	exp := File{}
+	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&exp)
+	cer := File{}
+	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&cer)
 	return &LawByID{
 		ID:                 law.ID,
 		Type:               law.Type,
@@ -233,11 +244,14 @@ func LawToSeenAdmin(law *Law) *LawByID {
 		NotificationNumber: law.NotificationNumber,
 		Body:               law.Body,
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
-		// Comments:           GetMinimalComment(law.ID, true),
 		SeenCount:          getSeenCount(law.ID),
-		Files:              getFilesMini(law.ID),
+		ExplanatoryPlan:    U.BaseURL + "/public/uploads/" + exp.Name,
+		Certificate:        U.BaseURL + "/public/uploads/" + cer.Name,
+		Attachment:         getFilesMini(law.ID),
 		NumberItems:        law.NumberItems,
 		NumberNotes:        law.NumberNotes,
 		Recommender:        law.Recommender,
+		Tags:               keyWord(law.ID),
+		// Comments:           GetMinimalComment(law.ID, true),
 	}
 }
