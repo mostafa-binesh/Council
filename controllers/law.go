@@ -166,6 +166,14 @@ func LawSearch(c *fiber.Ctx) error {
 
 // ! CHECK: files ham preload mishe. aya niazi?
 func LawByID(c *fiber.Ctx) error {
+	// ip := c.IP()
+	// return c.JSON(fiber.Map{
+	// 	"ip": ip,
+	// 	"port": c.Port(),
+	// 	"url" : c.BaseURL(),
+	// 	"hostname": c.Hostname(),
+		
+	// })
 	law := &M.Law{}
 	if err := D.DB().First(law, c.Params("id")).Error; err != nil {
 		return U.DBError(c, err)

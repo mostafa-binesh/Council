@@ -382,6 +382,7 @@ func CommentsByLawID(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{
 		"data": minimalComments,
+		"meta": pagination,
 	})
 }
 func DeleteFile(c *fiber.Ctx) error {
