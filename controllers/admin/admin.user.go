@@ -59,6 +59,13 @@ func EditUser(c *fiber.Ctx) error {
 	if result1.Error != nil {
 		return U.DBError(c, result1.Error)
 	}
+	var users []M.User
+	D.DB().Where("(personal_code = ? OR national_code = ? OR phone_number = ?) and id != ?",payload.PersonalCode,payload.NationalCode, payload.PhoneNumber, c.Params("id")).Find(&users)
+	if(len(users)!=0){
+		return c.Status(400).JSON(fiber.Map{
+			"error": " کد ملی یا کد پرسنلی یا شماره تلفن تکراری هست",
+		})
+	}
 	user.Name = payload.Name
 	user.NationalCode = payload.NationalCode
 	if payload.Password != "" {
@@ -135,6 +142,13 @@ func AddUser(c *fiber.Ctx) error {
 	// ! validate request
 	if errs := U.Validate(payload); errs != nil {
 		return U.ResValidationErr(c, errs)
+	}
+	var users []M.User
+	D.DB().Where("personal_code = ? OR national_code = ? OR phone_number = ?",payload.PersonalCode,payload.NationalCode, payload.PhoneNumber).Find(&users)
+	if(len(users)!=0){
+		return c.Status(400).JSON(fiber.Map{
+			"error": " کد ملی یا کد پرسنلی یا شماره تلفن تکراری هست",
+		})
 	}
 	// hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
