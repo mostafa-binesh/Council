@@ -274,3 +274,24 @@ func AddComment(c *fiber.Ctx) error {
 		"message": "کامنت با موفقیت اضافه شد",
 	})
 }
+
+func Static(c *fiber.Ctx) error {
+	var count1 int64
+	D.DB().Model(&M.Law{}).Where("type = ?", 1).Count(&count1)
+	
+	var count2 int64
+	D.DB().Model(&M.Law{}).Where("type = ?", 2).Count(&count2)
+	
+	var count3 int64
+	D.DB().Model(&M.Law{}).Where("type = ?", 3).Count(&count3)
+
+	var count int64
+	D.DB().Model(&M.Law{}).Where("true").Count(&count)
+
+	return c.JSON(fiber.Map{
+		"LawRegulations" : count1,
+		"LawStatutes" : count2,
+		"LawEnactments" : count3,
+		"Total" : count,
+	})
+}
