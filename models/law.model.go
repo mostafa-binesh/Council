@@ -229,6 +229,13 @@ func keyWord(lawID uint) string {
 	}
 	return tags
 }
+func checkNull (name string)  string{
+	if name == "" {
+		return ""
+	}
+	url := U.BaseURL + "/public/uploads/" + name
+	return  url
+}
 func LawToSeenAdmin(law *Law) *LawByID {
 	exp := File{}
 	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&exp)
@@ -245,8 +252,8 @@ func LawToSeenAdmin(law *Law) *LawByID {
 		Body:               law.Body,
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
 		SeenCount:          getSeenCount(law.ID),
-		ExplanatoryPlan:    U.BaseURL + "/public/uploads/" + exp.Name,
-		Certificate:        U.BaseURL + "/public/uploads/" + cer.Name,
+		ExplanatoryPlan:    checkNull(exp.Name),
+		Certificate:        checkNull(cer.Name),
 		Attachment:         getFilesMini(law.ID),
 		NumberItems:        law.NumberItems,
 		NumberNotes:        law.NumberNotes,

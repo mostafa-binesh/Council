@@ -36,6 +36,11 @@ func IndexUser(c *fiber.Ctx) error {
 			Verified:     user[i].Verified,
 		})
 	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return c.JSON(fiber.Map{
 		"meta": pagination,
 		"data": pass_data,
@@ -81,6 +86,11 @@ func EditUser(c *fiber.Ctx) error {
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return U.ResMessage(c, "کاربر ویرایش شد")
 }
 
@@ -97,6 +107,11 @@ func UserByID(c *fiber.Ctx) error {
 		PhoneNumber:  user.PhoneNumber,
 		PersonalCode: user.PersonalCode,
 		NationalCode: user.NationalCode,
+	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
 	return c.JSON(fiber.Map{
 		"data": minUser,
@@ -116,6 +131,11 @@ func DeleteUser(c *fiber.Ctx) error {
 	if result.RowsAffected == 0 {
 		return U.ResErr(c, "کاربر یافت نشد")
 	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return U.ResMessage(c, "کاربر حذف شد")
 }
 
@@ -124,12 +144,22 @@ func UserVerification(c *fiber.Ctx) error {
 	if result.Error != nil {
 		U.DBError(c, result.Error)
 	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return U.ResMessage(c, "کاربر تایید شد")
 }
 func UserUnVerification(c *fiber.Ctx) error {
 	result := D.DB().Model(&M.User{}).Where("id = ?", c.Params("id")).Update("verified", false)
 	if result.Error != nil {
 		U.DBError(c, result.Error)
+	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
 	return U.ResMessage(c, "کاربر رد شد")
 }
@@ -167,6 +197,10 @@ func AddUser(c *fiber.Ctx) error {
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
-
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return U.ResMessage(c, "کاربر ایجاد شد") // ! TODO talk with mohsen: should i send statusCreated or 200 ?
 }
