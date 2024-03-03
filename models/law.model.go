@@ -104,7 +104,7 @@ type EditLawInput struct {
 	NumberNotes        int       `json:"numberNotes" form:"numberNotes" `
 	Recommender        string    `json:"recommender" form:"recommender" `
 	Tags               string    `json:"tags" form:"tags" validate:"required"`
-	AttachmentsId      []uint64  `json:"attachmentsId" form:"attachmentsId" validate:"required"`
+	// AttachmentsId      []uint64  `json:"attachmentsId" form:"attachmentsId" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
