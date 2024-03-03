@@ -38,7 +38,7 @@ type LawByID struct {
 	SeenCount          int64            `json:"seenCount"`
 	ExplanatoryPlan    string           `json:"explanatoryPlan"`
 	Certificate        string           `json:"certificate"`
-	Attachment         []string         `json:"attachment"`
+	Attachment         []FileMinimal    `json:"attachment"`
 	NumberItems        int              `json:"NumberItems"`
 	NumberNotes        int              `json:"NumberNotes"`
 	Recommender        string           `json:"Recommender"`
@@ -284,11 +284,12 @@ func LawToSeenAdmin(law *Law) *LawByID {
 		SeenCount:          getSeenCount(law.ID),
 		ExplanatoryPlan:    checkNull(exp.Name),
 		Certificate:        checkNull(cer.Name),
-		Attachment:         getFilesMini(law.ID),
 		NumberItems:        law.NumberItems,
 		NumberNotes:        law.NumberNotes,
 		Recommender:        law.Recommender,
 		Tags:               keyWord(law.ID),
+		// Attachment:         getFilesMini(law.ID),
+		Attachment: law.getAttachmentFiles(),
 		// Comments:           GetMinimalComment(law.ID, true),
 	}
 }
