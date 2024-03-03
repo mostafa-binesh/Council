@@ -30,7 +30,7 @@ type FileMinimal struct {
 	ID uint `json:"id"`
 	// Type string `json:"type"` // like attachment, certificate and etc...
 	Type uint16 `json:"type"` // like attachment, certificate and etc...
-	URL  string `json:"name"`
+	URL  string `json:"href"`
 	// relations
 }
 type UploadFile struct {
