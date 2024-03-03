@@ -52,6 +52,9 @@ type LawMain struct {
 	Image              string           `json:"image"`
 	SeenCount          int64            `json:"seenCount"`
 	Comments           []CommentMinimal `json:"comments"`
+	Attachments        []FileMinimal    `json:"attachments"`
+	Plans              []FileMinimal    `json:"plans"`
+	Certificates       []FileMinimal    `json:"certificates"`
 }
 type LawMinimal struct {
 	ID               uint      `json:"id"`
@@ -96,7 +99,7 @@ type EditLawInput struct {
 	NumberNotes        int       `json:"numberNotes"`
 	Recommender        string    `json:"recommender"`
 	Tags               string    `json:"tags" validate:"required"`
-	AttachmentsId      []uint64  `json:"attachmentsId" validate:"required"`
+	AttachmentsId      []uint64  `json:"attachments" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
@@ -174,7 +177,6 @@ func GetMinimalComment(lawID uint) []CommentMinimal {
 			Body:     comments[i].Body,
 		}
 		minimalComments = append(minimalComments, minimalComment)
-
 	}
 	return minimalComments
 }
@@ -182,6 +184,31 @@ func getSeenCount(lawID uint) int64 {
 	var count int64
 	D.DB().Model(&LawLog{}).Where("law_id = ?", lawID).Count(&count)
 	return count
+}
+
+func (l Law) getAttachmentFiles() (files []FileMinimal) {
+	for _, file := range l.Files {
+		if file.isAttachment() {
+			files = append(files, file.ToFileMinimal())
+		}
+	}
+	return
+}
+func (l Law) getPlanFiles() (files []FileMinimal) {
+	for _, file := range l.Files {
+		if file.isPlan() {
+			files = append(files, file.ToFileMinimal())
+		}
+	}
+	return
+}
+func (l Law) getCertificateFiles() (files []FileMinimal) {
+	for _, file := range l.Files {
+		if file.isCertificate() {
+			files = append(files, file.ToFileMinimal())
+		}
+	}
+	return
 }
 func LawToLawByID(law *Law) *LawMain {
 	return &LawMain{
@@ -194,5 +221,8 @@ func LawToLawByID(law *Law) *LawMain {
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
 		Comments:           GetMinimalComment(law.ID),
 		SeenCount:          getSeenCount(law.ID),
+		Attachments:        law.getAttachmentFiles(),
+		Plans:              law.getPlanFiles(),
+		Certificates:       law.getCertificateFiles(),
 	}
 }

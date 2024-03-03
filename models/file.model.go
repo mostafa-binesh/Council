@@ -46,15 +46,26 @@ type UploadFile struct {
 func FileToFileMinimal(files []File) []FileMinimal {
 	var minimalFiles []FileMinimal
 	for i := 0; i < len(files); i++ {
-		minimalFile := FileMinimal{
-			ID: files[i].ID,
-			// Type:      IntFileTypes[files[i].Type],
-			Type:      files[i].Type,
-			URL:       U.BaseURL + "/public/uploads/" + files[i].Name,
-			CreatedAt: files[i].CreatedAt,
-			UpdatedAt: files[i].UpdatedAt,
-		}
+		minimalFile := files[i].ToFileMinimal()
 		minimalFiles = append(minimalFiles, minimalFile)
 	}
 	return minimalFiles
+}
+func (file File) ToFileMinimal() FileMinimal {
+	return FileMinimal{
+		ID:        file.ID,
+		Type:      file.Type,
+		URL:       U.BaseURL + "/public/uploads/" + file.Name,
+		CreatedAt: file.CreatedAt,
+		UpdatedAt: file.UpdatedAt,
+	}
+}
+func (f File) isAttachment() bool {
+	return f.Type == FileTypes["attachment"]
+}
+func (f File) isPlan() bool {
+	return f.Type == FileTypes["plan"]
+}
+func (f File) isCertificate() bool {
+	return f.Type == FileTypes["certificate"]
 }
