@@ -57,6 +57,26 @@ func UpdateLaw(c *fiber.Ctx) error {
 	law.Title = payload.Title
 	law.Type = payload.Type
 
+	// # keywords
+
+	// delete all assigned keywords to this law
+	if err := D.DB().Where("law_id = ?", lawId).Delete(&M.Keyword{}).Error; err != nil {
+		return U.DBError(c, err)
+	}
+
+	// create new keywords
+	keywordsString := strings.Split(payload.Tags, ",")
+	var keywords []M.Keyword
+	for _, keyword := range keywordsString {
+		keywords = append(keywords, M.Keyword{
+			Keyword: keyword,
+			LawID:   law.ID,
+		})
+	}
+	if err := D.DB().Create(&keywords).Error; err != nil {
+		return U.DBError(c, err)
+	}
+
 	imageFile, _ := c.FormFile("image")
 	if imageFile != nil {
 		fmt.Println("till here")
