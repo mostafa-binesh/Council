@@ -93,18 +93,18 @@ type CreateLawInput struct {
 	Tags               string    `json:"tags" validate:"required"`
 }
 type EditLawInput struct {
-	Type               int       `json:"type" validate:"required"`
-	Title              string    `json:"title"  validate:"required"`
-	SessionNumber      int       `json:"sessionNumber"`
-	SessionDate        time.Time `json:"sessionDate" validate:"required"`      // ! change default now later
-	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
-	NotificationNumber string    `json:"notificationNumber" validate:"required"`
-	Body               string    `json:"body" validate:"required"`
-	NumberItems        int       `json:"numberItems"`
-	NumberNotes        int       `json:"numberNotes"`
-	Recommender        string    `json:"recommender"`
-	Tags               string    `json:"tags" validate:"required"`
-	AttachmentsId      []uint64  `json:"attachments" validate:"required"`
+	Type               int       `json:"type" form:"type"  validate:"required"`
+	Title              string    `json:"title" form:"title"  validate:"required"`
+	SessionNumber      int       `json:"sessionNumber" form:"sessionNumber" `
+	SessionDate        time.Time `json:"sessionDate" form:"sessionDate" validate:"required"`            // ! change default now later
+	NotificationDate   time.Time `json:"notificationDate" form:"notificationDate"  validate:"required"` // ! change default now later
+	NotificationNumber string    `json:"notificationNumber" form:"notificationNumber"  validate:"required"`
+	Body               string    `json:"body" form:"body" validate:"required"`
+	NumberItems        int       `json:"numberItems" form:"numberItems" `
+	NumberNotes        int       `json:"numberNotes" form:"numberNotes" `
+	Recommender        string    `json:"recommender" form:"recommender" `
+	Tags               string    `json:"tags" form:"tags" validate:"required"`
+	AttachmentsId      []uint64  `json:"attachmentsId" form:"attachmentsId" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later

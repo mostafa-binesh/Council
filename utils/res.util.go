@@ -34,3 +34,6 @@ func BodyParserErr(c *fiber.Ctx) error {
 		"error": "خطای تجزیه ی درخواست",
 	})
 }
+func CreateNewLogError(c *fiber.Ctx) error {
+	return ResErr(c, "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید")
+}

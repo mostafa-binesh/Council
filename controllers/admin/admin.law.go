@@ -28,9 +28,7 @@ func IndexLaw(c *fiber.Ctx) error {
 		})
 	}
 	if !M.GetLog(c) {
-		return c.JSON(fiber.Map{
-			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
-		})
+		return U.CreateNewLogError(c)
 	}
 	return U.ResWithPagination(c, responseLaws, *pagination)
 }
