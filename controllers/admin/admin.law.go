@@ -39,8 +39,7 @@ func UpdateLaw(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		U.ResErr(c, err.Error())
 	}
-	items := c.Request().PostArgs().PeekMulti("attachmentsId[]")
-	return c.JSON(fiber.Map{"items": items})
+	// items := c.Request().PostArgs().PeekMulti("attachmentsId[]")
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
@@ -473,6 +472,33 @@ func UploadFile(c *fiber.Ctx) error {
 	}
 	// return U.ResMessage(c, "فایل آپلود شد")
 	return c.JSON(fiber.Map{"id": dbFile.ID})
+}
+func RemoveFile(c *fiber.Ctx) error {
+	// create payload
+	payload := new(M.RemoveFileInput)
+	// parse payload
+	if err := c.BodyParser(payload); err != nil {
+		U.ResErr(c, err.Error())
+	}
+	// validate payload
+	if errs := U.Validate(payload); errs != nil {
+		return c.Status(400).JSON(fiber.Map{"errors": errs})
+	}
+	// remove the file from database
+	result := D.DB().Where("id = ?", payload.FileID).Delete(&M.File{})
+	if result.Error != nil {
+		return U.DBError(c, result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return U.ResErr(c, "فایلی یافت نشد")
+	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
+	// return U.ResMessage(c, "فایل آپلود شد")
+	return U.ResMessage(c, "فایل حذف شد")
 }
 
 func Statics(c *fiber.Ctx) error {
