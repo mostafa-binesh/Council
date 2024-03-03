@@ -462,13 +462,17 @@ func UploadFile(c *fiber.Ctx) error {
 		Type:  M.FileTypes[payload.Type],
 		Name:  fileName,
 		LawID: payload.LawId,
-	})
+	}
+	if result := D.DB().Create(&dbFile); result.Error != nil {
+		return U.DBError(c, result.Error)
+	}
 	if !M.GetLog(c) {
 		return c.JSON(fiber.Map{
 			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
 		})
 	}
-	return U.ResMessage(c, "فایل آپلود شد")
+	// return U.ResMessage(c, "فایل آپلود شد")
+	return c.JSON(fiber.Map{"id": dbFile.ID})
 }
 
 func Statics(c *fiber.Ctx) error {
