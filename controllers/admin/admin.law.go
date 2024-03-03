@@ -39,6 +39,8 @@ func UpdateLaw(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		U.ResErr(c, err.Error())
 	}
+	items := c.Request().PostArgs().PeekMulti("attachmentsId[]")
+	return c.JSON(fiber.Map{"items": items})
 	if errs := U.Validate(payload); errs != nil {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
