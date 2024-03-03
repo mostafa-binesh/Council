@@ -49,7 +49,7 @@ func APIInit(router *fiber.App) {
 	authRequired.Get("/userInfo", C.UserInfo)
 
 	// ! admin Route
-	admin := authRequired.Group("/admin")
+	admin := authRequired.Group("/admin", AC.AdminLogMiddleware)
 	admin.Get("/users", AC.IndexUser)
 	admin.Get("/users/:id<int>", AC.UserByID)
 	admin.Put("/users/:id<int>", AC.EditUser)
