@@ -485,7 +485,7 @@ func RemoveFile(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"errors": errs})
 	}
 	// remove the file from database
-	result := D.DB().Where("id = ?", payload.FileID).Delete(&M.File{})
+	result := D.DB().Where("id = ? AND law_id = ?", payload.FileID, payload.LawID).Delete(&M.File{})
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}

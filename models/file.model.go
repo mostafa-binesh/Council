@@ -39,6 +39,7 @@ type UploadFile struct {
 }
 type RemoveFileInput struct {
 	FileID uint `json:"fileID" validate:"required"`
+	LawID  uint `json:"lawID" validate:"required"`
 }
 
 // tips: if convert is array, no need to call be reference
