@@ -68,7 +68,7 @@ func APIInit(router *fiber.App) {
 	admin.Delete("/laws/:id<int>/files/:fileID<int>", AC.DeleteFile) // ! TODO : file az storage ham bayad paak she
 	admin.Get("/statics", AC.Statics)
 	admin.Post("/uploadFile", AC.UploadFile)
-	admin.Put("/RemoveFile", AC.RemoveFile)
+	admin.Put("/removeFile", AC.RemoveFile)
 	admin.Put("/comment/:id<int>/verify", AC.VerifyComment)
 	admin.Put("/comment/:id<int>/unverify", AC.UnVerifyComment)
 	admin.Get("/current/user", C.Dashboard)
