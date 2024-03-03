@@ -151,14 +151,15 @@ func UpdateLaw(c *fiber.Ctx) error {
 	// 	// 	return U.ResErr(c, "cannot save")
 	// 	// }
 	// }
-	var attachmentFilesId []uint64
-	if result := D.DB().Where("law_id = ? AND type = ?", lawId, M.FileTypes["attachment"]).Pluck("id", attachmentFilesId); result.Error != nil {
-		return U.DBError(c, result.Error)
-	}
-	shouldRemoveFile := U.Difference(attachmentFilesId, payload.AttachmentsId)
-	if result := D.DB().Where("id IN ?", shouldRemoveFile).Delete(&M.File{}); result.Error != nil {
-		return U.DBError(c, result.Error)
-	}
+
+	// var attachmentFilesId []uint64
+	// if result := D.DB().Where("law_id = ? AND type = ?", lawId, M.FileTypes["attachment"]).Pluck("id", attachmentFilesId); result.Error != nil {
+	// 	return U.DBError(c, result.Error)
+	// }
+	// shouldRemoveFile := U.Difference(attachmentFilesId, payload.AttachmentsId)
+	// if result := D.DB().Where("id IN ?", shouldRemoveFile).Delete(&M.File{}); result.Error != nil {
+	// 	return U.DBError(c, result.Error)
+	// }
 	if !M.GetLog(c) {
 		return c.JSON(fiber.Map{
 			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
