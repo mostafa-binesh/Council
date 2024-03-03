@@ -36,6 +36,11 @@ func IndexUser(c *fiber.Ctx) error {
 			Verified:     user[i].Verified,
 		})
 	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return c.JSON(fiber.Map{
 		"meta": pagination,
 		"data": pass_data,
@@ -59,6 +64,13 @@ func EditUser(c *fiber.Ctx) error {
 	if result1.Error != nil {
 		return U.DBError(c, result1.Error)
 	}
+	var users []M.User
+	D.DB().Where("(personal_code = ? OR national_code = ? OR phone_number = ?) and id != ?",payload.PersonalCode,payload.NationalCode, payload.PhoneNumber, c.Params("id")).Find(&users)
+	if(len(users)!=0){
+		return c.Status(400).JSON(fiber.Map{
+			"error": " کد ملی یا کد پرسنلی یا شماره تلفن تکراری هست",
+		})
+	}
 	user.Name = payload.Name
 	user.NationalCode = payload.NationalCode
 	if payload.Password != "" {
@@ -73,6 +85,11 @@ func EditUser(c *fiber.Ctx) error {
 	result := D.DB().Save(&user)
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
+	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
 	return U.ResMessage(c, "کاربر ویرایش شد")
 }
@@ -91,6 +108,11 @@ func UserByID(c *fiber.Ctx) error {
 		PersonalCode: user.PersonalCode,
 		NationalCode: user.NationalCode,
 	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return c.JSON(fiber.Map{
 		"data": minUser,
 	})
@@ -98,16 +120,21 @@ func UserByID(c *fiber.Ctx) error {
 
 // ! Delete user with admin/users/{}
 func DeleteUser(c *fiber.Ctx) error {
-	result1 := D.DB().Where("user_id = ? ", c.Params("id")).Delete(&M.Comment{})
-	if result1.Error != nil {
-		return U.DBError(c, result1.Error)
-	}
+	// result1 := D.DB().Where("user_id = ? ", c.Params("id")).Delete(&M.Comment{})
+	// if result1.Error != nil {
+	// 	return U.DBError(c, result1.Error)
+	// }
 	result := D.DB().Delete(&M.User{}, c.Params("id"))
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
 	if result.RowsAffected == 0 {
 		return U.ResErr(c, "کاربر یافت نشد")
+	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
 	return U.ResMessage(c, "کاربر حذف شد")
 }
@@ -117,12 +144,22 @@ func UserVerification(c *fiber.Ctx) error {
 	if result.Error != nil {
 		U.DBError(c, result.Error)
 	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return U.ResMessage(c, "کاربر تایید شد")
 }
 func UserUnVerification(c *fiber.Ctx) error {
 	result := D.DB().Model(&M.User{}).Where("id = ?", c.Params("id")).Update("verified", false)
 	if result.Error != nil {
 		U.DBError(c, result.Error)
+	}
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
 	return U.ResMessage(c, "کاربر رد شد")
 }
@@ -135,6 +172,13 @@ func AddUser(c *fiber.Ctx) error {
 	// ! validate request
 	if errs := U.Validate(payload); errs != nil {
 		return U.ResValidationErr(c, errs)
+	}
+	var users []M.User
+	D.DB().Where("personal_code = ? OR national_code = ? OR phone_number = ?",payload.PersonalCode,payload.NationalCode, payload.PhoneNumber).Find(&users)
+	if(len(users)!=0){
+		return c.Status(400).JSON(fiber.Map{
+			"error": " کد ملی یا کد پرسنلی یا شماره تلفن تکراری هست",
+		})
 	}
 	// hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
@@ -153,6 +197,10 @@ func AddUser(c *fiber.Ctx) error {
 	if result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
-
+	if(!M.GetLog(c)){
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return U.ResMessage(c, "کاربر ایجاد شد") // ! TODO talk with mohsen: should i send statusCreated or 200 ?
 }

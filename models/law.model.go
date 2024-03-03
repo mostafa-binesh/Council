@@ -35,12 +35,15 @@ type LawByID struct {
 	Body               string           `json:"body"`
 	Image              string           `json:"image"`
 	Comments           []CommentMinimal `json:"comments"`
-	Files              []FileMinimal    `json:"files"`
+	SeenCount          int64            `json:"seenCount"`
+	ExplanatoryPlan    string           `json:"explanatoryPlan"`
+	Certificate        string           `json:"certificate"`
+	Attachment         []string         `json:"attachment"`
 	NumberItems        int              `json:"NumberItems"`
 	NumberNotes        int              `json:"NumberNotes"`
 	Recommender        string           `json:"Recommender"`
-	CreatedAt          time.Time        `json:"createdAt"`
-	UpdatedAt          time.Time        `json:"updatedAt"`
+	Tags               string           `json:"tags"`
+	// Files              []FileMinimal    `json:"files"`
 }
 type LawMain struct {
 	ID                 uint             `json:"id"`
@@ -55,6 +58,8 @@ type LawMain struct {
 	Attachments        []FileMinimal    `json:"attachments"`
 	Plans              []FileMinimal    `json:"plans"`
 	Certificates       []FileMinimal    `json:"certificates"`
+	CreatedAt          time.Time        `json:"created_at"`
+	UpdatedAt          time.Time        `json:"updated_at"`
 }
 type LawMinimal struct {
 	ID               uint      `json:"id"`
@@ -117,9 +122,11 @@ type Comment struct {
 	UpdatedAt       time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type CommentMinimal struct {
+	ID       uint   `json:"id"`
 	Body     string `json:"body" validate:"required"`
 	FullName string `json:"fullName"`
 	Email    string `json:"email"`
+	Status   bool   `json:"status"`
 	LawID    uint   `json:"law_id" validate:"required"`
 }
 type OfflineLaws struct {
@@ -167,14 +174,22 @@ type FAQ struct {
 	UpdatedAt    time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 
-func GetMinimalComment(lawID uint) []CommentMinimal {
+func GetMinimalComment(lawID uint, flag bool) []CommentMinimal {
 	comments := []Comment{}
-	D.DB().Where("law_id = ?", lawID).Where("status = true").Find(&comments)
+	if !flag {
+		D.DB().Where("law_id = ?", lawID).Where("status = true").Find(&comments)
+	}
+	if flag {
+		D.DB().Where("law_id = ?", lawID).Find(&comments)
+	}
 	var minimalComments []CommentMinimal
 	for i := 0; i < len(comments); i++ {
 		minimalComment := CommentMinimal{
+			ID:       comments[i].ID,
+			Email:    comments[i].Email,
 			FullName: comments[i].FullName,
 			Body:     comments[i].Body,
+			Status:   comments[i].Status,
 		}
 		minimalComments = append(minimalComments, minimalComment)
 	}
@@ -219,10 +234,115 @@ func LawToLawByID(law *Law) *LawMain {
 		NotificationNumber: law.NotificationNumber,
 		Body:               law.Body,
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
-		Comments:           GetMinimalComment(law.ID),
+		Comments:           GetMinimalComment(law.ID, false),
 		SeenCount:          getSeenCount(law.ID),
 		Attachments:        law.getAttachmentFiles(),
 		Plans:              law.getPlanFiles(),
 		Certificates:       law.getCertificateFiles(),
+		Attachments:        law.getAttachmentFiles(),
+		Plans:              law.getPlanFiles(),
+		Certificates:       law.getCertificateFiles(),
+	}
+}
+func getFilesMini(lawID uint) []string {
+	files := []File{}
+	D.DB().Where("law_id = ? and type=3", lawID).Find(&files)
+	var fileArray []string
+	for i := 0; i < len(files); i++ {
+		fileArray = append(fileArray, U.BaseURL+"/public/uploads/"+files[i].Name)
+	}
+	return fileArray
+}
+func keyWord(lawID uint) string {
+	words := []Keyword{}
+	D.DB().Where("law_id = ? ", lawID).Find(&words)
+	tags := ""
+	for i := 0; i < len(words); i++ {
+		tags += words[i].Keyword + ","
+	}
+	return tags
+}
+func checkNull(name string) string {
+	if name == "" {
+		return ""
+	}
+	url := U.BaseURL + "/public/uploads/" + name
+	return url
+}
+func LawToSeenAdmin(law *Law) *LawByID {
+	exp := File{}
+	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&exp)
+	cer := File{}
+	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&cer)
+	return &LawByID{
+		ID:                 law.ID,
+		Type:               law.Type,
+		Title:              law.Title,
+		SessionNumber:      law.SessionNumber,
+		SessionDate:        law.SessionDate,
+		NotificationDate:   law.NotificationDate,
+		NotificationNumber: law.NotificationNumber,
+		Body:               law.Body,
+		Image:              U.BaseURL + "/public/uploads/" + law.Image,
+		SeenCount:          getSeenCount(law.ID),
+		ExplanatoryPlan:    checkNull(exp.Name),
+		Certificate:        checkNull(cer.Name),
+		Attachment:         getFilesMini(law.ID),
+		NumberItems:        law.NumberItems,
+		NumberNotes:        law.NumberNotes,
+		Recommender:        law.Recommender,
+		Tags:               keyWord(law.ID),
+		// Comments:           GetMinimalComment(law.ID, true),
+	}
+}
+func getFilesMini(lawID uint) []string {
+	files := []File{}
+	D.DB().Where("law_id = ? and type=3", lawID).Find(&files)
+	var fileArray []string
+	for i := 0; i < len(files); i++ {
+		fileArray = append(fileArray, U.BaseURL+"/public/uploads/"+files[i].Name)
+	}
+	return fileArray
+}
+func keyWord(lawID uint) string {
+	words := []Keyword{}
+	D.DB().Where("law_id = ? ", lawID).Find(&words)
+	tags := ""
+	for i := 0; i < len(words); i++ {
+		tags += words[i].Keyword + ","
+	}
+	return tags
+}
+func checkNull(name string) string {
+	if name == "" {
+		return ""
+	}
+	url := U.BaseURL + "/public/uploads/" + name
+	return url
+}
+func LawToSeenAdmin(law *Law) *LawByID {
+	exp := File{}
+	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&exp)
+	cer := File{}
+	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&cer)
+	return &LawByID{
+		ID:                 law.ID,
+		Type:               law.Type,
+		Title:              law.Title,
+		SessionNumber:      law.SessionNumber,
+		SessionDate:        law.SessionDate,
+		NotificationDate:   law.NotificationDate,
+		NotificationNumber: law.NotificationNumber,
+		Body:               law.Body,
+		Image:              U.BaseURL + "/public/uploads/" + law.Image,
+		SeenCount:          getSeenCount(law.ID),
+		ExplanatoryPlan:    checkNull(exp.Name),
+		Certificate:        checkNull(cer.Name),
+		Attachment:         getFilesMini(law.ID),
+		NumberItems:        law.NumberItems,
+		NumberNotes:        law.NumberNotes,
+		Recommender:        law.Recommender,
+		Tags:               keyWord(law.ID),
+		// Comments:           GetMinimalComment(law.ID, true),
 	}
 }

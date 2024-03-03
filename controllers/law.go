@@ -68,8 +68,19 @@ func LawEnactments(c *fiber.Ctx) error {
 	enactments := []M.Law{}
 	pagination := U.ParsedPagination(c)
 	D.DB().Scopes(U.Paginate(&M.Law{}, pagination)).Where("type = ?", 3).Find(&enactments)
+	enactmentsArray := []M.LawMinimal{}
+	for i := 0; i < len(enactments); i++ {
+		if enactments[i].Type == 3 {
+			enactmentsArray = append(enactmentsArray, M.LawMinimal{
+				ID:               enactments[i].ID,
+				Title:            enactments[i].Title,
+				Image:            U.BaseURL + "/public/uploads/" + enactments[i].Image,
+				NotificationDate: enactments[i].NotificationDate,
+			})
+		}
+	}
 	return c.JSON(fiber.Map{
-		"data": enactments,
+		"data": enactmentsArray,
 		"meta": pagination,
 	})
 }
@@ -77,8 +88,19 @@ func LawStatutes(c *fiber.Ctx) error {
 	statutes := []M.Law{}
 	pagination := U.ParsedPagination(c)
 	D.DB().Scopes(U.Paginate(&M.Law{}, pagination)).Where("type = ?", 2).Find(&statutes)
+	statutesArray := []M.LawMinimal{}
+	for i := 0; i < len(statutes); i++ {
+		if statutes[i].Type == 2 {
+			statutesArray = append(statutesArray, M.LawMinimal{
+				ID:               statutes[i].ID,
+				Title:            statutes[i].Title,
+				Image:            U.BaseURL + "/public/uploads/" + statutes[i].Image,
+				NotificationDate: statutes[i].NotificationDate,
+			})
+		}
+	}
 	return c.JSON(fiber.Map{
-		"data": statutes,
+		"data": statutesArray,
 		"meta": pagination,
 	})
 }
@@ -86,8 +108,19 @@ func LawRegulations(c *fiber.Ctx) error {
 	regulations := []M.Law{}
 	pagination := U.ParsedPagination(c)
 	D.DB().Scopes(U.Paginate(&M.Law{}, pagination)).Where("type = ?", 1).Find(&regulations)
+	regulationsArray := []M.LawMinimal{}
+	for i := 0; i < len(regulations); i++ {
+		if regulations[i].Type == 1 {
+			regulationsArray = append(regulationsArray, M.LawMinimal{
+				ID:               regulations[i].ID,
+				Title:            regulations[i].Title,
+				Image:            U.BaseURL + "/public/uploads/" + regulations[i].Image,
+				NotificationDate: regulations[i].NotificationDate,
+			})
+		}
+	}
 	return c.JSON(fiber.Map{
-		"data": regulations,
+		"data": regulationsArray,
 		"meta": pagination,
 	})
 }
@@ -104,10 +137,9 @@ func AdvancedLawSearch(c *fiber.Ctx) error {
 func LawSearch(c *fiber.Ctx) error {
 	laws := []M.Law{}
 	pagination := U.ParsedPagination(c)
-
 	D.DB().Scopes(
 		F.FilterByType(c,
-			F.FilterType{QueryName: "title", Operator: "LIKE"},
+			F.FilterType{QueryName: "title", ColumnName: "title", Operator: "LIKE"},
 			F.FilterType{QueryName: "startDate", ColumnName: "notification_date", Operator: ">="},
 			F.FilterType{QueryName: "endDate", ColumnName: "notification_date", Operator: "<="},
 			F.FilterType{QueryName: "body", ColumnName: "body", Operator: "LIKE"}),
@@ -134,6 +166,14 @@ func LawSearch(c *fiber.Ctx) error {
 
 // ! CHECK: files ham preload mishe. aya niazi?
 func LawByID(c *fiber.Ctx) error {
+	// ip := c.IP()
+	// return c.JSON(fiber.Map{
+	// 	"ip": ip,
+	// 	"port": c.Port(),
+	// 	"url" : c.BaseURL(),
+	// 	"hostname": c.Hostname(),
+		
+	// })
 	law := &M.Law{}
 	if err := D.DB().First(law, c.Params("id")).Error; err != nil {
 		return U.DBError(c, err)
@@ -203,7 +243,8 @@ func OfflineLaws(c *fiber.Ctx) error {
 			NotificationDate:   laws[i].NotificationDate,
 			NotificationNumber: laws[i].NotificationNumber,
 			Body:               laws[i].Body,
-			Image:              U.BaseURL + "public/uploads/" + laws[i].Image,
+			CreatedAt:          laws[i].CreatedAt,
+			UpdatedAt:          laws[i].UpdatedAt,
 		})
 	}
 	return c.JSON(fiber.Map{"data": responseLaws})
@@ -219,7 +260,7 @@ func AddComment(c *fiber.Ctx) error {
 	}
 	comment := M.Comment{
 		Body:            payload.Body,
-		FullName:        payload.Email,
+		FullName:        payload.FullName,
 		Email:           payload.Email,
 		LawID:           payload.LawID,
 		ParentCommentID: 0,
@@ -231,5 +272,26 @@ func AddComment(c *fiber.Ctx) error {
 	}
 	return c.Status(200).JSON(fiber.Map{
 		"message": "کامنت با موفقیت اضافه شد",
+	})
+}
+
+func Static(c *fiber.Ctx) error {
+	var count1 int64
+	D.DB().Model(&M.Law{}).Where("type = ?", 1).Count(&count1)
+	
+	var count2 int64
+	D.DB().Model(&M.Law{}).Where("type = ?", 2).Count(&count2)
+	
+	var count3 int64
+	D.DB().Model(&M.Law{}).Where("type = ?", 3).Count(&count3)
+
+	var count int64
+	D.DB().Model(&M.Law{}).Where("true").Count(&count)
+
+	return c.JSON(fiber.Map{
+		"LawRegulations" : count1,
+		"LawStatutes" : count2,
+		"LawEnactments" : count3,
+		"Total" : count,
 	})
 }

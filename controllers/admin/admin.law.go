@@ -6,6 +6,7 @@ import (
 	U "docker/utils"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	// "strconv"
@@ -24,6 +25,11 @@ func IndexLaw(c *fiber.Ctx) error {
 			ID:    laws[i].ID,
 			Title: laws[i].Title,
 			Image: U.BaseURL + "/public/uploads/" + laws[i].Image,
+		})
+	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
 		})
 	}
 	return U.ResWithPagination(c, responseLaws, *pagination)
@@ -154,6 +160,11 @@ func UpdateLaw(c *fiber.Ctx) error {
 	if result := D.DB().Where("id IN ?", shouldRemoveFile).Delete(&M.File{}); result.Error != nil {
 		return U.DBError(c, result.Error)
 	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	// todo: handle removing the file from the storage later
 	return c.JSON(fiber.Map{
 		"message": "به روز رسانی با موفقیت انجام شد",
@@ -171,6 +182,11 @@ func DeleteLaw(c *fiber.Ctx) error {
 	}
 	if result.RowsAffected == 0 {
 		return U.ResErr(c, "مصوبه یافت نشد")
+	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
 	return c.JSON(fiber.Map{
 		"message": "حذف کردن با موفقیت انجام شد",
@@ -318,6 +334,11 @@ func CreateLaw(c *fiber.Ctx) error {
 		// 	return U.ResErr(c, "cannot save")
 		// }
 	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	// return response
 	return c.Status(200).JSON(fiber.Map{
 		"message": "مصوبه با موفقیت اضافه شد",
@@ -345,7 +366,7 @@ func LawSearch(c *fiber.Ctx) error {
 		pass_data = append(pass_data, M.LawMinimal_min{
 			ID:    laws[i].ID,
 			Title: laws[i].Title,
-			Image: laws[i].Image,
+			// Image: laws[i].Image,
 		})
 	}
 	return c.JSON(fiber.Map{
@@ -355,12 +376,43 @@ func LawSearch(c *fiber.Ctx) error {
 }
 func LawByID(c *fiber.Ctx) error {
 	law := &M.Law{}
-	if err := D.DB().Preload("Files").First(law, c.Params("id")).Error; err != nil {
+	if err := D.DB().First(law, c.Params("id")).Error; err != nil {
 		return U.DBError(c, err)
 	}
-	LawByID := M.LawToLawByID(law)
+	LawByID := M.LawToSeenAdmin(law)
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return c.JSON(fiber.Map{
 		"data": LawByID,
+	})
+}
+func CommentsByLawID(c *fiber.Ctx) error {
+	comments := []M.Comment{}
+	pagination := U.ParsedPagination(c)
+	D.DB().Where("law_id = ?", c.Params("id")).Scopes(U.Paginate(comments, pagination)).Find(&comments)
+	var minimalComments []M.CommentMinimal
+	for i := 0; i < len(comments); i++ {
+		minimalComment := M.CommentMinimal{
+			ID:       comments[i].ID,
+			Email:    comments[i].Email,
+			FullName: comments[i].FullName,
+			Body:     comments[i].Body,
+			Status:   comments[i].Status,
+		}
+		minimalComments = append(minimalComments, minimalComment)
+
+	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data": minimalComments,
+		"meta": pagination,
 	})
 }
 func DeleteFile(c *fiber.Ctx) error {
@@ -370,6 +422,11 @@ func DeleteFile(c *fiber.Ctx) error {
 	}
 	if result.RowsAffected == 0 {
 		return U.ResErr(c, "فایل یافت نشد")
+	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
 	return c.JSON(fiber.Map{
 		"message": "فایل حذف شد",
@@ -405,10 +462,60 @@ func UploadFile(c *fiber.Ctx) error {
 		Type:  M.FileTypes[payload.Type],
 		Name:  fileName,
 		LawID: payload.LawId,
+	})
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
 	}
-	if result := D.DB().Create(&dbFile); result.Error != nil {
-		return U.DBError(c, err)
+	return U.ResMessage(c, "فایل آپلود شد")
+}
+
+func Statics(c *fiber.Ctx) error {
+
+	var results []struct {
+		LawID uint
+		Count int64
+		Title string
 	}
-	// return U.ResMessage(c, "فایل آپلود شد")
-	return c.JSON(fiber.Map{"id": dbFile})
+	D.DB().Model(&M.LawLog{}).
+		Select("law_logs.law_id, laws.title, count(law_logs.law_id) as count").
+		Joins("INNER JOIN laws ON laws.id = law_logs.law_id").
+		Where("law_logs.created_at >= ?", time.Now().AddDate(0, 0, -10)).
+		Group("law_logs.law_id, laws.title").
+		Limit(10).
+		Scan(&results)
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data": results,
+	})
+}
+
+func VerifyComment(c *fiber.Ctx) error {
+	result := D.DB().Model(&M.Comment{}).Where("id = ?", c.Params("id")).Update("status", true)
+	if result.Error != nil {
+		U.DBError(c, result.Error)
+	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
+	return U.ResMessage(c, "کاربر تایید شد")
+}
+func UnVerifyComment(c *fiber.Ctx) error {
+	result := D.DB().Model(&M.Comment{}).Where("id = ?", c.Params("id")).Update("status", false)
+	if result.Error != nil {
+		U.DBError(c, result.Error)
+	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
+	return U.ResMessage(c, "کاربر تایید شد")
 }

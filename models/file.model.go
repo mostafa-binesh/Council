@@ -32,8 +32,8 @@ type FileMinimal struct {
 	Type uint16 `json:"type"` // like attachment, certificate and etc...
 	URL  string `json:"name"`
 	// relations
-	CreatedAt *time.Time `json:"createdAt" gorm:"not null;default:now()"`
-	UpdatedAt *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
+	// CreatedAt *time.Time `json:"createdAt" gorm:"not null;default:now()"`
+	// UpdatedAt *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type UploadFile struct {
 	LawId uint   `json:"lawId" validate:"required"`
@@ -53,11 +53,11 @@ func FileToFileMinimal(files []File) []FileMinimal {
 }
 func (file File) ToFileMinimal() FileMinimal {
 	return FileMinimal{
-		ID:        file.ID,
-		Type:      file.Type,
-		URL:       U.BaseURL + "/public/uploads/" + file.Name,
-		CreatedAt: file.CreatedAt,
-		UpdatedAt: file.UpdatedAt,
+		ID:   file.ID,
+		Type: file.Type,
+		URL:  U.BaseURL + "/public/uploads/" + file.Name,
+		// CreatedAt: file.CreatedAt,
+		// UpdatedAt: file.UpdatedAt,
 	}
 }
 func (f File) isAttachment() bool {

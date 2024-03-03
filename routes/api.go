@@ -5,7 +5,7 @@ import (
 	AC "docker/controllers/admin"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
+	// "github.com/gofiber/fiber/v2/middleware/encryptcookie"
 )
 
 func APIInit(router *fiber.App) {
@@ -15,7 +15,7 @@ func APIInit(router *fiber.App) {
 			"msg": "freeman was here :)",
 		})
 	})
-	router.Post("/signup", C.SignUpUser)
+	// router.Post("/signup", C.SignUpUser)
 	router.Post("/login", C.Login)
 	// ! laws route
 	laws := router.Group("/laws")
@@ -28,17 +28,18 @@ func APIInit(router *fiber.App) {
 	laws.Get("/offline", C.OfflineLaws)
 	laws.Put("/offilne/update", C.UpdateLawOffline)
 	laws.Post("/comment", C.AddComment)
+	laws.Get("/statics",C.Static)
 
-	// ! messaging
-	msg := router.Group("correspondence")
-	msg.Use(encryptcookie.New(encryptcookie.Config{
-		// ! only base64 charasters
-		// ! A-Z | a-z | 0-9 | + | /
-		Key: "S6e5+xc65+4dfs/nb4/f56+EW+56N4d6",
-	}))
-	msg.Get("/chats", C.GuestChats)
-	msg.Post("/chats", C.CreateGuestChat)
-	msg.Post("/messages", C.GuestSendMessage)
+	// // ! messaging
+	// msg := router.Group("correspondence")
+	// msg.Use(encryptcookie.New(encryptcookie.Config{
+	// 	// ! only base64 charasters
+	// 	// ! A-Z | a-z | 0-9 | + | /
+	// 	Key: "S6e5+xc65+4dfs/nb4/f56+EW+56N4d6",
+	// }))
+	// msg.Get("/chats", C.GuestChats)
+	// msg.Post("/chats", C.CreateGuestChat)
+	// msg.Post("/messages", C.GuestSendMessage)
 
 	// authentication required endpoints
 	router.Post("/login/token/refresh", C.RefreshToken)
@@ -59,14 +60,17 @@ func APIInit(router *fiber.App) {
 	admin.Get("/laws", AC.IndexLaw)
 	admin.Get("/laws/search", AC.LawSearch)
 	admin.Get("laws/:id<int>", AC.LawByID)
+	admin.Get("/comments/:id<int>",AC.CommentsByLawID)
 	admin.Post("/laws", AC.CreateLaw)
 	admin.Put("/laws/:id<int>", AC.UpdateLaw)
 	admin.Delete("/laws/:id<int>", AC.DeleteLaw)
 	admin.Get("/laws/offline", C.OfflineLaws)
 	admin.Delete("/laws/:id<int>/files/:fileID<int>", AC.DeleteFile) // ! TODO : file az storage ham bayad paak she
-
-	admin.Post("/uploadFile", AC.UploadFile) // ! TODO : file az storage ham bayad paak she
-
+	admin.Get("/statics",AC.Statics)
+	admin.Post("/uploadFile", AC.UploadFile) 
+	admin.Put("/comment/:id<int>/verify",AC.VerifyComment)
+	admin.Put("/comment/:id<int>/unverify",AC.UnVerifyComment)
+	admin.Get("/current/user",C.Dashboard)
 	// ! dashboard routes
 	dashboard := authRequired.Group("/dashboard", C.AuthMiddleware)
 	dashboard.Get("/", C.Dashboard)
