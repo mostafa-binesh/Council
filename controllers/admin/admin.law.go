@@ -401,10 +401,14 @@ func UploadFile(c *fiber.Ctx) error {
 	if err != nil {
 		return U.ResErr(c, err.Error())
 	}
-	D.DB().Create(&M.File{
+	dbFile := M.File{
 		Type:  M.FileTypes[payload.Type],
 		Name:  fileName,
 		LawID: payload.LawId,
-	})
-	return U.ResMessage(c, "فایل آپلود شد")
+	}
+	if result := D.DB().Create(&dbFile); result.Error != nil {
+		return U.DBError(c, err)
+	}
+	// return U.ResMessage(c, "فایل آپلود شد")
+	return c.JSON(fiber.Map{"id": dbFile})
 }
