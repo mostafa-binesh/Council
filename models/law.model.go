@@ -239,60 +239,6 @@ func LawToLawByID(law *Law) *LawMain {
 		Attachments:        law.getAttachmentFiles(),
 		Plans:              law.getPlanFiles(),
 		Certificates:       law.getCertificateFiles(),
-		Attachments:        law.getAttachmentFiles(),
-		Plans:              law.getPlanFiles(),
-		Certificates:       law.getCertificateFiles(),
-	}
-}
-func getFilesMini(lawID uint) []string {
-	files := []File{}
-	D.DB().Where("law_id = ? and type=3", lawID).Find(&files)
-	var fileArray []string
-	for i := 0; i < len(files); i++ {
-		fileArray = append(fileArray, U.BaseURL+"/public/uploads/"+files[i].Name)
-	}
-	return fileArray
-}
-func keyWord(lawID uint) string {
-	words := []Keyword{}
-	D.DB().Where("law_id = ? ", lawID).Find(&words)
-	tags := ""
-	for i := 0; i < len(words); i++ {
-		tags += words[i].Keyword + ","
-	}
-	return tags
-}
-func checkNull(name string) string {
-	if name == "" {
-		return ""
-	}
-	url := U.BaseURL + "/public/uploads/" + name
-	return url
-}
-func LawToSeenAdmin(law *Law) *LawByID {
-	exp := File{}
-	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&exp)
-	cer := File{}
-	D.DB().Where("law_id = ? and type = 1", law.ID).Find(&cer)
-	return &LawByID{
-		ID:                 law.ID,
-		Type:               law.Type,
-		Title:              law.Title,
-		SessionNumber:      law.SessionNumber,
-		SessionDate:        law.SessionDate,
-		NotificationDate:   law.NotificationDate,
-		NotificationNumber: law.NotificationNumber,
-		Body:               law.Body,
-		Image:              U.BaseURL + "/public/uploads/" + law.Image,
-		SeenCount:          getSeenCount(law.ID),
-		ExplanatoryPlan:    checkNull(exp.Name),
-		Certificate:        checkNull(cer.Name),
-		Attachment:         getFilesMini(law.ID),
-		NumberItems:        law.NumberItems,
-		NumberNotes:        law.NumberNotes,
-		Recommender:        law.Recommender,
-		Tags:               keyWord(law.ID),
-		// Comments:           GetMinimalComment(law.ID, true),
 	}
 }
 func getFilesMini(lawID uint) []string {
