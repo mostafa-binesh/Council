@@ -38,7 +38,7 @@ type LawByID struct {
 	SeenCount          int64            `json:"seenCount"`
 	ExplanatoryPlan    string           `json:"explanatoryPlan"`
 	Certificate        string           `json:"certificate"`
-	Attachment         []string         `json:"attachment"`
+	Attachment         []FileMinimal    `json:"attachment"`
 	NumberItems        int              `json:"NumberItems"`
 	NumberNotes        int              `json:"NumberNotes"`
 	Recommender        string           `json:"Recommender"`
@@ -55,6 +55,9 @@ type LawMain struct {
 	Image              string           `json:"image"`
 	SeenCount          int64            `json:"seenCount"`
 	Comments           []CommentMinimal `json:"comments"`
+	Attachments        []FileMinimal    `json:"attachments"`
+	Plans              []FileMinimal    `json:"plans"`
+	Certificates       []FileMinimal    `json:"certificates"`
 	CreatedAt          time.Time        `json:"created_at"`
 	UpdatedAt          time.Time        `json:"updated_at"`
 }
@@ -90,18 +93,18 @@ type CreateLawInput struct {
 	Tags               string    `json:"tags" validate:"required"`
 }
 type EditLawInput struct {
-	Type               int       `json:"type" validate:"required"`
-	Title              string    `json:"title"  validate:"required"`
-	SessionNumber      int       `json:"sessionNumber"`
-	SessionDate        time.Time `json:"sessionDate" validate:"required"`      // ! change default now later
-	NotificationDate   time.Time `json:"notificationDate" validate:"required"` // ! change default now later
-	NotificationNumber string    `json:"notificationNumber" validate:"required"`
-	Body               string    `json:"body" validate:"required"`
-	NumberItems        int       `json:"numberItems"`
-	NumberNotes        int       `json:"numberNotes"`
-	Recommender        string    `json:"recommender"`
-	Tags               string    `json:"tags" validate:"required"`
-	AttachmentsId      []uint64  `json:"attachmentsId" validate:"required"`
+	Type               int       `json:"type" form:"type"  validate:"required"`
+	Title              string    `json:"title" form:"title"  validate:"required"`
+	SessionNumber      int       `json:"sessionNumber" form:"sessionNumber" `
+	SessionDate        time.Time `json:"sessionDate" form:"sessionDate" validate:"required"`            // ! change default now later
+	NotificationDate   time.Time `json:"notificationDate" form:"notificationDate"  validate:"required"` // ! change default now later
+	NotificationNumber string    `json:"notificationNumber" form:"notificationNumber"  validate:"required"`
+	Body               string    `json:"body" form:"body" validate:"required"`
+	NumberItems        int       `json:"numberItems" form:"numberItems" `
+	NumberNotes        int       `json:"numberNotes" form:"numberNotes" `
+	Recommender        string    `json:"recommender" form:"recommender" `
+	Tags               string    `json:"tags" form:"tags" validate:"required"`
+	// AttachmentsId      []uint64  `json:"attachmentsId" form:"attachmentsId" validate:"required"`
 }
 type UpdatedLaws struct {
 	LastOnline time.Time `json:"lastOnline" validate:"required"` // ! change default now later
@@ -189,7 +192,6 @@ func GetMinimalComment(lawID uint, flag bool) []CommentMinimal {
 			Status:   comments[i].Status,
 		}
 		minimalComments = append(minimalComments, minimalComment)
-
 	}
 	return minimalComments
 }
@@ -197,6 +199,31 @@ func getSeenCount(lawID uint) int64 {
 	var count int64
 	D.DB().Model(&LawLog{}).Where("law_id = ?", lawID).Count(&count)
 	return count
+}
+
+func (l Law) getAttachmentFiles() (files []FileMinimal) {
+	for _, file := range l.Files {
+		if file.isAttachment() {
+			files = append(files, file.ToFileMinimal())
+		}
+	}
+	return
+}
+func (l Law) getPlanFiles() (files []FileMinimal) {
+	for _, file := range l.Files {
+		if file.isPlan() {
+			files = append(files, file.ToFileMinimal())
+		}
+	}
+	return
+}
+func (l Law) getCertificateFiles() (files []FileMinimal) {
+	for _, file := range l.Files {
+		if file.isCertificate() {
+			files = append(files, file.ToFileMinimal())
+		}
+	}
+	return
 }
 func LawToLawByID(law *Law) *LawMain {
 	return &LawMain{
@@ -209,6 +236,9 @@ func LawToLawByID(law *Law) *LawMain {
 		Image:              U.BaseURL + "/public/uploads/" + law.Image,
 		Comments:           GetMinimalComment(law.ID, false),
 		SeenCount:          getSeenCount(law.ID),
+		Attachments:        law.getAttachmentFiles(),
+		Plans:              law.getPlanFiles(),
+		Certificates:       law.getCertificateFiles(),
 	}
 }
 func getFilesMini(lawID uint) []string {
@@ -229,12 +259,12 @@ func keyWord(lawID uint) string {
 	}
 	return tags
 }
-func checkNull (name string)  string{
+func checkNull(name string) string {
 	if name == "" {
 		return ""
 	}
 	url := U.BaseURL + "/public/uploads/" + name
-	return  url
+	return url
 }
 func LawToSeenAdmin(law *Law) *LawByID {
 	exp := File{}
@@ -254,11 +284,12 @@ func LawToSeenAdmin(law *Law) *LawByID {
 		SeenCount:          getSeenCount(law.ID),
 		ExplanatoryPlan:    checkNull(exp.Name),
 		Certificate:        checkNull(cer.Name),
-		Attachment:         getFilesMini(law.ID),
 		NumberItems:        law.NumberItems,
 		NumberNotes:        law.NumberNotes,
 		Recommender:        law.Recommender,
 		Tags:               keyWord(law.ID),
+		// Attachment:         getFilesMini(law.ID),
+		Attachment: law.getAttachmentFiles(),
 		// Comments:           GetMinimalComment(law.ID, true),
 	}
 }

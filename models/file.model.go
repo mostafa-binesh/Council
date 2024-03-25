@@ -30,14 +30,16 @@ type FileMinimal struct {
 	ID uint `json:"id"`
 	// Type string `json:"type"` // like attachment, certificate and etc...
 	Type uint16 `json:"type"` // like attachment, certificate and etc...
-	URL  string `json:"name"`
+	URL  string `json:"href"`
 	// relations
-	// CreatedAt *time.Time `json:"createdAt" gorm:"not null;default:now()"`
-	// UpdatedAt *time.Time `json:"updatedAt" gorm:"not null;default:now()"`
 }
 type UploadFile struct {
 	LawId uint   `json:"lawId" validate:"required"`
 	Type  string `json:"type" validate:"required"`
+}
+type RemoveFileInput struct {
+	FileID uint `json:"fileID" validate:"required"`
+	LawID  uint `json:"lawID" validate:"required"`
 }
 
 // tips: if convert is array, no need to call be reference
@@ -46,15 +48,24 @@ type UploadFile struct {
 func FileToFileMinimal(files []File) []FileMinimal {
 	var minimalFiles []FileMinimal
 	for i := 0; i < len(files); i++ {
-		minimalFile := FileMinimal{
-			ID: files[i].ID,
-			// Type:      IntFileTypes[files[i].Type],
-			Type:      files[i].Type,
-			URL:       U.BaseURL + "/public/uploads/" + files[i].Name,
-			// CreatedAt: files[i].CreatedAt,
-			// UpdatedAt: files[i].UpdatedAt,
-		}
+		minimalFile := files[i].ToFileMinimal()
 		minimalFiles = append(minimalFiles, minimalFile)
 	}
 	return minimalFiles
+}
+func (file File) ToFileMinimal() FileMinimal {
+	return FileMinimal{
+		ID:   file.ID,
+		Type: file.Type,
+		URL:  U.BaseURL + "/public/uploads/" + file.Name,
+	}
+}
+func (f File) isAttachment() bool {
+	return f.Type == FileTypes["attachment"]
+}
+func (f File) isPlan() bool {
+	return f.Type == FileTypes["plan"]
+}
+func (f File) isCertificate() bool {
+	return f.Type == FileTypes["certificate"]
 }
