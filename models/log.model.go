@@ -2,8 +2,10 @@ package models
 
 import (
 	D "docker/database"
-	"github.com/gofiber/fiber/v2"
+	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type LawLog struct {
@@ -33,6 +35,10 @@ type ActionLog struct {
 
 func GetLog(c *fiber.Ctx) bool {
 	user := c.Locals("user").(User)
+	route := c.Route().Path;
+	if(strings.Contains(c.Route().Path , ":id<int>")){
+		route = strings.Replace(c.Route().Path,":id<int>",c.Params("id"),-1)
+	}
 	ip := c.Get("X-Real-IP")
 	if ip == "" {
 		ip = c.Get("X-Forwarded-For")
@@ -47,7 +53,7 @@ func GetLog(c *fiber.Ctx) bool {
 		Url:         c.BaseURL(),
 		UserID:      user.ID,
 		RequestType: c.Method(),
-		RouteName:   c.Route().Path,
+		RouteName:   route,
 	}
 	resultLog := D.DB().Create(&log)
 	if resultLog.Error != nil {

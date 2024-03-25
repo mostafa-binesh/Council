@@ -369,6 +369,11 @@ func LawSearch(c *fiber.Ctx) error {
 			// Image: laws[i].Image,
 		})
 	}
+	if !M.GetLog(c) {
+		return c.JSON(fiber.Map{
+			"error": "این درخواست مشکل دارد. لطفا لحظاتی بعد تلاش کنید",
+		})
+	}
 	return c.JSON(fiber.Map{
 		"meta": pagination,
 		"data": pass_data,
