@@ -28,7 +28,7 @@ func IndexLaw(c *fiber.Ctx) error {
 		})
 	}
 	if !M.GetLog(c) {
-		return U.CreateNewLogError(c)
+		
 	}
 	return U.ResWithPagination(c, responseLaws, *pagination)
 }
