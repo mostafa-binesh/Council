@@ -46,6 +46,10 @@ func RoleHasPermissionSeeder(){
 	})
 	D.DB().Create(&M.RoleHasPermission{
 		RoleID: 1,
+		PermissionID: 2,
+	})
+	D.DB().Create(&M.RoleHasPermission{
+		RoleID: 1,
 		PermissionID: 3,
 	})
 	D.DB().Create(&M.RoleHasPermission{
