@@ -29,7 +29,7 @@ func generateTexts(n int) []string {
 	var texts []string
 	for i := 0; i < n; i++ {
 		LargText := ""
-		for i := 0 ; i<1000 ; i++ {
+		for i := 0 ; i<3 ; i++ {
 			LargText += text
 		}
 		texts = append(texts, LargText)

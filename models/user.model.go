@@ -15,7 +15,7 @@ type User struct {
 	RoleID      uint   `gorm:"not null"`
 	Role        Role   `gorm:"foreignKey:RoleID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	// Role         uint   `gorm:"default:1;not null"` // 1: normal user, 2: moderator, 3: admin
-	PersonalCode string `gorm:"type:varchar(10);uniqueIndex"`
+	PersonalCode string `gorm:"type:varchar(100);uniqueIndex"`
 	NationalCode string `gorm:"type:varchar(10);uniqueIndex"`
 	// Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`
 	// Photo     *string    `gorm:"not null;default:'default.png'"`

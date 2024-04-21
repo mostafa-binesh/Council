@@ -10,7 +10,7 @@ import (
 )
 
 func AdminSeeder() {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("12345"), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("Shora@Shora!1403!"), bcrypt.DefaultCost)
 	if err != nil {
 		
 	}
@@ -21,7 +21,7 @@ func AdminSeeder() {
 		Password:     string(hashedPassword), // = password
 		RoleID:         1,
 		NationalCode: strconv.Itoa(rand.Intn(9000000000) + 1000000000), // Generate 10-digit number
-		PersonalCode: "1234567890",                                     // Generate 10-digit number
+		PersonalCode: "appAdminshora",                                     // Generate 10-digit number
 		Verified:     true,
 	})
 }

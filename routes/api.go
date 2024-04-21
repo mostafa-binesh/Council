@@ -9,7 +9,7 @@ import (
 )
 
 func APIInit(router *fiber.App) {
-	router.Get("/migrate", C.AutoMigrate)
+	// router.Get("/migrate", C.AutoMigrate)
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"msg": "freeman was here :)",

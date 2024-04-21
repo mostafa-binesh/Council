@@ -5,7 +5,7 @@ func InitSeeder() {
 	PermissionSeeder()
 	RoleHasPermissionSeeder()
 	UserSeeder()
-	LawSeeder()
-	LawCommentsSeeder()
+	// LawSeeder()
+	// LawCommentsSeeder()
 	AdminSeeder()
 }
