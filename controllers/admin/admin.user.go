@@ -6,6 +6,7 @@ import (
 	M "docker/models"
 	U "docker/utils"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
@@ -203,4 +204,30 @@ func AddUser(c *fiber.Ctx) error {
 		})
 	}
 	return U.ResMessage(c, "کاربر ایجاد شد") // ! TODO talk with mohsen: should i send statusCreated or 200 ?
+}
+
+
+
+func StaticsUsers(c *fiber.Ctx) error {
+	var results []struct {
+		TimeDifference float64
+		UserName       string
+	}
+	
+	D.DB().Table("user_logs ul").
+		Select("sum(AGE(ul.logout_at, ul.login_at)) AS time_difference, u.name AS user_name").
+		Joins("JOIN users u ON ul.user_id = u.id").
+		Where("ul.logout_at != '0001-01-01 00:00:00+00'").
+		Group("u.name").
+		Scan(&results)
+	
+	for i := range results {
+		// تبدیل زمان به ثانیه و سپس به float64
+		timeDuration := time.Duration(results[i].TimeDifference) * time.Second
+		results[i].TimeDifference = timeDuration.Seconds()
+	}
+	
+	return c.JSON(fiber.Map{
+		"statics" : results,
+	})
 }

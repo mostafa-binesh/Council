@@ -7,6 +7,7 @@ import (
 	M "docker/models"
 	U "docker/utils"
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -58,6 +59,12 @@ func SignUpUser(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
+	if user, ok := c.Locals("user").(M.User); ok {
+		return c.JSON(fiber.Map{
+			"user":    user.Name,
+			"message": "شما لاگین هستید",
+		})
+	}
 	payload := new(M.SignInInput)
 	// ! parse payload
 	if err := c.BodyParser(payload); err != nil {
@@ -110,18 +117,50 @@ func Login(c *fiber.Ctx) error {
 
 }
 func Logout(c *fiber.Ctx) error {
-	// ! just removing the session
-	sess, err := U.Store.Get(c)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"message": "not authenticated",
+	if user, ok := c.Locals("user").(M.User); ok {
+		sess, err := U.Store.Get(c)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"message": "not authenticated",
+			})
+		}
+
+		// حذف سشن
+		if err := sess.Destroy(); err != nil {
+			panic(err)
+		}
+
+		// دریافت کاربر از لوکال‌ها
+		// user := c.Locals("user").(M.User)
+
+		// بروزرسانی زمان لاگ‌اوت
+		var userLogs M.UserLog
+		D.DB().Where("user_id = ? AND logout_at = '0001-01-01 00:00:00+00'", user.ID).Order("login_at desc").First(&userLogs)
+		userLogs.LogoutAt = time.Now()
+
+		// ثبت تغییرات در دیتابیس
+		result := D.DB().Save(&userLogs)
+		if result.Error != nil {
+			return U.DBError(c, result.Error)
+		}
+
+		// منقضی کردن توکن
+		// if err := U.ExpireToken(user.ID); err != nil {
+		// 	return U.ResErr(c, err.Error())
+		// }
+
+		// پاسخ به موفقیت‌آمیز بودن لاگ‌اوت
+		return c.JSON(fiber.Map{
+			"message" : "logged out successfully",
+		})
+
+	} else {
+		return c.JSON(fiber.Map{
+			"message" : " شما لاگین نیستید که بخواهید لاگ اوت کنید",
 		})
 	}
-	if err := sess.Destroy(); err != nil {
-		panic(err)
-	}
-	return c.SendString("logged out successfully")
 }
+
 
 // refreshToken handles token refreshing by extracting the refresh token from POST parameters
 func RefreshToken(c *fiber.Ctx) error {

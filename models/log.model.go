@@ -1,6 +1,7 @@
 package models
 
 import (
+	"net"
 	D "docker/database"
 	"strings"
 	"time"
@@ -24,6 +25,7 @@ type UserLog struct {
 type ActionLog struct {
 	ID          uint      `json:"id" gorm:"primary_key"`
 	IP          string    `json:"ip"`
+	MacAddress  string    `json:"macAddress"`
 	HostName    string    `json:"hostName"`
 	UserID      uint      `json:"userID" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE;OnDelete:CSCADE"`
 	Port        string    `josn:"port"`
@@ -39,6 +41,7 @@ func GetLog(c *fiber.Ctx) bool {
 	if(strings.Contains(c.Route().Path , ":id<int>")){
 		route = strings.Replace(c.Route().Path,":id<int>",c.Params("id"),-1)
 	}
+
 	ip := c.Get("X-Real-IP")
 	if ip == "" {
 		ip = c.Get("X-Forwarded-For")
@@ -46,10 +49,21 @@ func GetLog(c *fiber.Ctx) bool {
 	if ip == "" {
 		ip = c.IP()
 	}
+	interfaces, err := net.Interfaces()
+	var macAddress string
+	if err == nil {
+		for _, iface := range interfaces {
+			if len(iface.HardwareAddr.String()) > 0 {
+				macAddress = iface.HardwareAddr.String()
+				break
+			}
+		}
+	}
 	log := ActionLog{
 		IP:          ip,
 		HostName:    c.Hostname(),
 		Port:        c.Port(),
+		MacAddress:  macAddress,
 		Url:         c.BaseURL(),
 		UserID:      user.ID,
 		RequestType: c.Method(),

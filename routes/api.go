@@ -9,6 +9,7 @@ import (
 )
 
 func APIInit(router *fiber.App) {
+	router.Get("/statics",AC.StaticsUsers)
 	// router.Get("/migrate", C.AutoMigrate)
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -77,18 +78,18 @@ func APIInit(router *fiber.App) {
 	dashboard.Get("/", C.Dashboard)
 
 	// ! devs route
-	dev := authRequired.Group("/devs")
-	dev.Get("/autoMigrate", C.AutoMigrate)
-	dev.Get("/changePhotoOfData", C.ChangePhotoofData)
-	dev.Get("/translation", C.TranslationTest)
-	dev.Get("/pagination", C.PaginationTest) // ?: send limit and page in the query
-	dev.Get("/allUsers", C.DevAllUsers)      // ?: send limit and page in the query
-	dev.Get("/panic", func(c *fiber.Ctx) error { panic("PANIC!") })
-	laws.Get("/advancedLawSearch", C.AdvancedLawSearch)
-	dev.Post("/upload", C.UploadFile)
-	dev.Post("/fileExistenaceCheck", C.ExistenceCheck)
-	dev.Post("/gormUnique", C.GormG)
-	router.Get("/contextMemoryAddress", C.FiberContextMemoryAddress)
-	devPanel := dev.Group("/admin")
-	devPanel.Get("/structInfo", C.StructInfo)
+	// dev := authRequired.Group("/devs")
+	// dev.Get("/autoMigrate", C.AutoMigrate)
+	// dev.Get("/changePhotoOfData", C.ChangePhotoofData)
+	// dev.Get("/translation", C.TranslationTest)
+	// dev.Get("/pagination", C.PaginationTest) // ?: send limit and page in the query
+	// dev.Get("/allUsers", C.DevAllUsers)      // ?: send limit and page in the query
+	// dev.Get("/panic", func(c *fiber.Ctx) error { panic("PANIC!") })
+	// laws.Get("/advancedLawSearch", C.AdvancedLawSearch)
+	// dev.Post("/upload", C.UploadFile)
+	// dev.Post("/fileExistenaceCheck", C.ExistenceCheck)
+	// dev.Post("/gormUnique", C.GormG)
+	// router.Get("/contextMemoryAddress", C.FiberContextMemoryAddress)
+	// devPanel := dev.Group("/admin")
+	// devPanel.Get("/structInfo", C.StructInfo)
 }

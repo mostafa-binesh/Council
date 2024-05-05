@@ -2,7 +2,7 @@ package controllers
 
 import (
 	D "docker/database"
-	S "docker/database/seeders"
+	// S "docker/database/seeders"
 	M "docker/models"
 	"fmt"
 	"strconv"
@@ -19,36 +19,36 @@ func AutoMigrate(c *fiber.Ctx) error {
 	// if c.Query("dropAllTables") == "1" {
 		fmt.Println("dropping all tables")
 		D.DB().Migrator().DropTable(
-			&M.Comment{},
-			&M.User{},
-			&M.RoleHasPermission{},
-			&M.Role{},
-			&M.Permission{},
-			&M.Keyword{},
-			&M.Law{},
-			&M.File{},
-			&M.GuestMessage{},
-			&M.GuestChat{},
-			&M.LawLog{},
-			&M.UserLog{},
-			&M.ActionLog{},
+			// &M.Comment{},
+			// &M.User{},
+			// &M.RoleHasPermission{},
+			// &M.Role{},
+			// &M.Permission{},
+			// &M.Keyword{},
+			// &M.Law{},
+			// &M.File{},
+			// &M.GuestMessage{},
+			// &M.GuestChat{},
+			// &M.LawLog{},
+			// &M.UserLog{},
+			// &M.ActionLog{},
 		)
 	// }
 	fmt.Println("Tables migration done...")
 	// ! migrate tables
 	err := D.DB().AutoMigrate(
-		&M.Law{},
-		&M.Keyword{},
-		&M.File{},
-		&M.GuestMessage{},
-		&M.GuestChat{},
-		&M.Permission{},
-		&M.Role{},
-		&M.RoleHasPermission{},
-		&M.User{},
-		&M.Comment{},
-		&M.LawLog{},
-		&M.UserLog{},
+		// &M.Law{},
+		// &M.Keyword{},
+		// &M.File{},
+		// &M.GuestMessage{},
+		// &M.GuestChat{},
+		// &M.Permission{},
+		// &M.Role{},
+		// &M.RoleHasPermission{},
+		// &M.User{},
+		// &M.Comment{},
+		// &M.LawLog{},
+		// &M.UserLog{},
 		&M.ActionLog{},
 	)
 	if err != nil {
@@ -68,7 +68,7 @@ func AutoMigrate(c *fiber.Ctx) error {
 	// ! seeders
 	fmt.Printf("seeder gonna run for %d loop", seederRepeatCount)
 	for i := 0; i < int(seederRepeatCount); i++ {
-		S.InitSeeder()
+		// S.InitSeeder()
 	}
 	return c.SendString("migrate completed")
 }
