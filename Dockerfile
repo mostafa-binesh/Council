@@ -1,17 +1,14 @@
-# Dockerfile
-FROM golang:latest
+# Use the official Golang image
+FROM golang:1.21
 
-# WORKDIR /go/src/app
-WORKDIR /app
-COPY go.mod ./
-COPY go.sum ./
+# Set the Working Directory
+WORKDIR /go/src/app
 
-# RUN go get -d -v ./...
-# RUN go install -v ./...
-RUN go mod download
-# COPY . . // copy all files
+# Copy the local code to the container
 COPY . .
-RUN go build -o /docker
-EXPOSE 8070
-CMD [ "/docker" ]
 
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+RUN go mod download
+
+# Command to run the executable
+CMD ["go", "run", "."]

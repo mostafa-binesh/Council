@@ -1,9 +1,10 @@
+version: '3.8'
 services:
   postgres:
     image: postgres
     container_name: postgres
     ports:
-      - 6500:5432
+      - "5500:5432"
     env_file:
       - ./.env
     volumes:
@@ -16,5 +17,14 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ubirockteam@gmail.com
       PGADMIN_DEFAULT_PASSWORD: admin
+  golang:
+    build:
+      context: ./app
+      dockerfile: Dockerfile # Ensure this Dockerfile is located within the ./app directory
+    container_name: go_app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app:/go/src/app
 volumes:
   postgres:
